@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ht-t-k0-aac.xml
+  ================
+  Disposition clavier CLDR (Keyboard 3.0, UTS #35 Part 7) pour l'Alphabet
+  Atomique Créole (AAC).
+
+  Identifiant BCP-47 : ht-t-k0-aac
+    ht        = créole haïtien
+    t-k0-aac  = extension de transformation clavier (« keyboard »), sous-tag
+                court "aac", conformément à la convention CLDR déjà utilisée
+                pour d'autres claviers (ex. fr-CH-t-k0-azerty).
+
+  Principe retenu : PAS de touche morte, PAS de transformation.
+    - š (U+0161), ŏ (U+014F) et ŋ (U+014B) sont des caractères Unicode
+      précomposés (un seul point de code chacun) : aucune recomposition
+      n'est nécessaire, donc aucun élément <transforms> n'est requis.
+    - Clavier matériel (form "us") : accès direct par AltGr (touche altR),
+      sur les positions physiques s / o / n, exactement comme ş/ğ en turc
+      ou š/č/ř en tchèque. Un seul temps de frappe, pas de séquence.
+    - Clavier tactile (formId "touch") : accès par appui long ("long press")
+      sur les touches s, o et n, comme pour ñ en espagnol sur les claviers
+      mobiles standards. Les voyelles accentuées déjà utilisées par
+      l'orthographe créole de 1979 (à, è, ò) sont incluses au même endroit
+      par cohérence, puisqu'un clavier créole réel en aura besoin de toute
+      façon.
+
+  Voir keyboard/README.md dans ce dépôt pour le guide d'utilisation complet
+  (validation, installation par plateforme, tests).
+-->
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="ht-t-k0-aac" conformsTo="45">
+
+  <version number="1.0.0"/>
+
+  <info name="Alfabè Atomik Kreyòl (AAC)"
+        author="Pwojè AAC — aac.ht"
+        layout="QWERTY + AltGr"
+        indicator="AAC"
+        attribution="Baze sou refòm ofisyèl 1979 la ak pwopozisyon memwa AAC la"/>
+
+  <locales>
+    <locale id="ht"/>
+  </locales>
+
+  <keys>
+    <!-- ==================================================================
+         Rangée des chiffres : symboles accessibles avec Majuscule (Shift)
+         ================================================================== -->
+    <key id="grave"       output="`"/>
+    <key id="asciitilde"  output="~"/>
+    <key id="exclam"      output="!"/>
+    <key id="at"          output="@"/>
+    <key id="numbersign"  output="#"/>
+    <key id="dollar"      output="$"/>
+    <key id="percent"     output="%"/>
+    <key id="caret"       output="^"/>
+    <key id="ampersand"   output="&amp;"/>
+    <key id="asterisk"    output="*"/>
+    <key id="parenleft"   output="("/>
+    <key id="parenright"  output=")"/>
+    <key id="minus"       output="-"/>
+    <key id="underscore"  output="_"/>
+    <key id="equal"       output="="/>
+    <key id="plus"        output="+"/>
+
+    <!-- ==================================================================
+         Ponctuasyon estanda (rangée QWERTY, rangée ASDF, rangée ZXCV)
+         ================================================================== -->
+    <key id="bracketleft"  output="["/>
+    <key id="braceleft"    output="{"/>
+    <key id="bracketright" output="]"/>
+    <key id="braceright"   output="}"/>
+    <key id="backslash"    output="\"/>
+    <key id="bar"          output="|"/>
+    <key id="semicolon"    output=";"/>
+    <key id="colon"        output=":"/>
+    <key id="apostrophe"   output="'"/>
+    <key id="quotedbl"     output='"'/>
+    <key id="comma"        output=","/>
+    <key id="less"         output="&lt;"/>
+    <key id="period"       output="."/>
+    <key id="greater"      output="&gt;"/>
+    <key id="slash"        output="/"/>
+    <key id="question"     output="?"/>
+
+    <!-- ==================================================================
+         Twa lèt AAC yo — koripondan pou s/o/n, miniskil ak majiskil
+         ================================================================== -->
+    <key id="s_acc" output="š"/> <!-- U+0161 -->
+    <key id="S_acc" output="Š"/> <!-- U+0160 -->
+    <key id="o_acc" output="ŏ"/> <!-- U+014F -->
+    <key id="O_acc" output="Ŏ"/> <!-- U+014E -->
+    <key id="n_acc" output="ŋ"/> <!-- U+014B -->
+    <key id="N_acc" output="Ŋ"/> <!-- U+014A -->
+
+    <!-- ==================================================================
+         Vwayèl aksante ki deja nan òtograf 1979 la (à, è, ò) — sèlman
+         itilize pou apiye long sou klavye taktil pi ba a. Yo pa touche
+         sou fòm "us" (klavye fizik la pa itilize aksan sikonfleks/grav
+         pou lèt sa yo — se konvansyon deja aksepte a).
+         ================================================================== -->
+    <key id="a_grave" output="à"/>
+    <key id="A_grave" output="À"/>
+    <key id="e_grave" output="è"/>
+    <key id="E_grave" output="È"/>
+    <key id="o_grave" output="ò"/>
+    <key id="O_grave" output="Ò"/>
+
+    <!-- ==================================================================
+         Sirsharj (override) kèk lèt "implied" pou ba yo yon lis apiye
+         long — sa a aplikab pou klavye taktil (form "touch") e pa gen
+         okenn efè sou fòm "us" la (longPressKeyIds senpleman inyore sou
+         yon klavye fizik).
+         ================================================================== -->
+    <key id="s" output="s" longPressKeyIds="s_acc"/>
+    <key id="S" output="S" longPressKeyIds="S_acc"/>
+    <key id="o" output="o" longPressKeyIds="o_grave o_acc" longPressDefaultKeyId="o_acc"/>
+    <key id="O" output="O" longPressKeyIds="O_grave O_acc" longPressDefaultKeyId="O_acc"/>
+    <key id="n" output="n" longPressKeyIds="n_acc"/>
+    <key id="N" output="N" longPressKeyIds="N_acc"/>
+    <key id="a" output="a" longPressKeyIds="a_grave"/>
+    <key id="A" output="A" longPressKeyIds="A_grave"/>
+    <key id="e" output="e" longPressKeyIds="e_grave"/>
+    <key id="E" output="E" longPressKeyIds="E_grave"/>
+
+    <!-- Touches de changement de couche (clavier tactile uniquement) -->
+    <key id="shift_on"  layerId="shift"/>
+    <key id="shift_off" layerId="base"/>
+  </keys>
+
+  <!-- ======================================================================
+       CLAVIER PHYSIQUE — form "us" (ANSI 101/104 touches)
+       8 couches : {aucun, Maj, Verr.Maj, Maj+Verr.Maj} × {sans AltGr, AltGr}
+       ====================================================================== -->
+
+  <layers formId="us">
+
+    <!-- ==== Sans AltGr : lèt estanda, pa gen aksan AAC ==== -->
+
+    <layer modifiers="none">
+      <row keys="grave 1 2 3 4 5 6 7 8 9 0 minus equal"/>
+      <row keys="q w e r t y u i o p bracketleft bracketright backslash"/>
+      <row keys="a s d f g h j k l semicolon apostrophe"/>
+      <row keys="z x c v b n m comma period slash"/>
+    </layer>
+
+    <layer modifiers="shift">
+      <row keys="asciitilde exclam at numbersign dollar percent caret ampersand asterisk parenleft parenright underscore plus"/>
+      <row keys="Q W E R T Y U I O P braceleft braceright bar"/>
+      <row keys="A S D F G H J K L colon quotedbl"/>
+      <row keys="Z X C V B N M less greater question"/>
+    </layer>
+
+    <layer modifiers="caps">
+      <row keys="grave 1 2 3 4 5 6 7 8 9 0 minus equal"/>
+      <row keys="Q W E R T Y U I O P bracketleft bracketright backslash"/>
+      <row keys="A S D F G H J K L semicolon apostrophe"/>
+      <row keys="Z X C V B N M comma period slash"/>
+    </layer>
+
+    <layer modifiers="caps shift">
+      <row keys="asciitilde exclam at numbersign dollar percent caret ampersand asterisk parenleft parenright underscore plus"/>
+      <row keys="q w e r t y u i o p braceleft braceright bar"/>
+      <row keys="a s d f g h j k l colon quotedbl"/>
+      <row keys="z x c v b n m less greater question"/>
+    </layer>
+
+    <!-- ==== Avec AltGr (touche droite Alt) : lèt AAC sou s/o/n ==== -->
+
+    <layer modifiers="altR">
+      <row keys="grave 1 2 3 4 5 6 7 8 9 0 minus equal"/>
+      <row keys="q w e r t y u i o_acc p bracketleft bracketright backslash"/>
+      <row keys="a s_acc d f g h j k l semicolon apostrophe"/>
+      <row keys="z x c v b n_acc m comma period slash"/>
+    </layer>
+
+    <layer modifiers="altR shift">
+      <row keys="asciitilde exclam at numbersign dollar percent caret ampersand asterisk parenleft parenright underscore plus"/>
+      <row keys="Q W E R T Y U I O_acc P braceleft braceright bar"/>
+      <row keys="A S_acc D F G H J K L colon quotedbl"/>
+      <row keys="Z X C V B N_acc M less greater question"/>
+    </layer>
+
+    <layer modifiers="altR caps">
+      <row keys="grave 1 2 3 4 5 6 7 8 9 0 minus equal"/>
+      <row keys="Q W E R T Y U I O_acc P bracketleft bracketright backslash"/>
+      <row keys="A S_acc D F G H J K L semicolon apostrophe"/>
+      <row keys="Z X C V B N_acc M comma period slash"/>
+    </layer>
+
+    <layer modifiers="altR caps shift">
+      <row keys="asciitilde exclam at numbersign dollar percent caret ampersand asterisk parenleft parenright underscore plus"/>
+      <row keys="q w e r t y u i o_acc p braceleft braceright bar"/>
+      <row keys="a s_acc d f g h j k l colon quotedbl"/>
+      <row keys="z x c v b n_acc m less greater question"/>
+    </layer>
+
+  </layers>
+
+  <!-- ======================================================================
+       CLAVIER TACTILE — formId "touch"
+       Sèlman de kouch (base / Maj) ; lèt AAC yo aksesib pa APIYE LONG,
+       pa AltGr (ki pa egziste sou klavye vityèl).
+       ====================================================================== -->
+
+  <layers formId="touch">
+
+    <layer id="base">
+      <row keys="1 2 3 4 5 6 7 8 9 0"/>
+      <row keys="q w e r t y u i o p"/>
+      <row keys="a s d f g h j k l"/>
+      <row keys="shift_on z x c v b n m period"/>
+      <row keys="space"/>
+    </layer>
+
+    <layer id="shift">
+      <row keys="1 2 3 4 5 6 7 8 9 0"/>
+      <row keys="Q W E R T Y U I O P"/>
+      <row keys="A S D F G H J K L"/>
+      <row keys="shift_off Z X C V B N M period"/>
+      <row keys="space"/>
+    </layer>
+
+  </layers>
+
+</keyboard3>
