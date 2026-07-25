@@ -104,14 +104,53 @@ node -e "const {toAcc} = require('./converter/acc_converter.js'); console.log(to
 
 **Démo web**
 
-Ouvrez `web-demo/index.html` dans un navigateur, ou servez le dépôt localement :
+Ouvrez `web-demo/index.html` dans un navigateur, ou servez le dépôt
+localement — utilisez `scripts/serve.py` plutôt que `python3 -m
+http.server` nu : ce dernier liste tout le contenu du dossier dans le
+navigateur (y compris `.git/`, `scripts/`, `.github/`) et écoute sur tout
+le réseau local par défaut. `scripts/serve.py` bloque ces deux points tout
+en servant normalement ce dont la démo a besoin :
 
 ```bash
-python3 -m http.server 8000 -d ./toolkit/v1.0.1/
+python3 scripts/serve.py
 # puis http://localhost:8000/web-demo/
+
+python3 scripts/serve.py 8080 --public  # port différent, accessible depuis le réseau local
 ```
 
+Voir [Sécurisation du serveur local](#sécurisation-du-serveur-local)
+ci-dessous pour le détail de ce qui est bloqué et pourquoi.
+
 Pour l'héberger sur GitHub Pages : Settings → Pages → Source = branche `main`, dossier `/ (root)`, puis partagez le lien vers `web-demo/index.html`.
+
+## Sécurisation du serveur local
+
+`python3 -m http.server` (sans argument) sert **tout** ce qui se trouve
+dans le dossier où vous le lancez, et **liste le contenu de n'importe quel
+dossier** qui n'a pas de `index.html` — y compris, si vous le lancez
+depuis la racine ou un dossier parent, l'historique Git complet
+(`.git/`), les scripts internes (`scripts/`), et les workflows CI
+(`.github/`). Rien de tout ça n'est censé être navigable par un visiteur.
+
+`scripts/serve.py` corrige ça (bibliothèque standard uniquement, aucune
+dépendance) :
+
+| Comportement | `python3 -m http.server` | `scripts/serve.py` |
+|---|---|---|
+| Liste le contenu d'un dossier sans `index.html` | Oui | Non — `403 Forbidden` |
+| Sert `.git/`, `scripts/`, `.github/`, `.githooks/` | Oui | Non — `403 Forbidden`, même en tapant l'URL exacte |
+| Sert `README.md`, `converter/*`, `keyboard/*`, `assets/*` (nécessaires à la démo) | Oui | Oui, normalement |
+| Interfaces réseau écoutées | Toutes (0.0.0.0) | `127.0.0.1` seulement, sauf avec `--public` |
+
+```bash
+python3 scripts/serve.py            # 127.0.0.1:8000, dossiers internes bloqués
+python3 scripts/serve.py 8080       # port différent
+python3 scripts/serve.py --public   # ouvre aussi au réseau local (utile pour tester sur téléphone)
+```
+
+Si vous ajoutez d'autres fichiers ou dossiers internes à ne jamais
+exposer, ajoutez-les à `BLOCKED_PREFIXES` en haut de
+[`scripts/serve.py`](scripts/serve.py).
 
 ## Les règles implémentées
 
