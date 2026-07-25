@@ -1,117 +1,64 @@
-
 # ACC — Alphabet Atomique Créole
 
-> Prototype technique accompagnant le mémoire *« Pour une Rationalisation Atomique de la Graphie Créole Haïtienne — De la Réforme Orthographique de 1979 à l'Alphabet Atomique Créole »*.
->
-> **English:** A working prototype (bidirectional converter + interactive demo) supporting a research proposal to simplify four opaque digraphs of the 1979 official Haitian Creole orthography (`ch`, `ou`, `oun`, `ng`) into three standard Unicode monographs (`š`, `ŏ`, `ŋ`), while deliberately leaving `an`, `en`, `on` untouched. The underlying theory reclassifies the traditional 32-letter alphabet as containing only 24 truly irreducible letters — the rest being regular, predictable combinations.
+Bienvenue sur le dépôt officiel du projet **ACC (Alphabet Atomique Créole)**.
 
-Ce dépôt ne contient pas de théorie supplémentaire : il contient du **code qui vérifie que la théorie fonctionne**. Chaque chiffre cité dans le mémoire (gain de 9,3 % sur le corpus Depestre, 140 → 127 caractères, réduction de l'inventaire alphabétique nominal de 32 à 24 lettres) est reproduit par une suite de tests automatisés, pas seulement affirmé dans un texte.
+Ce dépôt rassemble :
 
-## L'idée en une phrase
+- **Le livre complet** (au format PDF) : *« Pour une Rationalisation Atomique de la Graphie Créole Haïtienne — De la Réforme Orthographique de 1979 à l'Alphabet Atomique Créole »*.
+- **Le toolkit technique** : un convertisseur bidirectionnel, une démo web interactive, une disposition clavier, et des tests automatisés.
 
-L'orthographe créole de 1979 compte traditionnellement 32 « lettres », mais plusieurs d'entre elles (an, en, on, à, è, ò) ne sont pas des lettres irréductibles : ce sont des combinaisons régulières (voyelle + n, ou voyelle + accent). Une fois ce recomptage effectué, il ne reste que 24 lettres véritablement atomiques — et seules quatre séquences (ch, ou, oun, ng) sont de vraies anomalies orthographiques, corrigées ici par trois monogrammes déjà standardisés dans Unicode (š, ŏ, ŋ). Le détail complet de cette démonstration est dans le mémoire ; ce dépôt en est la preuve par le code.
+---
 
-## Pourquoi ce prototype
+## Contenu du dépôt
 
-Un ingénieur qui propose une réforme d'écriture doit, à un moment, cesser d'en parler et la faire tourner. Ce dépôt fait exactement ça :
+| Élément | Description |
+| :--- | :--- |
+| 📄 [`Alphabet Atomique Creole Livre - v1.2.0.pdf`](./Alphabet%20Atomique%20Creole%20Livre%20-%20v1.2.0.pdf) | Le mémoire complet, version livre (6×9 po). |
+| 🧰 [`toolkit/v1.0.1/`](./toolkit/v1.0.1/) | La première version publiée du toolkit ACC (convertisseur, démo, clavier, tests). |
+| 📂 `toolkit/v1.1.0/` (à venir) | Futures versions du toolkit. |
 
-- **Un convertisseur bidirectionnel** (Python + JavaScript, sans dépendance externe) entre l'orthographe officielle de 1979 et l'ACC.
-- **Une suite de tests** qui rejoue l'exemple du chapitre IV du mémoire et échoue si les chiffres cités deviennent faux.
-- **Une démo web interactive** à page unique, déployable telle quelle sur GitHub Pages, sans étape de build. Les deux panneaux (1979 / ACC) sont éditables et se convertissent automatiquement l'un l'autre, dans les deux sens, sans bouton à cliquer.
-- **Une visionneuse de fichiers intégrée** à la démo : README, LICENSE et le code source (Python/JS/tests) se lisent directement sur la page, dans une fenêtre modale avec coloration syntaxique légère, sans quitter le site.
-- **Une disposition clavier complète** (`keyboard/ht-t-k0-aac.xml`, format [CLDR Keyboard 3.0](https://www.unicode.org/reports/tr35/tr35-keyboards.html)) pour taper š, ŏ et ŋ directement au clavier — AltGr sur ordinateur, appui long sur mobile — plus un guide d'installation par plateforme.
+---
 
-## Structure du dépôt
+## À propos du livre
 
-```
-acc-toolkit/
-├── converter/
-│   ├── acc_converter.py       # implémentation de référence (Python)
-│   ├── acc_converter.js       # port JavaScript (même comportement)
-│   └── tests/
-│       └── test_converter.py  # tests de non-régression liés au mémoire
-├── web-demo/
-│   └── index.html             # démo interactive, un seul fichier
-├── keyboard/
-│   ├── ht-t-k0-aac.xml        # disposition clavier CLDR Keyboard 3.0
-│   └── README.md              # guide d'installation par plateforme
-├── docs/
-│   └── grapheme-table.md      # table de correspondance complète
-├── assets/
-│   ├── aac-logo.png           # logo (en-tête du site)
-│   ├── aac-logo-square.png    # favicon
-│   └── aac-og.jpg             # image de partage réseaux sociaux
-├── LICENSE
-└── README.md
-```
+Le livre détaille la théorie derrière l'ACC : un alphabet rationalisé pour le créole haïtien, réduisant l'inventaire de 32 à 24 lettres atomiques. Il contient l'historique, la justification linguistique, le protocole d'implémentation, les résultats chiffrés et des annexes complètes.
 
-## Essayer localement
+➡️ **Accéder au livre :** [`Alphabet Atomique Creole Livre - v1.2.0.pdf`](./Alphabet%20Atomique%20Creole%20Livre%20-%20v1.2.0.pdf)
 
-**Python**
+---
 
-```bash
-python3 converter/acc_converter.py to-acc "Chak moun gen dwa pou yo chèche travay san pwoblèm nan peyi a."
-# -> Šak mŏn gen dwa pŏ yo šèše travay san pwoblèm nan peyi a.
+## À propos du toolkit
 
-python3 -m unittest converter.tests.test_converter -v
-```
+Le toolkit est une implémentation technique de la réforme proposée. Il comprend :
 
-**JavaScript / Node**
+- **Un convertisseur** (Python / JavaScript) entre l'orthographe officielle de 1979 et l'ACC.
+- **Une démo web** interactive (éditeur à deux panneaux, conversion en temps réel).
+- **Une disposition clavier** pour taper `š`, `ŏ` et `ŋ` facilement.
+- **Une suite de tests** qui reproduit les chiffres du mémoire (gain de 9,3 %, réduction à 127 caractères, etc.).
 
-```bash
-node -e "const {toAcc} = require('./converter/acc_converter.js'); console.log(toAcc('Chante pou chase lapli.'))"
-```
+➡️ **Accéder au toolkit :** [`toolkit/v1.0.1/`](./toolkit/v1.0.1/) — consultez son README pour l'installation et l'utilisation.
 
-**Démo web**
+---
 
-Ouvrez `web-demo/index.html` dans un navigateur, ou servez le dépôt localement :
+## Versions du toolkit
 
-```bash
-python3 -m http.server 8000
-# puis http://localhost:8000/web-demo/
-```
+- `v1.0.1` — version initiale (inclut le convertisseur, la démo, le clavier, les tests).
+- Les versions ultérieures seront ajoutées dans des dossiers séparés (`toolkit/v1.1.0/`, etc.).
 
-
-## Les règles implémentées
-
-| Son (API) | 1979    | ACC | Codepoint | Statut        |
-|-----------|---------|-----|-----------|---------------|
-| /ʃ/       | ch      | š   | U+0161    | Remplacé      |
-| /u/, /ũ/  | ou, oun | ŏ   | U+014F    | Remplacé      |
-| /ɲ/       | ng      | ŋ   | U+014B    | Remplacé      |
-| /ã/       | an      | an  | —         | **Inchangé**  |
-| /ɛ̃/       | en      | en  | —         | **Inchangé**  |
-| /õ/       | on      | on  | —         | **Inchangé**  |
-| /ɥi/      | ui      | wi  | —         | Séquence déjà existante |
-
-Détail complet et justification linguistique : [`docs/grapheme-table.md`](docs/grapheme-table.md) et chapitre III du mémoire.
-
-## Limite connue et documentée
-
-La conversion ACC → 1979 n'est **pas parfaitement réversible** pour la séquence `wi` : ce groupe existait déjà dans l'orthographe de 1979 pour des mots qui n'ont jamais été écrits `ui` (l'exemple le plus fréquent est `wi`, « oui »). Le convertisseur inclut une petite liste d'exceptions lexicales (`WI_WORDS_NEVER_FROM_UI`) pour gérer les cas les plus courants, mais une fidélité totale demanderait un lexique complet — c'est justement l'un des livrables prévus en phase 2 de la feuille de route du mémoire (constitution d'un corpus de référence bilingue). Ce n'est pas caché : c'est testé explicitement dans `test_converter.py`.
-
-## Par rapport aux travaux existants
-
-Ce prototype n'invente pas le principe d'un alphabet à monogrammes pour le créole : le linguiste Frantz Gourdet en a publié une version plus ambitieuse en 2022 (*Rechèch Etid Kreyòl*, théorie du linéarisme), qui touche également `an`, `en`, `on`. L'ACC s'en distingue délibérément en laissant ces trois séquences inchangées — voir la section 3.5 du mémoire pour la justification complète de ce choix.
-
-## Documents associés
-
-Ce dépôt est le complément technique d'un ensemble documentaire plus large :
-
-- **Mémoire complet** (format Letter, ~70 pages) — la démonstration scientifique intégrale : histoire de la graphie créole, diagnostic, théorie de l'alphabet atomique, protocole d'implémentation, évaluation d'impact, chapitre dédié au traitement automatique du langage (tokenisation, GPT/Claude), annexes phonologique et Unicode complètes.
-- **Édition livre** (format 6×9 po, page de titre, ISBN en attente de l’obtention au BNH, dépôt légal) — la même démonstration scientifique, mise en forme pour une diffusion en dehors du cadre strictement académique.
-
-Ces documents ne sont pas inclus dans ce dépôt (ce sont des fichiers Word volumineux, peu adaptés à un suivi git) mais définissent l'intégralité du raisonnement dont ce code n'est que la vérification.
+---
 
 ## Licence
 
-Le code de ce dépôt est publié sous licence [MIT](LICENSE). Le texte du mémoire associé suit sa propre licence (voir le document lui-même).
+- **Code** (toolkit) : licence [MIT](./toolkit/v1.0.1/LICENSE).
+- **Livre** : licence propre (voir le PDF).
 
-## Statut du projet
+---
 
-Prototype de recherche indépendant, soumis pour discussion à l'Akademi Kreyòl Ayisyen. Contributions, corrections et signalements d'erreurs linguistiques bienvenus via les *issues* de ce dépôt.
+## Auteur
 
-> 
-> **Auteur** : Harcit Lincoln Compère
-> **email** : lincolncompere@gmail.com
->
+**Harcit Lincoln Compère**  
+[lincolncompere@gmail.com](mailto:lincolncompere@gmail.com)
+
+---
+
+*Ce dépôt est la vitrine d'un projet de recherche indépendant. Contributions et retours bienvenus via les issues GitHub.*
