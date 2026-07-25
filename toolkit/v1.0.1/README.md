@@ -112,11 +112,45 @@ le réseau local par défaut. `scripts/serve.py` bloque ces deux points tout
 en servant normalement ce dont la démo a besoin :
 
 ```bash
+python3 .\toolkit\v1.0.1\scripts\serve.py #q 
 python3 scripts/serve.py
 # puis http://localhost:8000/web-demo/
 
 python3 scripts/serve.py 8080 --public  # port différent, accessible depuis le réseau local
 ```
+
+## Stopper le serveur 
+```bash
+Ctrl+C
+```
+Le script capte cet arrêt proprement (`KeyboardInterrupt`) et affiche `Sèvè a rete`. avant de se terminer.
+
+Si tu as lancé le serveur en arrière-plan (avec `&` à la fin de la commande, ou dans un autre terminal que tu as fermé sans faire Ctrl+C), le port reste occupé. Deux façons de le retrouver et l'arrêter :
+
+**1) Par le port (le plus fiable — remplace 8000 par ton port) :**
+
+```bash
+lsof -ti :8000 | xargs kill
+```
+
+**2) Par le nom du processus :**
+
+```bash
+pkill -f "scripts/serve.py"
+```
+
+Pour vérifier qu'il ne tourne vraiment plus :
+```bash
+lsof -i :8000
+```
+Si cette commande n'affiche rien, le port est libre.
+
+Si jamais `kill` seul ne suffit pas (rare, processus bloqué), ajoute `-9` pour forcer :
+
+```bash
+lsof -ti :8000 | xargs kill -9
+```
+
 
 Voir [Sécurisation du serveur local](#sécurisation-du-serveur-local)
 ci-dessous pour le détail de ce qui est bloqué et pourquoi.
@@ -178,9 +212,7 @@ Ce prototype n'invente pas le principe d'un alphabet à monogrammes pour le cré
 
 Ce dépôt est le complément technique d'un ensemble documentaire plus large :
 
-- **Mémoire complet** (format Letter, ~70 pages) — la démonstration scientifique intégrale : histoire de la graphie créole, diagnostic, théorie de l'alphabet atomique, protocole d'implémentation, évaluation d'impact, chapitre dédié au traitement automatique du langage (tokenisation, GPT/Claude), annexes phonologique et Unicode complètes.
 - **Édition livre** (format 6×9 po, page de titre, ISBN à obtenir, dépôt légal) — la même démonstration scientifique, mise en forme pour une diffusion en dehors du cadre strictement académique.
-- **Document de préparation à la soutenance** — 36 questions-réponses anticipant les objections d'un jury ou de l'Académie, y compris les questions les plus inconfortables.
 
 Ces documents ne sont pas inclus dans ce dépôt (ce sont des fichiers Word volumineux, peu adaptés à un suivi git) mais définissent l'intégralité du raisonnement dont ce code n'est que la vérification.
 
