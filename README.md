@@ -71,7 +71,6 @@ python3 -m http.server 8000
 # puis http://localhost:8000/web-demo/
 ```
 
-Pour l'héberger sur GitHub Pages : Settings → Pages → Source = branche `main`, dossier `/ (root)`, puis partagez le lien vers `web-demo/index.html`.
 
 ## Les règles implémentées
 
@@ -100,8 +99,7 @@ Ce prototype n'invente pas le principe d'un alphabet à monogrammes pour le cré
 Ce dépôt est le complément technique d'un ensemble documentaire plus large :
 
 - **Mémoire complet** (format Letter, ~70 pages) — la démonstration scientifique intégrale : histoire de la graphie créole, diagnostic, théorie de l'alphabet atomique, protocole d'implémentation, évaluation d'impact, chapitre dédié au traitement automatique du langage (tokenisation, GPT/Claude), annexes phonologique et Unicode complètes.
-- **Édition livre** (format 6×9 po, page de titre, ISBN à obtenir, dépôt légal) — la même démonstration scientifique, mise en forme pour une diffusion en dehors du cadre strictement académique.
-- **Document de préparation à la soutenance** — 36 questions-réponses anticipant les objections d'un jury ou de l'Académie, y compris les questions les plus inconfortables.
+- **Édition livre** (format 6×9 po, page de titre, ISBN en attente de l’obtention au BNH, dépôt légal) — la même démonstration scientifique, mise en forme pour une diffusion en dehors du cadre strictement académique.
 
 Ces documents ne sont pas inclus dans ce dépôt (ce sont des fichiers Word volumineux, peu adaptés à un suivi git) mais définissent l'intégralité du raisonnement dont ce code n'est que la vérification.
 
