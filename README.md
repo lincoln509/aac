@@ -1,4 +1,3 @@
-
 # ACC — Alphabet Atomique Créole
 
 > Prototype technique accompagnant le mémoire *« Pour une Rationalisation Atomique de la Graphie Créole Haïtienne — De la Réforme Orthographique de 1979 à l'Alphabet Atomique Créole »*.
@@ -100,8 +99,10 @@ Ce prototype n'invente pas le principe d'un alphabet à monogrammes pour le cré
 Ce dépôt est le complément technique d'un ensemble documentaire plus large :
 
 - **Mémoire complet** (format Letter, ~70 pages) — la démonstration scientifique intégrale : histoire de la graphie créole, diagnostic, théorie de l'alphabet atomique, protocole d'implémentation, évaluation d'impact, chapitre dédié au traitement automatique du langage (tokenisation, GPT/Claude), annexes phonologique et Unicode complètes.
-- **Édition livre** (format 6×9 po, page de titre, ISBN à obtenir, dépôt légal) — la même démonstration scientifique, mise en forme pour une diffusion en dehors du cadre strictement académique.
-- **Document de préparation à la soutenance** — 36 questions-réponses anticipant les objections d'un jury ou de l'Académie, y compris les questions les plus inconfortables.
+- **Édition livre** (format 6×9 po, page de titre, ISBN en attente de l’obtention au BNH, dépôt légal) — la même
+  démonstration scientifique, mise en forme pour une diffusion en dehors du cadre strictement académique.
+
+[//]: # (- **Document de préparation à la soutenance** — 36 questions-réponses anticipant les objections d'un jury ou de l'Académie, y compris les questions les plus inconfortables.)
 
 Ces documents ne sont pas inclus dans ce dépôt (ce sont des fichiers Word volumineux, peu adaptés à un suivi git) mais définissent l'intégralité du raisonnement dont ce code n'est que la vérification.
 
@@ -113,7 +114,7 @@ Le code de ce dépôt est publié sous licence [MIT](LICENSE). Le texte du mémo
 
 Prototype de recherche indépendant, soumis pour discussion à l'Akademi Kreyòl Ayisyen. Contributions, corrections et signalements d'erreurs linguistiques bienvenus via les *issues* de ce dépôt.
 
-> 
+---
 > **Auteur** : Harcit Lincoln Compère
 > **email** : lincolncompere@gmail.com
 >
