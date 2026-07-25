@@ -56,7 +56,7 @@ Le toolkit est une implémentation technique de la réforme proposée. Il compre
 
 ## Auteur
 
-**Harcit Lincoln Compère**  
+**Harcot Lincoln Compère**  
 [lincolncompere@gmail.com](mailto:lincolncompere@gmail.com)
 
 ---

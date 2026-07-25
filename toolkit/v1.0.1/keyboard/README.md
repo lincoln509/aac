@@ -218,4 +218,3 @@ Le fichier est conçu pour rester lisible et modifiable directement :
 - Dépôt source CLDR (DTD, exemples officiels) : [github.com/unicode-org/cldr](https://github.com/unicode-org/cldr/tree/main/keyboards)
 - Outil de compilation/distribution recommandé : [keyman.com](https://keyman.com)
 - Table de correspondance complète des graphèmes AAC : [`../docs/grapheme-table.md`](../docs/grapheme-table.md)
-

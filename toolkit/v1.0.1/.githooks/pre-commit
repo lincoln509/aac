@@ -1,0 +1,33 @@
+#!/bin/sh
+# .githooks/pre-commit
+#
+# Relance automatiquement scripts/sync_snapshots.py avant chaque commit.
+# Si des fichiers surveillés (README.md, LICENSE, converter/*, keyboard/*)
+# ont changé, cet instantané intégré dans web-demo/index.html est remis à
+# jour et ajouté au commit en cours — vous n'avez plus jamais à y penser.
+#
+# Installation (une seule fois par clone) :
+#   git config core.hooksPath .githooks
+#
+# Pour désactiver temporairement (déconseillé) :
+#   git config --unset core.hooksPath
+
+set -e
+
+ROOT_DIR="$(git rev-parse --show-toplevel)"
+cd "$ROOT_DIR"
+
+if ! command -v python3 >/dev/null 2>&1; then
+    echo "pre-commit: python3 introuvable, synchronisation des instantanés ignorée." >&2
+    exit 0
+fi
+
+python3 scripts/sync_snapshots.py
+
+# Si le script a modifié web-demo/index.html, on l'ajoute au commit en cours
+if ! git diff --quiet -- web-demo/index.html; then
+    git add web-demo/index.html
+    echo "pre-commit: web-demo/index.html mis à jour et ajouté au commit."
+fi
+
+exit 0

@@ -40,8 +40,49 @@ acc-toolkit/
 │   ├── aac-logo.png           # logo (en-tête du site)
 │   ├── aac-logo-square.png    # favicon
 │   └── aac-og.jpg             # image de partage réseaux sociaux
+├── scripts/
+│   └── sync_snapshots.py      # resynchronise l'instantané hors-ligne du site
+├── .githooks/
+│   ├── pre-commit              # relance sync_snapshots.py à chaque commit
+│   └── README.md               # comment l'activer
+├── .github/workflows/
+│   └── sync-snapshots.yml      # même vérification, filet de sécurité côté GitHub
 ├── LICENSE
 └── README.md
+```
+
+## Maintenance : garder la démo synchronisée avec ce dépôt
+
+La visionneuse de fichiers intégrée à `web-demo/index.html` lit README.md,
+LICENSE, le code et les fichiers clavier **en direct** (`fetch`) quand le
+site est servi par un serveur web (GitHub Pages, `python3 -m http.server`,
+etc.) — dans ce cas, toute modification de ces fichiers apparaît dès le
+prochain rechargement de page, sans rien d'autre à faire.
+
+Quand le site est ouvert directement depuis le disque (double-clic,
+`file://`), les navigateurs interdisent `fetch()` vers d'autres fichiers
+locaux : la visionneuse retombe alors sur un **instantané intégré**
+directement dans `index.html` (encodé en base64), pour que la démo reste
+utilisable hors-ligne. Cet instantané ne se met pas à jour tout seul —
+c'est le rôle de [`scripts/sync_snapshots.py`](scripts/sync_snapshots.py).
+
+**Automatique** : activez le hook une seule fois par clone —
+
+```bash
+git config core.hooksPath .githooks
+```
+
+— et chaque `git commit` resynchronise l'instantané si besoin, sans y
+penser. Un filet de sécurité équivalent tourne aussi côté GitHub Actions
+([`.github/workflows/sync-snapshots.yml`](.github/workflows/sync-snapshots.yml))
+pour les modifications faites sans le hook local (éditeur web GitHub, par
+exemple).
+
+**Manuel**, si besoin :
+
+```bash
+python3 scripts/sync_snapshots.py          # met à jour
+python3 scripts/sync_snapshots.py --check  # vérifie seulement (utile en CI)
 ```
 
 ## Essayer localement
@@ -66,7 +107,7 @@ node -e "const {toAcc} = require('./converter/acc_converter.js'); console.log(to
 Ouvrez `web-demo/index.html` dans un navigateur, ou servez le dépôt localement :
 
 ```bash
-python3 -m http.server 8000
+python3 -m http.server 8000 -d ./toolkit/v1.0.1/
 # puis http://localhost:8000/web-demo/
 ```
 
@@ -99,10 +140,8 @@ Ce prototype n'invente pas le principe d'un alphabet à monogrammes pour le cré
 Ce dépôt est le complément technique d'un ensemble documentaire plus large :
 
 - **Mémoire complet** (format Letter, ~70 pages) — la démonstration scientifique intégrale : histoire de la graphie créole, diagnostic, théorie de l'alphabet atomique, protocole d'implémentation, évaluation d'impact, chapitre dédié au traitement automatique du langage (tokenisation, GPT/Claude), annexes phonologique et Unicode complètes.
-- **Édition livre** (format 6×9 po, page de titre, ISBN en attente de l’obtention au BNH, dépôt légal) — la même
-  démonstration scientifique, mise en forme pour une diffusion en dehors du cadre strictement académique.
-
-[//]: # (- **Document de préparation à la soutenance** — 36 questions-réponses anticipant les objections d'un jury ou de l'Académie, y compris les questions les plus inconfortables.)
+- **Édition livre** (format 6×9 po, page de titre, ISBN à obtenir, dépôt légal) — la même démonstration scientifique, mise en forme pour une diffusion en dehors du cadre strictement académique.
+- **Document de préparation à la soutenance** — 36 questions-réponses anticipant les objections d'un jury ou de l'Académie, y compris les questions les plus inconfortables.
 
 Ces documents ne sont pas inclus dans ce dépôt (ce sont des fichiers Word volumineux, peu adaptés à un suivi git) mais définissent l'intégralité du raisonnement dont ce code n'est que la vérification.
 
@@ -113,12 +152,3 @@ Le code de ce dépôt est publié sous licence [MIT](LICENSE). Le texte du mémo
 ## Statut du projet
 
 Prototype de recherche indépendant, soumis pour discussion à l'Akademi Kreyòl Ayisyen. Contributions, corrections et signalements d'erreurs linguistiques bienvenus via les *issues* de ce dépôt.
-
-
-## Auteur
-
-**Harcot Lincoln Compère**  
-[lincolncompere@gmail.com](mailto:lincolncompere@gmail.com)
-
----
-*Ce dépôt est la vitrine d'un projet de recherche indépendant. Contributions et retours bienvenus via les issues GitHub.*
