@@ -1,0 +1,853 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Konvèti dokiman — AAC</title>
+<meta name="description" content="Konvèti yon dokiman Word oswa PDF antye an AAC, ak yon rapò estatistik konpare (mwayèn, entèval konfyans, tès t) olye d'yon sèl chif ponktyèl.">
+
+<link rel="icon" type="image/png" href="../assets/aac-logo-square.png">
+<link rel="apple-touch-icon" href="../assets/aac-logo-square.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!--
+  Depandans eksteren (CDN) — sèl paj sa a nan tout sit la ki bezwen yo.
+  index.html rete san depandans (fichye .docx/.pdf pa gen fason pou'w li/ekri
+  yo san yon lib) :
+    - JSZip   : li/ekri achiv .docx (yon .docx se yon .zip)
+    - pdf.js  : ekstrè tèks nan yon .pdf, paragraf pa paragraf
+  Si youn nan CDN yo bloke (rezo lokal, entranèt), paj sa a p ap mache men
+  tout rès sit la (index.html) kontinye fonksyone nòmalman.
+-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+<style>
+  :root{
+    --bg: #F6F3EC;
+    --paper: #FCFAF5;
+    --ink: #1C1A17;
+    --ink-soft: #565049;
+    --primary: #1F3864;
+    --primary-soft: #2c4c85;
+    --accent: #8A6D3B;
+    --old: #A5342C;
+    --old-bg: #F6DAD6;
+    --new: #2F6F62;
+    --new-bg: #DCEBE6;
+    --warn: #8A6D3B;
+    --warn-bg: #F1E6D2;
+    --rule: #DED6C4;
+    --display: 'Fraunces', serif;
+    --body: 'Source Serif 4', serif;
+    --mono: 'IBM Plex Mono', monospace;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--body); font-size:17px; line-height:1.6;}
+  .wrap{max-width:960px; margin:0 auto; padding:0 28px;}
+  .topbar{display:flex; align-items:center; justify-content:space-between; padding:22px 0; border-bottom:1px solid var(--rule);}
+  .brand{display:flex; align-items:center; gap:12px; text-decoration:none; color:var(--primary);}
+  .brand img{height:38px; width:auto; display:block;}
+  .brand-word{font-family:var(--mono); font-size:13px; letter-spacing:.1em; color:var(--ink-soft);}
+  .toplinks{display:flex; gap:20px; font-family:var(--mono); font-size:12.5px;}
+  .toplinks a{color:var(--ink-soft); text-decoration:none;}
+  .toplinks a:hover, .toplinks a.active{color:var(--primary);}
+
+  header.hero{padding:56px 0 44px; border-bottom:1px solid var(--rule);}
+  .eyebrow{
+    font-family:var(--mono); font-size:12.5px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--accent); margin:0 0 22px; display:flex; align-items:center; gap:10px;
+  }
+  .eyebrow::before{content:""; width:22px; height:1px; background:var(--accent); display:inline-block;}
+  h1{
+    font-family:var(--display); font-optical-sizing:auto; font-weight:600;
+    font-size:clamp(2rem, 4.4vw, 3rem); line-height:1.1; margin:0 0 18px; color:var(--primary); letter-spacing:-.01em;
+  }
+  .lede{font-size:1.1rem; color:var(--ink-soft); max-width:62ch; margin:0;}
+  .lede a{color:var(--primary);}
+
+  section{padding:48px 0; border-bottom:1px solid var(--rule);}
+  h2{font-family:var(--display); font-weight:600; font-size:1.5rem; color:var(--primary); margin:0 0 8px;}
+  .section-note{color:var(--ink-soft); font-size:.98rem; margin:0 0 28px; max-width:62ch;}
+
+  .dropzone{
+    background:var(--paper); border:2px dashed var(--rule); border-radius:6px; padding:44px 24px;
+    text-align:center; cursor:pointer; transition:border-color .2s ease, background .2s ease;
+  }
+  .dropzone.drag{border-color:var(--primary); background:var(--new-bg);}
+  .dropzone .dz-title{font-family:var(--display); font-size:1.2rem; color:var(--primary); margin:0 0 6px;}
+  .dropzone .dz-sub{color:var(--ink-soft); font-size:.92rem; margin:0;}
+  .dropzone input{display:none;}
+  .dz-btn{
+    display:inline-block; margin-top:16px; font-family:var(--mono); font-size:12.5px; letter-spacing:.04em;
+    background:var(--primary); color:var(--paper); border:none; border-radius:20px; padding:10px 20px; cursor:pointer;
+  }
+  .dz-btn:hover{background:var(--primary-soft);}
+
+  .status-line{
+    display:flex; align-items:center; gap:10px; margin-top:18px; font-family:var(--mono); font-size:12.5px;
+    color:var(--ink-soft);
+  }
+  .spinner{
+    width:14px; height:14px; border-radius:50%; border:2px solid var(--rule); border-top-color:var(--primary);
+    animation:spin .8s linear infinite; display:none;
+  }
+  .spinner.on{display:inline-block;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .warn-box{
+    background:var(--warn-bg); border:1px solid #E4D3AE; border-radius:4px; padding:14px 18px;
+    font-size:.92rem; color:#5b4a26; margin-top:16px; display:none;
+  }
+  .warn-box.on{display:block;}
+  .warn-box ul{margin:6px 0 0; padding-left:1.2em;}
+
+  .results{display:none; margin-top:36px;}
+  .results.on{display:block;}
+
+  .stat-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(160px,1fr)); gap:1px; background:var(--rule); border:1px solid var(--rule); border-radius:4px; overflow:hidden; margin-bottom:24px;}
+  .stat-card{background:var(--paper); padding:16px 18px;}
+  .stat-card .lbl{font-family:var(--mono); font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:6px;}
+  .stat-card .val{font-family:var(--display); font-size:1.5rem; color:var(--primary); font-weight:600;}
+  .stat-card .val.new{color:var(--new);}
+  .stat-card .sub{font-family:var(--mono); font-size:11px; color:var(--ink-soft); margin-top:4px;}
+
+  .info-box{
+    background:var(--paper); border:1px solid var(--rule); border-radius:4px; padding:18px 22px;
+    font-size:.95rem; margin-bottom:24px;
+  }
+  .info-box summary{cursor:pointer; font-family:var(--mono); font-size:12px; letter-spacing:.04em; color:var(--primary); text-transform:uppercase;}
+  .info-box .term{margin-top:14px;}
+  .info-box .term b{color:var(--primary);}
+
+  table{width:100%; border-collapse:collapse; font-size:.92rem; margin-bottom:24px;}
+  th, td{text-align:left; padding:9px 12px; border-bottom:1px solid var(--rule);}
+  th{font-family:var(--mono); font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft); font-weight:500;}
+  td.mono{font-family:var(--mono); font-size:.88rem;}
+  tr:last-child td{border-bottom:none;}
+  .verdict{font-weight:600;}
+  .verdict.sig{color:var(--new);}
+  .verdict.nonsig{color:var(--old);}
+
+  .downloads{display:flex; gap:12px; flex-wrap:wrap; margin-top:8px;}
+  .dl-btn{
+    font-family:var(--mono); font-size:12.5px; letter-spacing:.03em; color:var(--paper); background:var(--new);
+    border:none; border-radius:20px; padding:10px 18px; cursor:pointer; text-decoration:none; display:inline-block;
+  }
+  .dl-btn:hover{background:#255950;}
+  .dl-btn.secondary{background:var(--primary);}
+  .dl-btn.secondary:hover{background:var(--primary-soft);}
+
+  .preview-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:24px;}
+  .preview-block{background:var(--paper); border:1px solid var(--rule); border-radius:4px; padding:14px 16px; font-family:var(--mono); font-size:13px; line-height:1.6; max-height:220px; overflow:auto;}
+  .preview-block .lbl{font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-soft); margin-bottom:8px;}
+  @media (max-width:640px){.preview-grid{grid-template-columns:1fr;}}
+
+  footer{padding:40px 0 72px; color:var(--ink-soft); font-size:.9rem;}
+  footer a{color:var(--primary);}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="topbar">
+    <a class="brand" href="index.html">
+      <img src="../assets/aac-logo.png" alt="Logo AAC">
+      <span class="brand-word">aac.ht</span>
+    </a>
+    <nav class="toplinks">
+      <a href="index.html">Konvètisè</a>
+      <a href="documents.html" class="active">Dokiman</a>
+    </nav>
+  </div>
+
+  <header class="hero">
+    <p class="eyebrow">Dokiman antye · Word ak PDF</p>
+    <h1>Konvèti yon dokiman antye, ak chif ki gen valè.</h1>
+    <p class="lede">Chaje yon fichye <code>.docx</code> oswa <code>.pdf</code> ekri an kreyòl 1979. Li konvèti an AAC — fòma orijinal la (gra, italik, tablo pou .docx) rete menm jan an — epi li kalkile yon rapò estatistik reyèl sou tout dokiman an: mwayèn, ekar-tip, entèval konfyans, tès t, olye d'yon sèl chif tankou 9,3 % chapit IV memwa a.</p>
+  </header>
+
+  <section id="upload">
+    <h2>1. Chaje dokiman an</h2>
+    <p class="section-note">Konvèsyon an fèt antyèman nan navigatè a (JavaScript) — fichye w la pa janm voye sou okenn sèvè.</p>
+
+    <div class="dropzone" id="dropzone">
+      <p class="dz-title">Depoze fichye a isit, oswa</p>
+      <p class="dz-sub"><code>.docx</code> oswa <code>.pdf</code> — plizyè fichye posib, pou plis segman ak yon estimasyon pi solid</p>
+      <button class="dz-btn" type="button" id="pickBtn">Chwazi fichye</button>
+      <input type="file" id="fileInput" accept=".docx,.pdf" multiple>
+    </div>
+
+    <div class="granularity-row" style="margin-top:16px; display:flex; align-items:center; gap:18px; font-family:var(--mono); font-size:12.5px; color:var(--ink-soft);">
+      <span>Inite obsèvasyon:</span>
+      <label><input type="radio" name="granularity" value="paragraph" checked> paragraf</label>
+      <label><input type="radio" name="granularity" value="sentence"> fraz (plis segman)</label>
+    </div>
+
+    <div class="file-list" id="fileList" style="margin-top:14px; font-family:var(--mono); font-size:12.5px; color:var(--ink-soft);"></div>
+
+    <div class="status-line" id="statusLine" style="display:none;">
+      <span class="spinner" id="spinner"></span>
+      <span id="statusText"></span>
+    </div>
+
+    <div class="warn-box" id="warnBox">
+      <strong>Remak</strong>
+      <ul id="warnList"></ul>
+    </div>
+  </section>
+
+  <section id="results-section" style="display:none;" id="resultsSection">
+    <h2>2. Rapò</h2>
+    <p class="section-note">Chak paragraf (oswa fraz) chak dokiman se yon obsèvasyon. Plis dokiman ak plis segman ou bay, plis entèval konfyans lan vin jis.</p>
+
+    <div class="results" id="results">
+
+      <div class="stat-grid" id="statGrid"></div>
+
+      <details class="info-box" open>
+        <summary>Kisa "lwa Student" ak "bootstrap" vle di?</summary>
+        <div class="term">
+          <b>Lwa Student (entèval konfyans "Student")</b> — Lè'w kalkile yon mwayèn sou yon ti kantite echantiyon (isit: yon ti kantite paragraf), mwayèn sa a p ap janm egzakteman koresponn ak "vrè" mwayèn nan si'w te gen dokiman an antye pou'w analize. Lwa Student bay yon fouchèt otou mwayèn nan ("entèval konfyans 95 %") kote vrè valè a gen 95 chans sou 100 pou l ye, si w ta refè menm mezi a plizyè fwa. Se yon zouti estatistik ki fèt espesyalman pou ti echantiyon (kontrèman ak lwa nòmal la, ki mande plis obsèvasyon pou l fyab).
+        </div>
+        <div class="term">
+          <b>Bootstrap</b> — Yon dezyèm fason, diferan, pou kalkile yon fouchèt ensètitid, san pran pou akize okenn fòm patikilye (pa gen ipotèz "lwa Student" oswa "lwa nòmal"). Prensip la: repwodwi dokiman an, o aza epi ak ranplasman, dè milye fwa (isit: 10 000 fwa), epi gade jan mwayèn nan varye chak fwa. Si de metòd yo (Student ak bootstrap) bay yon fouchèt sanble, se yon bon siy — sa vle di rezilta a solid, pa yon aksidan lekilib mo.
+        </div>
+        <div class="term">
+          <b>Tès pèmitasyon (Monte Carlo)</b> — Yon twazyèm verifikasyon, ki pa sipoze okenn fòm distribisyon menm. Li mande: "si pa te gen okenn efè reyèl, e chak segman te ka ogmante oswa diminye o aza, ki chans pou'w jwenn yon rezilta konsa?" Avèk yon ti kantite segman, kalkil sa a limite (pa egzanp ak 4 segman, li pa ka janm bay yon rezilta ki pi ba pase 6,25 %) — yon lòt rezon konkrè pou plis done.
+        </div>
+        <div class="term">
+          <b>Analiz pisans (power analysis)</b> — Konbyen segman ki ta nesesè pou detekte efè sa a 80 fwa sou 100, si'l egziste vre? Kalkile pa simulasyon, an repwodwi done ou genyen deja plizyè fwa.
+        </div>
+      </details>
+
+      <table id="segmentTable">
+        <thead><tr><th>Segman</th><th>Anvan</th><th>Apre</th><th>Gen (%)</th></tr></thead>
+        <tbody id="segmentTableBody"></tbody>
+      </table>
+
+      <table id="ruleTable">
+        <thead><tr><th>Règ</th><th>Okirans</th><th>Karaktè ekonomize / okirans</th></tr></thead>
+        <tbody id="ruleTableBody"></tbody>
+      </table>
+
+      <p id="verdictText" style="font-size:.98rem;"></p>
+      <p id="extraStatsText" style="font-size:.98rem; color:var(--ink-soft);"></p>
+      <p id="powerText" style="font-size:.9rem; color:var(--ink-soft);"></p>
+
+      <div class="preview-grid" id="previewGrid"></div>
+
+      <h2 style="font-size:1.2rem; margin-top:8px;">3. Telechaje</h2>
+      <div class="downloads" id="downloads"></div>
+    </div>
+  </section>
+
+  <footer>
+    <p><a href="index.html">← Retounen nan konvètisè senp la</a></p>
+    <p>
+      Fidelite <code>.docx → .docx</code> total (menm gra, italik, tablo). Pou <code>.pdf</code>, sèl tèks la garanti fidèl —
+      mizanpaj rekonstwi a pa yon kopi vizyèl egzat. Pou yon konvèsyon PDF→PDF ki respekte mizanpaj la pi byen (ak yon polis
+      Unicode entegre), sèvi ak <code>converter/document_converter.py</code> nan repo a, ki gen menm estatistik yo.
+    </p>
+  </footer>
+</div>
+
+<script>
+/* =====================================================================
+   1) document_stats — mwayèn, ekar-tip, IC Student, bootstrap, tès t,
+      d Cohen. Menm fòmil yo egzakteman ak converter/document_stats.py,
+      validé kont scipy.stats.t avan pòte yo an JS.
+   ===================================================================== */
+
+function betacf(a, b, x, maxit = 200, eps = 3e-12, fpmin = 1e-300) {
+  const qab = a + b, qap = a + 1.0, qam = a - 1.0;
+  let c = 1.0;
+  let d = 1.0 - (qab * x) / qap;
+  if (Math.abs(d) < fpmin) d = fpmin;
+  d = 1.0 / d;
+  let h = d;
+  for (let m = 1; m <= maxit; m++) {
+    const m2 = 2 * m;
+    let aa = (m * (b - m) * x) / ((qam + m2) * (a + m2));
+    d = 1.0 + aa * d; if (Math.abs(d) < fpmin) d = fpmin;
+    c = 1.0 + aa / c; if (Math.abs(c) < fpmin) c = fpmin;
+    d = 1.0 / d; h *= d * c;
+    aa = (-(a + m) * (qab + m) * x) / ((a + m2) * (qap + m2));
+    d = 1.0 + aa * d; if (Math.abs(d) < fpmin) d = fpmin;
+    c = 1.0 + aa / c; if (Math.abs(c) < fpmin) c = fpmin;
+    d = 1.0 / d; const de = d * c; h *= de;
+    if (Math.abs(de - 1.0) < eps) break;
+  }
+  return h;
+}
+function lgamma(x) {
+  const g = 7;
+  const c = [0.99999999999980993, 676.5203681218851, -1259.1392167224028,
+    771.32342877765313, -176.61502916214059, 12.507343278686905,
+    -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
+  if (x < 0.5) return Math.log(Math.PI / Math.sin(Math.PI * x)) - lgamma(1 - x);
+  x -= 1;
+  let a = c[0];
+  const t = x + g + 0.5;
+  for (let i = 1; i < g + 2; i++) a += c[i] / (x + i);
+  return 0.5 * Math.log(2 * Math.PI) + (x + 0.5) * Math.log(t) - t + Math.log(a);
+}
+function betai(a, b, x) {
+  if (x <= 0) return 0.0;
+  if (x >= 1) return 1.0;
+  const bt = Math.exp(lgamma(a + b) - lgamma(a) - lgamma(b) + a * Math.log(x) + b * Math.log(1.0 - x));
+  return x < (a + 1.0) / (a + b + 2.0) ? (bt * betacf(a, b, x)) / a : 1.0 - (bt * betacf(b, a, 1.0 - x)) / b;
+}
+function tCDF(t, df) {
+  const x = df / (df + t * t);
+  const ib = betai(df / 2.0, 0.5, x);
+  return t >= 0 ? 1.0 - 0.5 * ib : 0.5 * ib;
+}
+function tInvCDF(p, df) {
+  let lo = -100.0, hi = 100.0;
+  for (let i = 0; i < 200; i++) {
+    const mid = (lo + hi) / 2;
+    if (tCDF(mid, df) < p) lo = mid; else hi = mid;
+    if (hi - lo < 1e-9) break;
+  }
+  return (lo + hi) / 2;
+}
+function mulberry32(seed) {
+  return function () {
+    seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function mean(arr) { return arr.reduce((a, b) => a + b, 0) / arr.length; }
+function sampleStdev(arr) {
+  if (arr.length < 2) return NaN;
+  const m = mean(arr);
+  return Math.sqrt(arr.reduce((a, b) => a + (b - m) ** 2, 0) / (arr.length - 1));
+}
+
+const ACC_RULES = [
+  ["Ch", "Š"], ["CH", "Š"], ["ch", "š"],
+  ["Ou", "Ŏ"], ["OU", "Ŏ"], ["ou", "ŏ"],
+  ["Ng", "Ŋ"], ["NG", "Ŋ"], ["ng", "ŋ"],
+  ["Ui", "Wi"], ["UI", "WI"], ["ui", "wi"],
+];
+function toAcc(text) {
+  let result = text;
+  for (const [pattern, repl] of ACC_RULES) result = result.split(pattern).join(repl);
+  return result;
+}
+function diffSummary(text) {
+  const count = (re) => (text.match(re) || []).length;
+  return { ch: count(/[Cc][Hh]/g), ou: count(/[Oo][Uu]/g), ng: count(/[Nn][Gg]/g), ui: count(/[Uu][Ii]/g) };
+}
+
+function buildDocumentReport(segments, { confidenceLevel = 0.95, bootstrapResamples = 10000, bootstrapSeed = 42 } = {}) {
+  const rows = segments
+    .filter((s) => s.original.trim())
+    .map((s) => {
+      const converted = toAcc(s.original);
+      return { label: s.label, original: s.original, converted, before: s.original.length, after: converted.length };
+    });
+
+  const n = rows.length;
+  const before = rows.map((r) => r.before);
+  const after = rows.map((r) => r.after);
+  const gains = rows.map((r) => (r.before === 0 ? 0 : ((r.before - r.after) / r.before) * 100));
+
+  const charsBeforeTotal = before.reduce((a, b) => a + b, 0);
+  const charsAfterTotal = after.reduce((a, b) => a + b, 0);
+  const gainGlobal = charsBeforeTotal === 0 ? 0 : ((charsBeforeTotal - charsAfterTotal) / charsBeforeTotal) * 100;
+
+  const meanGain = n ? mean(gains) : NaN;
+  const stdevGain = sampleStdev(gains);
+  const sem = n > 1 ? stdevGain / Math.sqrt(n) : NaN;
+
+  let ci95 = [NaN, NaN];
+  if (n > 1) {
+    const alpha = 1 - confidenceLevel;
+    const tCrit = tInvCDF(1 - alpha / 2, n - 1);
+    const margin = tCrit * sem;
+    ci95 = [meanGain - margin, meanGain + margin];
+  }
+
+  let tStat = NaN, pValue = NaN, df = 0;
+  if (n > 1) {
+    const diffs = before.map((b, i) => b - after[i]);
+    const dMean = mean(diffs);
+    const dStd = sampleStdev(diffs);
+    df = n - 1;
+    if (dStd === 0) {
+      tStat = dMean === 0 ? 0 : Infinity;
+      pValue = dMean === 0 ? 1 : 0;
+    } else {
+      tStat = (dMean / dStd) * Math.sqrt(n);
+      pValue = 1 - tCDF(tStat, df); // H1 unilatérale : before > after
+    }
+  }
+
+  let cohensD = NaN;
+  if (n > 1) {
+    const diffs = before.map((b, i) => b - after[i]);
+    const dStd = sampleStdev(diffs);
+    cohensD = dStd === 0 ? (mean(diffs) === 0 ? 0 : Infinity) : mean(diffs) / dStd;
+  }
+
+  let bootCI = [NaN, NaN];
+  let bootCID = [NaN, NaN];
+  if (n > 1) {
+    const rng = mulberry32(bootstrapSeed);
+    const means = new Array(bootstrapResamples);
+    const ds = [];
+    for (let i = 0; i < bootstrapResamples; i++) {
+      let s = 0;
+      const idx = new Array(n);
+      for (let j = 0; j < n; j++) { idx[j] = Math.floor(rng() * n); s += gains[idx[j]]; }
+      means[i] = s / n;
+      const bSample = idx.map((k) => before[k]);
+      const aSample = idx.map((k) => after[k]);
+      const diffSample = bSample.map((b, k) => b - aSample[k]);
+      const sd = sampleStdev(diffSample);
+      if (sd > 0) ds.push(mean(diffSample) / sd);
+      else if (mean(diffSample) === 0) ds.push(0);
+    }
+    means.sort((a, b) => a - b);
+    const alpha = 1 - confidenceLevel;
+    bootCI = [means[Math.floor((alpha / 2) * bootstrapResamples)], means[Math.ceil((1 - alpha / 2) * bootstrapResamples) - 1]];
+    if (ds.length > bootstrapResamples * 0.5) {
+      ds.sort((a, b) => a - b);
+      bootCID = [ds[Math.floor((alpha / 2) * ds.length)], ds[Math.ceil((1 - alpha / 2) * ds.length) - 1]];
+    }
+  }
+
+  // Test de permutation (Monte Carlo, retournement de signe) : 3e vérification
+  // indépendante du test t, sans hypothèse de distribution. Avec un petit n,
+  // l'espace des permutations (2^n) est grossier : le p minimal atteignable
+  // est 1/2^n, ce qui peut empêcher la significativité même si le test t,
+  // paramétrique, la trouve — signal honnête qu'il faut plus de segments.
+  let permutation = { observedMeanDiff: NaN, pValue: NaN, nPermutations: 0 };
+  if (n > 1) {
+    const rng2 = mulberry32(bootstrapSeed + 2);
+    const diffs = before.map((b, i) => b - after[i]);
+    const observed = mean(diffs);
+    let countGE = 0;
+    for (let i = 0; i < bootstrapResamples; i++) {
+      let s = 0;
+      for (let j = 0; j < n; j++) s += (rng2() < 0.5 ? -1 : 1) * diffs[j];
+      if (s / n >= observed) countGE++;
+    }
+    permutation = { observedMeanDiff: observed, pValue: (countGE + 1) / (bootstrapResamples + 1), nPermutations: bootstrapResamples };
+  }
+
+  // Corrélation longueur du segment / gain % (Pearson) — diagnostic : le
+  // gain ne devrait pas dépendre artificiellement de la longueur.
+  let lengthGainCorr = { r: NaN, pValue: NaN, applicable: false };
+  if (n >= 3) {
+    const mx = mean(before), my = mean(gains);
+    let sxy = 0, sxx = 0, syy = 0;
+    for (let i = 0; i < n; i++) {
+      const dx = before[i] - mx, dy = gains[i] - my;
+      sxy += dx * dy; sxx += dx * dx; syy += dy * dy;
+    }
+    const r = (sxx === 0 || syy === 0) ? 0 : sxy / Math.sqrt(sxx * syy);
+    const dfree = n - 2;
+    let pValue = NaN;
+    if (dfree > 0 && Math.abs(r) < 1) {
+      const tStatCorr = r * Math.sqrt(dfree / (1 - r * r));
+      pValue = 2 * (1 - tCDF(Math.abs(tStatCorr), dfree));
+    } else if (Math.abs(r) >= 1) {
+      pValue = 0;
+    }
+    lengthGainCorr = { r, pValue, applicable: true };
+  }
+
+  const totals = { ch: 0, ou: 0, ng: 0, ui: 0 };
+  for (const r of rows) {
+    const c = diffSummary(r.original);
+    totals.ch += c.ch; totals.ou += c.ou; totals.ng += c.ng; totals.ui += c.ui;
+  }
+  const predictedSavings = totals.ch + totals.ou + totals.ng;
+  const actualSavings = charsBeforeTotal - charsAfterTotal;
+
+  return {
+    n, rows, charsBeforeTotal, charsAfterTotal, gainGlobal,
+    meanGain, stdevGain, sem, ci95, bootCI, bootCID,
+    tStat, pValue, df, cohensD,
+    permutation, lengthGainCorr,
+    ruleContribution: { totals, predictedSavings, actualSavings, matches: predictedSavings === actualSavings },
+  };
+}
+
+// Analyse de puissance par simulation (ré-échantillonnage des différences
+// par-paragraphe observées) : pour chaque n candidat, tire n_simulations
+// échantillons, refait le test t à chaque fois, compte la proportion de
+// rejets. Répond à « combien de segments faudrait-il ? » sans hypothèse
+// de distribution analytique — même principe que document_stats.py.
+function powerAnalysis(report, { targetNs = [10, 20, 30, 50, 100], alpha = 0.05, nSimulations = 800, seed = 7 } = {}) {
+  if (report.n < 2) return { achievedPowerAtN: NaN, byN: {}, requiredN80: null, currentN: report.n };
+  const diffs = report.rows.map((r) => r.before - r.after);
+  const rng = mulberry32(seed);
+
+  function powerAt(nTarget) {
+    let rejections = 0;
+    for (let i = 0; i < nSimulations; i++) {
+      const sample = new Array(nTarget);
+      for (let j = 0; j < nTarget; j++) sample[j] = diffs[Math.floor(rng() * diffs.length)];
+      const sd = sampleStdev(sample);
+      let rejected;
+      if (sd === 0) rejected = mean(sample) > 0;
+      else {
+        const tStat = (mean(sample) / sd) * Math.sqrt(nTarget);
+        const p = 1 - tCDF(tStat, nTarget - 1);
+        rejected = p < alpha;
+      }
+      if (rejected) rejections++;
+    }
+    return rejections / nSimulations;
+  }
+
+  const byN = {};
+  for (const nT of [...new Set(targetNs)].sort((a, b) => a - b)) byN[nT] = Math.round(powerAt(nT) * 1000) / 1000;
+  const achievedPowerAtN = Math.round(powerAt(report.n) * 1000) / 1000;
+
+  let requiredN80 = null;
+  for (let nT = Math.max(2, report.n); nT <= 300; nT += (nT < 30 ? 1 : 5)) {
+    if (powerAt(nT) >= 0.8) { requiredN80 = nT; break; }
+  }
+
+  return { achievedPowerAtN, byN, requiredN80, currentN: report.n };
+}
+
+// Découpe un paragraphe en phrases (augmente n). Heuristique simple,
+// identique à split_into_sentences en Python.
+function splitIntoSentences(text) {
+  const parts = text.split(/(?<=[.!?])\s+(?=[A-ZÀ-Þ0-9])/).map((s) => s.trim()).filter(Boolean);
+  return parts.length ? parts : [text];
+}
+
+/* =====================================================================
+   2) DOCX — round-trip fidèl via JSZip. Sèl <w:t>...</w:t> yo touche ;
+      tout rès XML la (gra, italik, tablo, estil) rete jan li ye.
+   ===================================================================== */
+
+function decodeXmlEntities(s) {
+  return s.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&apos;/g, "'").replace(/&quot;/g, '"').replace(/&amp;/g, "&");
+}
+function encodeXmlEntities(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+function extractDocxParagraphSegments(xml) {
+  const paraBlocks = xml.match(/<w:p\b[^>]*>[\s\S]*?<\/w:p>/g) || [];
+  const segments = [];
+  paraBlocks.forEach((block, i) => {
+    const texts = [...block.matchAll(/<w:t(?:\s[^>]*)?>([\s\S]*?)<\/w:t>/g)].map((m) => decodeXmlEntities(m[1]));
+    const original = texts.join("");
+    if (original.trim()) segments.push({ label: `paragraf ${i + 1}`, original });
+  });
+  return segments;
+}
+function convertDocxXml(xml) {
+  return xml.replace(/<w:t(\s[^>]*)?>([\s\S]*?)<\/w:t>/g, (full, attrs, inner) => {
+    const converted = toAcc(decodeXmlEntities(inner));
+    return `<w:t${attrs || ""}>${encodeXmlEntities(converted)}</w:t>`;
+  });
+}
+async function convertDocxFile(arrayBuffer) {
+  const zip = await JSZip.loadAsync(arrayBuffer);
+  const docPath = "word/document.xml";
+  if (!zip.file(docPath)) throw new Error("Fichye .docx la pa gen word/document.xml — li ka domaje.");
+  const xml = await zip.file(docPath).async("string");
+  const segments = extractDocxParagraphSegments(xml);
+  zip.file(docPath, convertDocxXml(xml));
+  const blob = await zip.generateAsync({ type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+  return { segments, blob, warnings: [] };
+}
+
+/* =====================================================================
+   3) PDF — ekstraksyon paragraf pa paragraf (pdf.js), rekonstriksyon
+      apwoksimatif an .txt/.docx. Pa gen rekonstriksyon .pdf isit (rezo
+      fon: prezève polis/mizanpaj egzat mande plis pase sa yon paj estatik
+      san sèvè ka garanti san risk — sèvi ak zouti Python la pou sa).
+   ===================================================================== */
+
+function groupPdfItemsIntoParagraphs(items) {
+  const sorted = [...items].sort((a, b) => b.y - a.y || a.x - b.x);
+  const lines = [];
+  let currentLine = [];
+  let lastY = null;
+  for (const it of sorted) {
+    if (lastY === null || Math.abs(it.y - lastY) < it.height * 0.5) currentLine.push(it);
+    else { lines.push(currentLine); currentLine = [it]; }
+    lastY = it.y;
+  }
+  if (currentLine.length) lines.push(currentLine);
+
+  const lineTexts = lines.map((line) => line.slice().sort((a, b) => a.x - b.x).map((i) => i.str).join(""));
+  const lineYs = lines.map((line) => line[0].y);
+  const gaps = [];
+  for (let i = 1; i < lineYs.length; i++) gaps.push(lineYs[i - 1] - lineYs[i]);
+
+  let threshold = Infinity;
+  if (gaps.length >= 2) {
+    const sortedGaps = [...gaps].sort((a, b) => a - b);
+    let bestJump = -Infinity, bestIdx = -1;
+    for (let i = 1; i < sortedGaps.length; i++) {
+      const jump = sortedGaps[i] - sortedGaps[i - 1];
+      if (jump > bestJump) { bestJump = jump; bestIdx = i; }
+    }
+    if (bestIdx > 0 && bestJump > 0.25 * sortedGaps[sortedGaps.length - 1]) {
+      threshold = (sortedGaps[bestIdx - 1] + sortedGaps[bestIdx]) / 2;
+    }
+  }
+
+  const paragraphs = [];
+  let cur = [];
+  for (let i = 0; i < lineTexts.length; i++) {
+    cur.push(lineTexts[i]);
+    if (i < gaps.length && gaps[i] > threshold) { paragraphs.push(cur.join(" ").replace(/\s+/g, " ").trim()); cur = []; }
+  }
+  if (cur.length) paragraphs.push(cur.join(" ").replace(/\s+/g, " ").trim());
+  return paragraphs.filter((p) => p.length > 0);
+}
+
+async function extractPdfParagraphs(arrayBuffer) {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+  const doc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+  const segments = [];
+  for (let p = 1; p <= doc.numPages; p++) {
+    const page = await doc.getPage(p);
+    const content = await page.getTextContent();
+    const items = content.items
+      .map((it) => ({ str: it.str, x: it.transform[4], y: it.transform[5], height: it.height || Math.abs(it.transform[3]) || 10 }))
+      .filter((it) => it.str.trim().length > 0);
+    const paragraphs = groupPdfItemsIntoParagraphs(items);
+    paragraphs.forEach((text, i) => segments.push({ label: `paj ${p}, blòk ${i + 1}`, original: text }));
+  }
+  return segments;
+}
+
+function buildMinimalDocx(paragraphs) {
+  const zip = new JSZip();
+  zip.file("[Content_Types].xml",
+    `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>`);
+  zip.folder("_rels").file(".rels",
+    `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>`);
+  zip.folder("word").folder("_rels").file("document.xml.rels",
+    `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"></Relationships>`);
+  const body = paragraphs.map((p) => `<w:p><w:r><w:t xml:space="preserve">${encodeXmlEntities(p)}</w:t></w:r></w:p>`).join("");
+  zip.file("word/document.xml",
+    `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>${body}<w:sectPr/></w:body></w:document>`);
+  return zip;
+}
+
+/* =====================================================================
+   4) UI
+   ===================================================================== */
+
+const dropzone = document.getElementById("dropzone");
+const fileInput = document.getElementById("fileInput");
+const pickBtn = document.getElementById("pickBtn");
+const statusLine = document.getElementById("statusLine");
+const statusText = document.getElementById("statusText");
+const spinner = document.getElementById("spinner");
+const warnBox = document.getElementById("warnBox");
+const warnList = document.getElementById("warnList");
+const resultsSection = document.getElementById("resultsSection") || document.getElementById("results-section");
+const results = document.getElementById("results");
+
+pickBtn.addEventListener("click", () => fileInput.click());
+dropzone.addEventListener("click", (e) => { if (e.target === dropzone) fileInput.click(); });
+["dragenter", "dragover"].forEach((ev) => dropzone.addEventListener(ev, (e) => { e.preventDefault(); dropzone.classList.add("drag"); }));
+["dragleave", "drop"].forEach((ev) => dropzone.addEventListener(ev, (e) => { e.preventDefault(); dropzone.classList.remove("drag"); }));
+dropzone.addEventListener("drop", (e) => { if (e.dataTransfer.files.length) handleFiles([...e.dataTransfer.files]); });
+fileInput.addEventListener("change", () => { if (fileInput.files.length) handleFiles([...fileInput.files]); });
+
+function setStatus(text, busy) {
+  statusLine.style.display = "flex";
+  statusText.textContent = text;
+  spinner.classList.toggle("on", !!busy);
+}
+function showWarnings(list) {
+  if (!list.length) { warnBox.classList.remove("on"); return; }
+  warnList.innerHTML = list.map((w) => `<li>${w}</li>`).join("");
+  warnBox.classList.add("on");
+}
+function currentGranularity() {
+  return document.querySelector('input[name="granularity"]:checked').value;
+}
+function applyGranularity(segments) {
+  if (currentGranularity() !== "sentence") return segments;
+  const expanded = [];
+  segments.forEach((s) => {
+    splitIntoSentences(s.original).forEach((sentence, i) => {
+      expanded.push({ label: `${s.label} · fraz ${i + 1}`, original: sentence });
+    });
+  });
+  return expanded;
+}
+
+// Dokiman ki chaje deja yo rete an memwa (segman paragraf + telechajman),
+// pou chanje "paragraf"/"fraz" ka rekalkile enstantane san yo pa
+// mande pou re-chaje fichye a.
+let loadedCache = null; // { perFile: [{name, paragraphSegments, downloads}], warnings: [] }
+
+document.querySelectorAll('input[name="granularity"]').forEach((r) =>
+  r.addEventListener("change", () => { if (loadedCache) recompute(); })
+);
+
+async function handleFiles(files) {
+  results.classList.remove("on");
+  showWarnings([]);
+  document.getElementById("fileList").textContent = files.map((f) => f.name).join(" · ");
+  setStatus(`K'ap li ${files.length} fichye...`, true);
+
+  const perFile = [];
+  const warnings = [];
+
+  try {
+    for (const file of files) {
+      const ext = file.name.toLowerCase().split(".").pop();
+      const arrayBuffer = await file.arrayBuffer();
+      let paragraphSegments;
+      const downloads = [];
+
+      if (ext === "docx") {
+        setStatus(`K'ap konvèti ${file.name} (fòma prezève)...`, true);
+        const { segments: segs, blob } = await convertDocxFile(arrayBuffer);
+        paragraphSegments = segs;
+        downloads.push({ label: `Telechaje ${file.name} an AAC (.docx)`, blob, filename: file.name.replace(/\.docx$/i, "_acc.docx") });
+      } else if (ext === "pdf") {
+        setStatus(`K'ap ekstrè tèks ${file.name} (paj pa paj)...`, true);
+        paragraphSegments = await extractPdfParagraphs(arrayBuffer);
+        warnings.push(`${file.name}: fidelite tèks garanti, men mizanpaj (kolòn, imaj, gwosè font orijinal) pa rekonstwi egzakteman.`);
+        // Telechajman yo toujou baze sou nivo paragraf (endepandan de grenn
+        // estatistik la), pou yo pa vin fragmante fraz pa fraz.
+        const convertedParas = paragraphSegments.map((s) => toAcc(s.original));
+        const txtBlob = new Blob([convertedParas.join("\n\n")], { type: "text/plain;charset=utf-8" });
+        downloads.push({ label: `Telechaje ${file.name} an AAC (.txt)`, blob: txtBlob, filename: file.name.replace(/\.pdf$/i, "_acc.txt") });
+        const docxZip = buildMinimalDocx(convertedParas);
+        const docxBlob = await docxZip.generateAsync({ type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+        downloads.push({ label: `Telechaje ${file.name} an AAC (.docx, mizanpaj senp)`, blob: docxBlob, filename: file.name.replace(/\.pdf$/i, "_acc.docx"), secondary: true });
+      } else {
+        warnings.push(`${file.name}: fòma pa sipòte (ignore).`);
+        continue;
+      }
+
+      perFile.push({ name: file.name, paragraphSegments, downloads });
+    }
+
+    if (!perFile.length) throw new Error("Pa jwenn okenn tèks itilizab nan fichye yo.");
+
+    loadedCache = { perFile, warnings };
+    recompute();
+  } catch (err) {
+    console.error(err);
+    setStatus(`Erè: ${err.message}`, false);
+  }
+}
+
+function recompute() {
+  if (!loadedCache) return;
+  setStatus("K'ap kalkile estatistik yo...", true);
+
+  const multi = loadedCache.perFile.length > 1;
+  const allSegments = [];
+  const allDownloads = [];
+  loadedCache.perFile.forEach((f) => {
+    const docPrefix = multi ? `${f.name} · ` : "";
+    applyGranularity(f.paragraphSegments).forEach((s) => allSegments.push({ label: docPrefix + s.label, original: s.original }));
+    allDownloads.push(...f.downloads);
+  });
+
+  const report = buildDocumentReport(allSegments);
+  const power = report.n > 1 ? powerAnalysis(report) : null;
+  renderReport(report, allDownloads, power);
+  showWarnings(loadedCache.warnings);
+  const granLabel = currentGranularity() === "sentence" ? "fraz" : "paragraf";
+  setStatus(`Fini — ${loadedCache.perFile.length} fichye, ${report.n} segman (${granLabel}) analize.`, false);
+  resultsSection.style.display = "block";
+  results.classList.add("on");
+}
+
+function fmt(x, d = 1) { return Number.isFinite(x) ? x.toFixed(d) : "—"; }
+
+function renderReport(report, downloads, power) {
+  const statGrid = document.getElementById("statGrid");
+  statGrid.innerHTML = `
+    <div class="stat-card"><div class="lbl">Segman analize</div><div class="val">${report.n}</div></div>
+    <div class="stat-card"><div class="lbl">Karaktè anvan → apre</div><div class="val">${report.charsBeforeTotal} → ${report.charsAfterTotal}</div></div>
+    <div class="stat-card"><div class="lbl">Gen global</div><div class="val new">${fmt(report.gainGlobal)}%</div></div>
+    <div class="stat-card"><div class="lbl">Mwayèn gen / segman</div><div class="val new">${fmt(report.meanGain)}%</div><div class="sub">ekar-tip ${fmt(report.stdevGain, 2)} pwen</div></div>
+    <div class="stat-card"><div class="lbl">IC 95% (Student)</div><div class="val">${fmt(report.ci95[0])}% ; ${fmt(report.ci95[1])}%</div></div>
+    <div class="stat-card"><div class="lbl">IC 95% (bootstrap)</div><div class="val">${fmt(report.bootCI[0])}% ; ${fmt(report.bootCI[1])}%</div></div>
+    <div class="stat-card"><div class="lbl">Tès t apareye</div><div class="val">t(${report.df}) = ${fmt(report.tStat, 2)}</div><div class="sub">p = ${Number.isFinite(report.pValue) ? report.pValue.toExponential(2) : "—"}</div></div>
+    <div class="stat-card"><div class="lbl">Tès pèmitasyon</div><div class="val">p = ${Number.isFinite(report.permutation.pValue) ? report.permutation.pValue.toFixed(4) : "—"}</div><div class="sub">${report.permutation.nPermutations || 0} tiraj</div></div>
+    <div class="stat-card"><div class="lbl">d de Cohen</div><div class="val">${fmt(report.cohensD, 2)}</div><div class="sub">IC95 [${fmt(report.bootCID[0],2)} ; ${fmt(report.bootCID[1],2)}]</div></div>
+  `;
+
+  const tbody = document.getElementById("segmentTableBody");
+  tbody.innerHTML = report.rows.slice(0, 30).map((r) => `
+    <tr><td class="mono">${r.label}</td><td class="mono">${r.before}</td><td class="mono">${r.after}</td><td class="mono">${fmt(r.before === 0 ? 0 : ((r.before - r.after) / r.before) * 100)}%</td></tr>
+  `).join("");
+  if (report.rows.length > 30) {
+    tbody.innerHTML += `<tr><td colspan="4" class="mono" style="color:var(--ink-soft);">… ak ${report.rows.length - 30} lòt segman</td></tr>`;
+  }
+
+  const rc = report.ruleContribution;
+  document.getElementById("ruleTableBody").innerHTML = `
+    <tr><td>ch → š</td><td class="mono">${rc.totals.ch}</td><td class="mono">1</td></tr>
+    <tr><td>ou → ŏ</td><td class="mono">${rc.totals.ou}</td><td class="mono">1</td></tr>
+    <tr><td>ng → ŋ</td><td class="mono">${rc.totals.ng}</td><td class="mono">1</td></tr>
+    <tr><td>ui → wi</td><td class="mono">${rc.totals.ui}</td><td class="mono">0 (chanjman non, pa konpresyon)</td></tr>
+  `;
+
+  const sig = report.pValue < 0.05;
+  const permSig = report.permutation.pValue < 0.05;
+  document.getElementById("verdictText").innerHTML = Number.isFinite(report.pValue)
+    ? `Gen prevwa pa règ yo: <b>${rc.predictedSavings}</b> karaktè. Gen mezire reyèlman: <b>${rc.actualSavings}</b> karaktè ${rc.matches ? "— yo koresponn egzakteman." : "— gen yon diferans, verifye si gen yon entèraksyon ant règ yo."}<br>
+       Tès t (paramétrik): <span class="verdict ${sig ? "sig" : "nonsig"}">${sig ? "gen anpil chans pou gen konvèsyon vre (p < 0,05)" : "pa gen prèv sifizan (p ≥ 0,05)"}</span> ·
+       Tès pèmitasyon (san ipotèz distribisyon): <span class="verdict ${permSig ? "sig" : "nonsig"}">${permSig ? "konfime (p < 0,05)" : "pa konfime — souvan yon siy ke n gen twò piti pou rezolisyon tès la"}</span>.`
+    : "Yon sèl segman jwenn — pa gen ase done pou kalkile ekar-tip oswa fè yon tès.";
+
+  const corr = report.lengthGainCorr;
+  document.getElementById("extraStatsText").innerHTML = corr.applicable
+    ? `Korelasyon longè-segman / gen % : r = ${fmt(corr.r, 3)}, p = ${fmt(corr.pValue, 3)} — ${Math.abs(corr.r) < 0.3 || corr.pValue >= 0.05 ? "pa gen depandans notab ant longè segman ak gen an %." : "gen yon depandans posib, verifye tablo segman yo."}`
+    : "";
+
+  const powerText = document.getElementById("powerText");
+  if (power && Number.isFinite(power.achievedPowerAtN)) {
+    powerText.innerHTML = `Pisans estatistik estime nan n=${power.currentN} : <b>${power.achievedPowerAtN}</b>. ` +
+      (power.requiredN80 ? `Pou pisans 80 % : anviwon <b>${power.requiredN80} segman</b> ta nesesè.` : "Pisans 80 % pa atenn menm jiska n=300 — efè a fèb oswa twò varyab pou n ogmante ase.");
+  } else {
+    powerText.textContent = "";
+  }
+
+  const previewGrid = document.getElementById("previewGrid");
+  const sample = report.rows[0];
+  previewGrid.innerHTML = sample ? `
+    <div class="preview-block"><div class="lbl">Anvan (1979)</div>${escapeHtml(sample.original)}</div>
+    <div class="preview-block"><div class="lbl">Apre (AAC)</div>${escapeHtml(sample.converted)}</div>
+  ` : "";
+
+  const dlContainer = document.getElementById("downloads");
+  dlContainer.innerHTML = "";
+  downloads.forEach((d) => {
+    const url = URL.createObjectURL(d.blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = d.filename; a.className = "dl-btn" + (d.secondary ? " secondary" : "");
+    a.textContent = d.label;
+    dlContainer.appendChild(a);
+  });
+}
+
+function escapeHtml(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+</script>
+</body>
+</html>

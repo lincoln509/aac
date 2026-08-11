@@ -19,6 +19,7 @@ Un ingénieur qui propose une réforme d'écriture doit, à un moment, cesser d'
 - **Une démo web interactive** à page unique, déployable telle quelle sur GitHub Pages, sans étape de build. Les deux panneaux (1979 / ACC) sont éditables et se convertissent automatiquement l'un l'autre, dans les deux sens, sans bouton à cliquer.
 - **Une visionneuse de fichiers intégrée** à la démo : README, LICENSE et le code source (Python/JS/tests) se lisent directement sur la page, dans une fenêtre modale avec coloration syntaxique légère, sans quitter le site.
 - **Une disposition clavier complète** (`keyboard/ht-t-k0-aac.xml`, format [CLDR Keyboard 3.0](https://www.unicode.org/reports/tr35/tr35-keyboards.html)) pour taper š, ŏ et ŋ directement au clavier — AltGr sur ordinateur, appui long sur mobile — plus un guide d'installation par plateforme.
+- **Une conversion de documents Word/PDF entiers**, avec préservation du format d'origine, accompagnée d'un vrai traitement statistique du gain (écart-type, intervalle de confiance à 95 %, test t apparié, bootstrap) plutôt qu'un chiffre unique. Disponible en ligne de commande (`converter/document_converter.py`, fidélité maximale) **et** directement dans le navigateur (`web-demo/documents.html`, glisser-déposer, sans backend) — voir « Conversion de documents » plus bas.
 
 ## Structure du dépôt
 
@@ -27,10 +28,16 @@ acc-toolkit/
 ├── converter/
 │   ├── acc_converter.py       # implémentation de référence (Python)
 │   ├── acc_converter.js       # port JavaScript (même comportement)
+│   ├── document_converter.py  # conversion .docx/.pdf avec préservation du format
+│   ├── document_stats.py      # traitement statistique (écart-type, IC, test t, bootstrap)
+│   ├── requirements-documents.txt
 │   └── tests/
-│       └── test_converter.py  # tests de non-régression liés au mémoire
+│       ├── test_converter.py           # tests de non-régression liés au mémoire
+│       ├── test_document_converter.py  # fidélité de mise en forme docx
+│       └── test_document_stats.py      # validité du traitement statistique
 ├── web-demo/
-│   └── index.html             # démo interactive, un seul fichier
+│   ├── index.html             # démo interactive, un seul fichier
+│   └── documents.html         # conversion de documents entiers (docx/pdf) + rapport statistique
 ├── keyboard/
 │   ├── ht-t-k0-aac.xml        # disposition clavier CLDR Keyboard 3.0
 │   └── README.md              # guide d'installation par plateforme
@@ -203,6 +210,51 @@ Détail complet et justification linguistique : [`docs/grapheme-table.md`](docs/
 ## Limite connue et documentée
 
 La conversion ACC → 1979 n'est **pas parfaitement réversible** pour la séquence `wi` : ce groupe existait déjà dans l'orthographe de 1979 pour des mots qui n'ont jamais été écrits `ui` (l'exemple le plus fréquent est `wi`, « oui »). Le convertisseur inclut une petite liste d'exceptions lexicales (`WI_WORDS_NEVER_FROM_UI`) pour gérer les cas les plus courants, mais une fidélité totale demanderait un lexique complet — c'est justement l'un des livrables prévus en phase 2 de la feuille de route du mémoire (constitution d'un corpus de référence bilingue). Ce n'est pas caché : c'est testé explicitement dans `test_converter.py`.
+
+## Conversion de documents (Word / PDF) et traitement statistique
+
+Le chiffre du mémoire — « gain de 9,3 % sur le corpus Depestre » — repose sur **un seul extrait de 140 caractères**. C'est une démonstration ponctuelle, pas une estimation : elle n'a ni écart-type, ni intervalle de confiance, et rien n'indique si elle se généralise à un texte réel. `converter/document_converter.py` et `converter/document_stats.py` répondent à ça en opérant au niveau du document entier plutôt que sur un extrait choisi.
+
+```bash
+pip install -r converter/requirements-documents.txt
+python converter/document_converter.py memoire.docx memoire_acc.docx --report rapport.md
+python converter/document_converter.py chapitre.pdf chapitre_acc.pdf --report rapport.json
+```
+
+- **`.docx` → `.docx`** : fidélité totale. Seul le texte à l'intérieur des runs Word existants est modifié (`run.text = to_acc(run.text)`) — gras, italique, polices, styles de titre et tableaux restent identiques à l'original. Limite documentée : une séquence `ch`/`ou`/`ng` coupée exactement à la frontière entre deux runs (rare, généralement après une correction manuelle) n'est pas convertie ; le script le signale sur stderr.
+- **`.pdf` → `.pdf`** : fidélité textuelle, pas visuelle. Un PDF n'a pas de « texte modifiable » — le texte est extrait paragraphe par paragraphe (`pdfplumber`) puis un nouveau PDF est reconstruit (`reportlab`, police DejaVu Sans pour que š/ŏ/ŋ s'affichent correctement) avec la même taille de page. Pour un document essentiellement textuel le résultat est très proche de l'original ; pour une mise en page complexe (colonnes, texte sur image), le contenu reste correct mais la mise en page ne l'est pas — vérifier visuellement, ou repartir du `.docx` source s'il existe.
+
+Chaque **paragraphe** du document devient une observation indépendante, ce qui permet un vrai traitement statistique plutôt qu'un chiffre unique :
+
+- moyenne et écart-type (échantillon, ddof=1) du gain (%) entre paragraphes ;
+- intervalle de confiance à 95 % par loi de Student (df = n−1) **et** par bootstrap (10 000 ré-échantillons, percentile) — le second ne suppose pas la normalité et sert de vérification croisée ;
+- test de Shapiro-Wilk sur la distribution des gains, pour juger si l'IC de Student est fiable ou s'il faut privilégier le bootstrap ;
+- test t apparié (nombre de caractères avant vs après) contre l'hypothèse nulle « aucune différence », pour vérifier que la réduction n'est pas un artefact du choix des paragraphes ;
+- **test de permutation** (Monte Carlo, retournement de signe) : une troisième vérification indépendante, sans aucune hypothèse de distribution — utile en particulier pour révéler qu'avec un tout petit échantillon, l'espace des permutations est trop grossier pour jamais atteindre p<0,05, même quand le test t (paramétrique) y arrive. Un signal honnête plutôt qu'un artefact caché ;
+- taille d'effet (d de Cohen, mesures appariées), avec son propre **intervalle de confiance bootstrap** ;
+- **corrélation longueur du segment / gain %** (Pearson) : diagnostic de validité — un gain qui dépendrait artificiellement de la longueur du paragraphe serait suspect ;
+- **analyse de puissance par simulation** : combien de paragraphes faudrait-il pour détecter l'effet observé avec 80 % de certitude, si on répétait l'expérience ? Répond directement à « combien de texte faut-il pour un résultat solide » ;
+- décomposition du gain par règle (`ch`/`ou`/`ng` économisent chacun 1 caractère par occurrence, `ui→wi` est un renommage neutre à 0 caractère) avec vérification croisée : la somme des économies prédites par règle doit égaler le gain réellement mesuré.
+
+### Augmenter la taille de l'échantillon
+
+Deux leviers, cumulables, pour resserrer les intervalles de confiance :
+
+- **Granularité plus fine** : au lieu du paragraphe, découper en phrases (`--granularity sentence` en CLI, ou le sélecteur « fraz » dans `documents.html`). Plus de segments, IC plus étroit — au prix d'une indépendance un peu plus faible entre observations (deux phrases du même paragraphe se ressemblent plus que deux paragraphes de documents différents).
+- **Plusieurs documents à la fois** : `python converter/document_converter.py analyze fichier1.docx fichier2.pdf ... --report rapport.md` (ou glisser plusieurs fichiers dans `documents.html`) regroupe tous les segments. Le rapport distingue alors deux lectures :
+  - **pooled** — chaque paragraphe de chaque document compte comme une observation indépendante (IC le plus étroit, un peu optimiste) ;
+  - **cluster** — chaque document résumé par sa propre moyenne, n = nombre de documents (IC plus large, plus honnête — c'est celui à citer dans un mémoire). Avec seulement 1-2 documents, cet IC "cluster" est volontairement très large : c'est le signal qu'il faut plus de documents, pas plus de paragraphes du même texte.
+
+`converter/tests/test_document_stats.py` vérifie entre autres que le chiffre historique du mémoire (140 → 127 caractères, −9,3 %) reste reproductible tel quel via ce pipeline, et que le test t détecte correctement un gain nul quand le texte ne contient aucune séquence opaque. `converter/tests/test_document_converter.py` vérifie la préservation du gras/italique sur un docx converti.
+
+### Version navigateur (`web-demo/documents.html`)
+
+Même traitement statistique, mais glisser-déposer direct dans le navigateur, sans backend — `converter/document_converter.py` est le même calcul, en Python, pour qui préfère la ligne de commande ou traiter un lot de fichiers.
+
+- **.docx → .docx** : fidélité totale. Implémenté avec [JSZip](https://stuk.github.io/jszip/) : le `.docx` est ouvert comme l'archive ZIP qu'il est, seul le texte à l'intérieur des balises `<w:t>` de `word/document.xml` est modifié, puis l'archive est réécrite telle quelle — gras, italique, tableaux, styles restent identiques à l'original (vérifié en rendant le fichier de sortie et en inspectant runs et mise en page).
+- **.pdf → texte/.docx** : le texte est extrait paragraphe par paragraphe avec [pdf.js](https://mozilla.github.io/pdf.js/) (regroupement des lignes par position verticale, détection du saut de paragraphe par écart de ligne), puis proposé en téléchargement `.txt` (fidélité de contenu garantie) et `.docx` (mise en page simple, un paragraphe par `<w:p>`). Reconstruire un `.pdf` visuellement fidèle sans backend n'est pas fait ici — utiliser `document_converter.py` pour ça.
+- Les fonctions statistiques (bêta incomplète, CDF/PPF de Student, bootstrap, test t apparié, d de Cohen) sont un port JavaScript direct de `document_stats.py`, validées ligne à ligne contre `scipy.stats.t` avant portage, puis testées de bout en bout dans un vrai navigateur (Playwright) sur les mêmes documents que les tests Python — les deux implémentations produisent des résultats identiques au dixième de point près.
+- Dépendances chargées par CDN (JSZip, pdf.js) : seule cette page en a besoin, `index.html` reste sans dépendance externe.
 
 ## Par rapport aux travaux existants
 
