@@ -12,18 +12,20 @@ Ce dépôt rassemble :
 ---
 
 ## Contenu du dépôt
-
-| Élément | Description |
-| :--- | :--- |
-
 [//]: # (| 📄 [`Alphabet Atomique Creole Livre - v1.2.0.pdf`]&#40;./Alphabet%20Atomique%20Creole%20Livre%20-%20v1.2.0.pdf&#41; | Le mémoire complet, version livre &#40;6×9 po&#41;. |)
+[//]: # (./toolkit/v1.0.1/)
+| Élément                                                                                 | Description |
+|:----------------------------------------------------------------------------------------| :--- |
 | 📄 [`Alphabet Atomique Creole Livre - v1.2.0`](https://doi.org/10.5281/zenodo.21540458) | Le mémoire complet, version livre (6×9 po). |
-| 🧰 [`toolkit/v1.0.1/`](./toolkit/v1.0.1/) | La première version publiée du toolkit ACC (convertisseur, démo, clavier, tests). |
-| 🧰 [`toolkit/v1.1.0/`](./toolkit/v1.1.0/) | Cette version inclut la transcription des documents words/pdf du format créole 1979 en format AAC tout en donnant un rapport statistique complet avec explication des algorithmes utilisés et les gains reçus du traitement |
-| 📂 [`toolkit/v1.1.1/`] (à venir) | Futures versions du toolkit. |
+| 🧰 [`toolkit/v1.0.1/`](https://github.com/lincoln509/aac/tree/v1.0.1)                   | La première version publiée du toolkit ACC (convertisseur, démo, clavier, tests). |
+| 🧰 [`toolkit/v1.1.0/`](https://github.com/lincoln509/aac/tree/v1.1.0/toolkit)           | Cette version inclut la transcription des documents words/pdf du format créole 1979 en format AAC tout en donnant un rapport statistique complet avec explication des algorithmes utilisés et les gains reçus du traitement |
+| 📂 [`toolkit/v1.1.1/`] (à venir)                                                        | Futures versions du toolkit. |
 
 ---
 
+[`toolkit/v1.0.1/`](https://github.com/lincoln509/aac/blob/main/toolkit/v1.0.1)
+[`toolkit/v1.1.0/`](https://github.com/lincoln509/aac/blob/main/toolkit/v1.1.0)
+[Voir toutes les versions](https://github.com/lincoln509/aac/tags)
 ## À propos du livre
 
 Le livre détaille la théorie derrière l'ACC : un alphabet rationalisé pour le créole haïtien, réduisant l'inventaire de 32 à 24 lettres atomiques. Il contient l'historique, la justification linguistique, le protocole d'implémentation, les résultats chiffrés et des annexes complètes.
