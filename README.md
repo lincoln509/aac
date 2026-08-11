@@ -12,8 +12,6 @@ Ce dépôt rassemble :
 ---
 
 ## Contenu du dépôt
-[//]: # (| 📄 [`Alphabet Atomique Creole Livre - v1.2.0.pdf`]&#40;./Alphabet%20Atomique%20Creole%20Livre%20-%20v1.2.0.pdf&#41; | Le mémoire complet, version livre &#40;6×9 po&#41;. |)
-[//]: # (./toolkit/v1.0.1/)
 | Élément                                                                                 | Description |
 |:----------------------------------------------------------------------------------------| :--- |
 | 📄 [`Alphabet Atomique Creole Livre - v1.2.0`](https://doi.org/10.5281/zenodo.21540458) | Le mémoire complet, version livre (6×9 po). |
