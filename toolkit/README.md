@@ -264,9 +264,13 @@ Ce prototype n'invente pas le principe d'un alphabet à monogrammes pour le cré
 
 Ce dépôt est le complément technique d'un ensemble documentaire plus large :
 
-- **Édition livre** (format 6×9 po, page de titre, ISBN à obtenir, dépôt légal) — la même démonstration scientifique, mise en forme pour une diffusion en dehors du cadre strictement académique.
+- **Édition livre** (format 6×9 po, page de titre, avec ISBN en d'obtention depuis la BNH, dépôt légal) — la même démonstration scientifique, mise en forme pour une diffusion en dehors du cadre strictement académique.
+- **Mémoire complet** (format Letter, ~70 pages) — la démonstration scientifique intégrale : histoire de la graphie créole, diagnostic, théorie de l'alphabet atomique, protocole d'implémentation, évaluation d'impact, chapitre dédié au traitement automatique du langage (tokenisation, GPT/deepseek/Claude etc.), annexes phonologique et Unicode complètes.
+- **ht-t-k0-aac.xml** — Disposition clavier CLDR (Keyboard 3.0, UTS #35 Part 7) pour l'Alphabet Atomique Créole (AAC).
+- **Un manuel de transition technique vers l'AAC** — Qui contient les spécifications des dispositions clavier (physique/virtuelle), Guide de conversion pour éditeurs et des protocoles de la phase pilote.
 
-Ces documents ne sont pas inclus dans ce dépôt (ce sont des fichiers Word volumineux, peu adaptés à un suivi git) mais définissent l'intégralité du raisonnement dont ce code n'est que la vérification.
+
+Ces documents ne sont pas inclus, à l'exception de ht-t-k0-aac.xml, qui s'y trouve dans le dossier : [keyboard/ht-t-k0-aac.xml](keyboard/ht-t-k0-aac.xml), dans ce dépôt (ce sont des fichiers Word volumineux, peu adaptés à un suivi git), mais définissent l'intégralité du raisonnement dont ce code n'est que la vérification.
 
 ## Licence
 
