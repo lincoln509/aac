@@ -1,0 +1,778 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jwèt — Pratike Òtograf AAC</title>
+<meta name="description" content="Kat jwèt entèraktif pou pratike Alfabè Atomik Kreyòl (AAC) : devinèt mo ki kwonometre e ki 'neye' apre erè, koerans tematik, memwa 1979/AAC, ak kesyon gramè.">
+
+<link rel="icon" type="image/png" href="../assets/aac-logo-square.png">
+<link rel="apple-touch-icon" href="../assets/aac-logo-square.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg: #F6F3EC;
+    --paper: #FCFAF5;
+    --ink: #1C1A17;
+    --ink-soft: #565049;
+    --primary: #1F3864;
+    --primary-soft: #2c4c85;
+    --accent: #8A6D3B;
+    --old: #A5342C;
+    --old-bg: #F6DAD6;
+    --new: #2F6F62;
+    --new-bg: #DCEBE6;
+    --warn: #8A6D3B;
+    --warn-bg: #F1E6D2;
+    --rule: #DED6C4;
+    --display: 'Fraunces', serif;
+    --body: 'Source Serif 4', serif;
+    --mono: 'IBM Plex Mono', monospace;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--body); font-size:17px; line-height:1.6;}
+  .wrap{max-width:960px; margin:0 auto; padding:0 28px;}
+  .topbar{display:flex; align-items:center; justify-content:space-between; padding:22px 0; border-bottom:1px solid var(--rule);}
+  .brand{display:flex; align-items:center; gap:12px; text-decoration:none; color:var(--primary);}
+  .brand img{height:38px; width:auto; display:block;}
+  .brand-word{font-family:var(--mono); font-size:13px; letter-spacing:.1em; color:var(--ink-soft);}
+  .toplinks{display:flex; gap:20px; font-family:var(--mono); font-size:12.5px;}
+  .toplinks a{color:var(--ink-soft); text-decoration:none;}
+  .toplinks a:hover, .toplinks a.active{color:var(--primary);}
+
+  header.hero{padding:56px 0 44px; border-bottom:1px solid var(--rule);}
+  .eyebrow{
+    font-family:var(--mono); font-size:12.5px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--accent); margin:0 0 22px; display:flex; align-items:center; gap:10px;
+  }
+  .eyebrow::before{content:""; width:22px; height:1px; background:var(--accent); display:inline-block;}
+  h1{
+    font-family:var(--display); font-optical-sizing:auto; font-weight:600;
+    font-size:clamp(2rem, 4.4vw, 3rem); line-height:1.1; margin:0 0 18px; color:var(--primary); letter-spacing:-.01em;
+  }
+  .lede{font-size:1.1rem; color:var(--ink-soft); max-width:62ch; margin:0;}
+  .lede a{color:var(--primary);}
+
+  section{padding:48px 0; border-bottom:1px solid var(--rule);}
+  h2{font-family:var(--display); font-weight:600; font-size:1.5rem; color:var(--primary); margin:0 0 8px;}
+  .section-note{color:var(--ink-soft); font-size:.98rem; margin:0 0 28px; max-width:62ch;}
+
+  .dropzone{
+    background:var(--paper); border:2px dashed var(--rule); border-radius:6px; padding:44px 24px;
+    text-align:center; cursor:pointer; transition:border-color .2s ease, background .2s ease;
+  }
+  .dropzone.drag{border-color:var(--primary); background:var(--new-bg);}
+  .dropzone .dz-title{font-family:var(--display); font-size:1.2rem; color:var(--primary); margin:0 0 6px;}
+  .dropzone .dz-sub{color:var(--ink-soft); font-size:.92rem; margin:0;}
+  .dropzone input{display:none;}
+  .dz-btn{
+    display:inline-block; margin-top:16px; font-family:var(--mono); font-size:12.5px; letter-spacing:.04em;
+    background:var(--primary); color:var(--paper); border:none; border-radius:20px; padding:10px 20px; cursor:pointer;
+  }
+  .dz-btn:hover{background:var(--primary-soft);}
+
+  .status-line{
+    display:flex; align-items:center; gap:10px; margin-top:18px; font-family:var(--mono); font-size:12.5px;
+    color:var(--ink-soft);
+  }
+  .spinner{
+    width:14px; height:14px; border-radius:50%; border:2px solid var(--rule); border-top-color:var(--primary);
+    animation:spin .8s linear infinite; display:none;
+  }
+  .spinner.on{display:inline-block;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .warn-box{
+    background:var(--warn-bg); border:1px solid #E4D3AE; border-radius:4px; padding:14px 18px;
+    font-size:.92rem; color:#5b4a26; margin-top:16px; display:none;
+  }
+  .warn-box.on{display:block;}
+  .warn-box ul{margin:6px 0 0; padding-left:1.2em;}
+
+  .results{display:none; margin-top:36px;}
+  .results.on{display:block;}
+
+  .stat-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(160px,1fr)); gap:1px; background:var(--rule); border:1px solid var(--rule); border-radius:4px; overflow:hidden; margin-bottom:24px;}
+  .stat-card{background:var(--paper); padding:16px 18px;}
+  .stat-card .lbl{font-family:var(--mono); font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:6px;}
+  .stat-card .val{font-family:var(--display); font-size:1.5rem; color:var(--primary); font-weight:600;}
+  .stat-card .val.new{color:var(--new);}
+  .stat-card .sub{font-family:var(--mono); font-size:11px; color:var(--ink-soft); margin-top:4px;}
+
+  .info-box{
+    background:var(--paper); border:1px solid var(--rule); border-radius:4px; padding:18px 22px;
+    font-size:.95rem; margin-bottom:24px;
+  }
+  .info-box summary{cursor:pointer; font-family:var(--mono); font-size:12px; letter-spacing:.04em; color:var(--primary); text-transform:uppercase;}
+  .info-box .term{margin-top:14px;}
+  .info-box .term b{color:var(--primary);}
+
+  table{width:100%; border-collapse:collapse; font-size:.92rem; margin-bottom:24px;}
+  th, td{text-align:left; padding:9px 12px; border-bottom:1px solid var(--rule);}
+  th{font-family:var(--mono); font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft); font-weight:500;}
+  td.mono{font-family:var(--mono); font-size:.88rem;}
+  tr:last-child td{border-bottom:none;}
+  .verdict{font-weight:600;}
+  .verdict.sig{color:var(--new);}
+  .verdict.nonsig{color:var(--old);}
+
+  .downloads{display:flex; gap:12px; flex-wrap:wrap; margin-top:8px;}
+  .dl-btn{
+    font-family:var(--mono); font-size:12.5px; letter-spacing:.03em; color:var(--paper); background:var(--new);
+    border:none; border-radius:20px; padding:10px 18px; cursor:pointer; text-decoration:none; display:inline-block;
+  }
+  .dl-btn:hover{background:#255950;}
+  .dl-btn.secondary{background:var(--primary);}
+  .dl-btn.secondary:hover{background:var(--primary-soft);}
+
+  .preview-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:24px;}
+  .preview-block{background:var(--paper); border:1px solid var(--rule); border-radius:4px; padding:14px 16px; font-family:var(--mono); font-size:13px; line-height:1.6; max-height:220px; overflow:auto;}
+  .preview-block .lbl{font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-soft); margin-bottom:8px;}
+  @media (max-width:640px){.preview-grid{grid-template-columns:1fr;}}
+
+  footer{padding:40px 0 72px; color:var(--ink-soft); font-size:.9rem;}
+  footer a{color:var(--primary);}
+  code.pill{
+    font-family:var(--mono); background:var(--old-bg); color:var(--old); padding:1px 6px; border-radius:3px; font-size:.9em;
+  }
+
+
+  .game-tabs{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0 8px;}
+  .game-tab{font-family:var(--mono);font-size:13px;letter-spacing:.03em;padding:10px 18px;
+    border-radius:20px;border:1px solid var(--rule);background:var(--paper);color:var(--ink-soft);
+    cursor:pointer;transition:.15s;}
+  .game-tab:hover{border-color:var(--primary);color:var(--primary);}
+  .game-tab.active{background:var(--primary);border-color:var(--primary);color:var(--paper);}
+
+  .game-panel{display:none;padding:32px 0 8px;border-bottom:1px solid var(--rule);margin-bottom:8px;}
+  .game-panel.active{display:block;}
+  .game-panel h2{margin-top:0;}
+
+  .dv-layout{display:grid;grid-template-columns:190px 1fr;gap:32px;align-items:start;}
+  @media (max-width:640px){.dv-layout{grid-template-columns:1fr;}}
+  .hangman-svg{width:100%;max-width:190px;background:var(--paper);border:1px solid var(--rule);border-radius:6px;display:block;}
+  #dvWater{transition:y .4s ease, height .4s ease;}
+
+  .dv-hint{font-family:var(--body);font-style:italic;color:var(--ink-soft);margin:0 0 10px;}
+  .dv-slots{font-family:var(--mono);font-size:1.7rem;letter-spacing:.24em;color:var(--primary);
+    margin:0 0 16px;word-break:break-all;}
+
+  .kbd{display:grid;grid-template-columns:repeat(9,1fr);gap:6px;margin:16px 0 20px;max-width:430px;}
+  @media (max-width:480px){.kbd{grid-template-columns:repeat(6,1fr);}}
+  .kbd button{font-family:var(--mono);font-size:14px;padding:9px 0;border:1px solid var(--rule);
+    background:var(--paper);color:var(--ink);border-radius:4px;cursor:pointer;text-transform:uppercase;}
+  .kbd button:hover:not(:disabled){border-color:var(--primary);}
+  .kbd button:disabled{cursor:default;opacity:.5;}
+  .kbd button.correct{background:var(--new-bg);color:var(--new);border-color:var(--new);}
+  .kbd button.wrong{background:var(--old-bg);color:var(--old);border-color:var(--old);}
+
+  .msg-banner{min-height:1.4em;font-family:var(--mono);font-size:13.5px;margin:8px 0 4px;}
+  .msg-banner.win{color:var(--new);}
+  .msg-banner.lose{color:var(--old);}
+
+  .choice-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:14px 0;}
+  .choice-btn{font-family:var(--mono);font-size:14px;padding:15px 10px;border:1px solid var(--rule);
+    border-radius:6px;background:var(--paper);color:var(--ink);cursor:pointer;text-align:center;}
+  .choice-btn:hover:not(:disabled){border-color:var(--primary);}
+  .choice-btn:disabled{cursor:default;}
+  .choice-btn.correct{background:var(--new-bg);color:var(--new);border-color:var(--new);}
+  .choice-btn.wrong{background:var(--old-bg);color:var(--old);border-color:var(--old);}
+
+  .mem-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:520px;margin:14px 0;}
+  @media (max-width:520px){.mem-grid{grid-template-columns:repeat(3,1fr);}}
+  .mem-card{aspect-ratio:1/1;font-family:var(--mono);font-size:12.5px;border:1px solid var(--rule);
+    border-radius:6px;background:var(--primary);color:var(--paper);cursor:pointer;display:flex;
+    align-items:center;justify-content:center;padding:4px;text-align:center;word-break:break-word;
+    line-height:1.15;}
+  .mem-card:disabled{cursor:default;}
+  .mem-card.revealed{background:var(--paper);color:var(--ink);border-color:var(--primary);}
+  .mem-card.matched{background:var(--new-bg);color:var(--new);border-color:var(--new);}
+
+  .dz-btn.secondary{background:var(--paper);color:var(--primary);border:1px solid var(--primary);
+    margin-left:0;}
+  .dz-btn.secondary:hover{background:var(--primary);color:var(--paper);}
+
+  .game-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="topbar">
+    <a class="brand" href="index.html">
+      <img src="../assets/aac-logo.png" alt="Logo AAC">
+      <span class="brand-word">aac.ht</span>
+    </a>
+    <nav class="toplinks">
+      <a href="index.html">Konvètisè</a>
+      <a href="documents.html">Dokiman</a>
+      <a href="jwet.html" class="active">Jwèt</a>
+    </nav>
+  </div>
+
+  <header class="hero">
+    <p class="eyebrow">Jwèt · Pratike AAC</p>
+    <h1>Aprann AAC la san w pa wè l ap pase.</h1>
+    <p class="lede">Kat jwèt kout pou pratike òtograf <code class="pill">š</code> <code class="pill">ŏ</code> <code class="pill">ŋ</code> yo epi ranfòse memwa w : yon devinèt mo ki kwonometre e ki fè w pi pre nan dlo chak fwa w manke, yon jwèt koerans tematik, yon jwèt memwa ki parye òtograf 1979 ak AAC, ak yon ti kiz gramè.</p>
+  </header>
+
+  <section>
+    <div class="game-tabs" id="gameTabs">
+      <button class="game-tab active" data-game="devinet" type="button">Devinèt Mo</button>
+      <button class="game-tab" data-game="tematik" type="button">Koerans Tematik</button>
+      <button class="game-tab" data-game="memwa" type="button">Memwa</button>
+      <button class="game-tab" data-game="grame" type="button">Gramè</button>
+    </div>
+  </section>
+
+  <!-- ============ JWÈT 1 : DEVINÈT MO (noyaj) ============ -->
+  <section id="game-devinet" class="game-panel active">
+    <h2>Devinèt Mo — pa kite l neye</h2>
+    <p class="section-note">Devine mo a, lèt pa lèt, ekri an AAC. Chak move repons fè dlo a moute — senk erè, epi pèsonaj la neye. Tan w kwonometre depi premye lèt ou tape a.</p>
+
+    <div class="dv-layout">
+      <div>
+        <svg viewBox="0 0 160 180" class="hangman-svg" aria-hidden="true">
+          <line x1="18" y1="168" x2="142" y2="168" style="stroke:var(--ink-soft); stroke-width:3;"/>
+          <circle cx="80" cy="58" r="16" fill="none" style="stroke:var(--ink); stroke-width:3;"/>
+          <line x1="80" y1="74" x2="80" y2="126" style="stroke:var(--ink); stroke-width:3;"/>
+          <line x1="80" y1="92" x2="58" y2="112" style="stroke:var(--ink); stroke-width:3;"/>
+          <line x1="80" y1="92" x2="102" y2="112" style="stroke:var(--ink); stroke-width:3;"/>
+          <line x1="80" y1="126" x2="63" y2="164" style="stroke:var(--ink); stroke-width:3;"/>
+          <line x1="80" y1="126" x2="97" y2="164" style="stroke:var(--ink); stroke-width:3;"/>
+          <rect id="dvWater" x="0" y="180" width="160" height="0" fill="rgba(31,56,100,.55)"/>
+        </svg>
+      </div>
+      <div>
+        <div class="stat-grid" style="margin-bottom:16px;">
+          <div class="stat-card"><div class="lbl">Tan</div><div class="val" id="dvTimer">0.0 s</div></div>
+          <div class="stat-card"><div class="lbl">Erè</div><div class="val" id="dvErrors">0 / 5</div></div>
+          <div class="stat-card"><div class="lbl">Pi bon tan</div><div class="val new" id="dvBest">—</div></div>
+        </div>
+        <p class="dv-hint" id="dvHint">—</p>
+        <p class="dv-slots" id="dvSlots">_ _ _</p>
+        <div class="msg-banner" id="dvMsg"></div>
+        <div class="kbd" id="dvKeyboard"></div>
+        <div class="game-actions">
+          <button class="dz-btn" id="dvNewBtn" type="button">Nouvo mo</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ JWÈT 2 : KOERANS TEMATIK ============ -->
+  <section id="game-tematik" class="game-panel">
+    <h2>Koerans Tematik — jwenn moun ki pa fè pati</h2>
+    <p class="section-note">Kat mo fè pati menm tèm nan (pati kò, fanmi, koulè, manje, bèt) — yon sèl se yon entri ki soti nan yon lòt tèm. Klike sou li.</p>
+
+    <div class="stat-grid" style="margin-bottom:16px;">
+      <div class="stat-card"><div class="lbl">Pwen</div><div class="val" id="tmScore">0</div></div>
+      <div class="stat-card"><div class="lbl">Nan swit</div><div class="val" id="tmStreak">0</div></div>
+      <div class="stat-card"><div class="lbl">Pi bon nan swit</div><div class="val new" id="tmBest">—</div></div>
+    </div>
+    <p class="dv-hint" id="tmTheme">Tèm: —</p>
+    <div class="choice-grid" id="tmGrid"></div>
+    <div class="msg-banner" id="tmMsg"></div>
+    <div class="game-actions">
+      <button class="dz-btn" id="tmNewBtn" type="button">Pwochen won</button>
+    </div>
+  </section>
+
+  <!-- ============ JWÈT 3 : MEMWA (1979 <-> AAC) ============ -->
+  <section id="game-memwa" class="game-panel">
+    <h2>Memwa — parye 1979 ak AAC</h2>
+    <p class="section-note">Douz kat, sis pè : yon kat ekri mo a an òtograf 1979, lòt la ekri menm mo a an AAC. Jwenn tou de kat ki reprezante menm mo a, ak mwens eseye posib.</p>
+
+    <div class="stat-grid" style="margin-bottom:16px;">
+      <div class="stat-card"><div class="lbl">Tan</div><div class="val" id="mmTimer">0.0 s</div></div>
+      <div class="stat-card"><div class="lbl">Eseye</div><div class="val" id="mmMoves">0</div></div>
+      <div class="stat-card"><div class="lbl">Pi bon eseye</div><div class="val new" id="mmBest">—</div></div>
+    </div>
+    <div class="mem-grid" id="mmGrid"></div>
+    <div class="msg-banner" id="mmMsg"></div>
+    <div class="game-actions">
+      <button class="dz-btn" id="mmNewBtn" type="button">Nouvo pati</button>
+    </div>
+  </section>
+
+  <!-- ============ JWÈT 4 : GRAMÈ / ÒTOGRAF ============ -->
+  <section id="game-grame" class="game-panel">
+    <h2>Gramè ak Òtograf — kesyon kout</h2>
+    <p class="section-note">Melanj kesyon sou jan pou ekri sèten mo an AAC, ak kesyon sou mo gramatikal (tan vèb : te/ap/pral/fèk/ta, ak marikè pliryèl yo).</p>
+
+    <div class="stat-grid" style="margin-bottom:16px;">
+      <div class="stat-card"><div class="lbl" id="qzProgress">Kesyon 1 / 12</div><div class="val" id="qzScore">0</div></div>
+      <div class="stat-card"><div class="lbl">Pi bon eskò</div><div class="val new" id="qzBest">—</div></div>
+    </div>
+    <p class="dv-hint" id="qzPrompt">—</p>
+    <div class="choice-grid" id="qzOptions"></div>
+    <div class="msg-banner" id="qzMsg"></div>
+    <div class="msg-banner" id="qzResult"></div>
+    <div class="game-actions">
+      <button class="dz-btn" id="qzNextBtn" type="button" style="display:none;">Kesyon swivan</button>
+      <button class="dz-btn secondary" id="qzNewBtn" type="button">Rekòmanse kiz la</button>
+    </div>
+  </section>
+
+  <footer>
+    <div class="foot-links">
+      <a class="linklike" href="index.html" style="text-decoration:none;">Konvètisè</a>
+      <a class="linklike" href="documents.html" style="text-decoration:none;">Konvèti dokiman</a>
+    </div>
+    Jwèt sa yo itilize menm règ konvèsyon an ak konvètisè prensipal la (<code class="pill">ch→š</code>, <code class="pill">ou/oun→ŏ</code>, <code class="pill">ng→ŋ</code>, <code class="pill">ui→wi</code>) — pa gen okenn òtograf tape alamen, tout jenere depi mo 1979 yo pou evite erè.
+  </footer>
+</div>
+
+<script>
+/* ============ Konvètisè AAC (menm règ ak converter/acc_converter.js) ============
+   Enliye dirèkteman pou paj sa a ka mache san sèvè, menm jan ak index.html. */
+const FORWARD_RULES = [
+  ["Ch", "Š"], ["CH", "Š"], ["ch", "š"],
+  ["Ou", "Ŏ"], ["OU", "Ŏ"], ["ou", "ŏ"],
+  ["Ui", "Wi"], ["UI", "WI"], ["ui", "wi"],
+];
+/* "ng" pa toujou reprezante yon sèl son /ŋ/. Se sèlman lè "n" fèmen yon silab
+   e "g" ta dwe kòmanse yon lòt silab (donk "ng" swiv pa yon vwayèl, tankou
+   nan "grangou" = gran+gou) yo rete de konsòn separe — "ng" pa fizyone.
+   Se sèlman lè "ng" pa swiv pa yon vwayèl (fen mo, oswa devan yon konsòn,
+   tankou nan "long" oswa "lang") li reprezante yon sèl nazal e li vin Ŋ. */
+function toAcc(text) {
+  let result = text;
+  /* Desizyon "ng" an dwe fèt sou tèks ORIJINAL la anvan lòt règ yo (sitou "ou")
+     manje vwayèl la — otreman "ŏ" pa rekonèt kòm vwayèl ankò e "ng" ta konvèti mal. */
+  result = result.replace(/Ng(?![aeiouàèòAEIOUÀÈÒ])/g, "Ŋ");
+  result = result.replace(/NG(?![aeiouàèòAEIOUÀÈÒ])/g, "Ŋ");
+  result = result.replace(/ng(?![aeiouàèòAEIOUÀÈÒ])/g, "ŋ");
+  for (const [pattern, repl] of FORWARD_RULES) {
+    result = result.split(pattern).join(repl);
+  }
+  return result;
+}
+
+/* ============ Itilitè jeneral ============ */
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function pickRandom(arr, n) { return shuffle(arr).slice(0, n); }
+function lsGet(key, def) {
+  try { const v = localStorage.getItem(key); return v === null ? def : JSON.parse(v); }
+  catch (e) { return def; }
+}
+function lsSet(key, val) {
+  try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) { /* silencieux */ }
+}
+
+/* ============ Done : bank mo (òtograf 1979 — AAC jenere otomatikman) ============ */
+const CATEGORIES = {
+  pati_ko: { label: 'Pati kò', words: ['tèt','je','bouch','nen','zòrèy','men','pye','dan','lang','dwèt','do','vant','jenou','kou','zepòl'] },
+  fanmi:   { label: 'Fanmi',   words: ['manman','papa','pitit','frè','sè','granmè','granpè','matant','tonton','kouzen','mari','madanm'] },
+  koulè:   { label: 'Koulè',   words: ['wouj','ble','jòn','vèt','nwa','blan','gri','woz','mov','mawon'] },
+  manje:   { label: 'Manje',   words: ['diri','pwa','bannann','mayi','vyann','ze','pen','sòs','fwi','sèl'] },
+  bèt:     { label: 'Bèt',     words: ['chen','chat','kabrit','poul','bèf','chwal','kochon','mouton','rat','zwazo','pwason','kodenn'] },
+};
+
+const DEVINET_WORDS = [
+  { w:'chante',  hint:'Sa yon chantè fè',                 cat:'Vèb' },
+  { w:'chemen',  hint:'Kote w mache pou rive yon kote',    cat:'Non' },
+  { w:'chèz',    hint:'Ou chita sou li',                   cat:'Non' },
+  { w:'dlo',     hint:'Ou bwè l lè w swaf',                cat:'Non' },
+  { w:'moun',    hint:'Yon èt imen',                       cat:'Non' },
+  { w:'chen',    hint:'Bèt ki jape',                       cat:'Bèt' },
+  { w:'lekòl',   hint:'Kote timoun aprann',                cat:'Kote' },
+  { w:'kouto',   hint:'Zouti ki koupe',                    cat:'Zouti' },
+  { w:'soulye',  hint:'Ou mete l nan pye w',                cat:'Rad' },
+  { w:'jenou',   hint:'Pati kò ki ka pliye',                cat:'Pati kò' },
+  { w:'lang',    hint:'Pati kò nan bouch ou ki pale',       cat:'Pati kò' },
+  { w:'grangou', hint:'Santiman lè vant ou vid',            cat:'Santiman' },
+  { w:'long',    hint:'Kontrè kout',                        cat:'Deskripsyon' },
+  { w:'jwenn',   hint:'Dekouvri yon bagay ou t ap chèche',  cat:'Vèb' },
+  { w:'touche',  hint:'Mete men sou yon bagay',             cat:'Vèb' },
+  { w:'wouj',    hint:'Koulè san',                          cat:'Koulè' },
+  { w:'chwal',   hint:'Bèt yo monte',                       cat:'Bèt' },
+  { w:'bouch',   hint:'Pati kò ou manje avè l',             cat:'Pati kò' },
+];
+
+/* ============ Tabs ============ */
+const initialized = { devinet:false, tematik:false, memwa:false, grame:false };
+function switchGame(name) {
+  document.querySelectorAll('.game-tab').forEach(b => b.classList.toggle('active', b.dataset.game === name));
+  document.querySelectorAll('.game-panel').forEach(p => p.classList.toggle('active', p.id === 'game-' + name));
+  if (!initialized[name]) {
+    initialized[name] = true;
+    if (name === 'devinet') dvNewRound();
+    if (name === 'tematik') tmNewRound();
+    if (name === 'memwa') mmNewGame();
+    if (name === 'grame') qzNewGame();
+  }
+}
+document.querySelectorAll('.game-tab').forEach(btn => {
+  btn.addEventListener('click', () => switchGame(btn.dataset.game));
+});
+
+/* ============ JWÈT 1 : Devinèt Mo (noyaj) ============ */
+const DV_KEYBOARD_LETTERS = 'abdefgijklmnŋoòŏèprsštvwyz'.split('').sort((a, b) => a.localeCompare(b, 'fr'));
+let dvState = null;
+
+function dvNewRound() {
+  if (dvState && dvState.timerInt) clearInterval(dvState.timerInt);
+  const entry = DEVINET_WORDS[Math.floor(Math.random() * DEVINET_WORDS.length)];
+  dvState = {
+    word: entry.w, hint: entry.hint, cat: entry.cat,
+    aac: toAcc(entry.w).toLowerCase(),
+    guessed: new Set(), wrong: 0, maxWrong: 5,
+    started: false, startTime: null, finished: false, timerInt: null,
+  };
+  dvBuildKeyboard();
+  dvRender();
+  document.getElementById('dvTimer').textContent = '0.0 s';
+  /* Kwonomèt la pa demare toutafè — li pran mòd sèlman lè w tape premye lèt ou a (gade dvGuess). */
+}
+
+function dvStartTimerIfNeeded() {
+  if (dvState.started) return;
+  dvState.started = true;
+  dvState.startTime = performance.now();
+  dvState.timerInt = setInterval(() => {
+    if (!dvState.finished) {
+      document.getElementById('dvTimer').textContent = ((performance.now() - dvState.startTime) / 1000).toFixed(1) + ' s';
+    }
+  }, 100);
+}
+
+function dvBuildKeyboard() {
+  const kbd = document.getElementById('dvKeyboard');
+  kbd.innerHTML = '';
+  DV_KEYBOARD_LETTERS.forEach(letter => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = letter;
+    b.addEventListener('click', () => dvGuess(letter, b));
+    kbd.appendChild(b);
+  });
+}
+
+function dvRender() {
+  const slots = [...dvState.aac].map(ch => dvState.guessed.has(ch) ? ch.toUpperCase() : '_').join(' ');
+  document.getElementById('dvSlots').textContent = slots;
+  document.getElementById('dvHint').textContent = dvState.hint + ' · ' + dvState.cat;
+  document.getElementById('dvErrors').textContent = dvState.wrong + ' / ' + dvState.maxWrong;
+  const h = Math.min(dvState.wrong, dvState.maxWrong) * 32;
+  const water = document.getElementById('dvWater');
+  water.setAttribute('y', 180 - h);
+  water.setAttribute('height', h);
+  const best = lsGet('aac_dv_best', null);
+  document.getElementById('dvBest').textContent = best === null ? '—' : best.toFixed(1) + ' s';
+}
+
+function dvGuess(letter, btn) {
+  if (dvState.finished || dvState.guessed.has(letter)) return;
+  dvStartTimerIfNeeded();
+  dvState.guessed.add(letter);
+  btn.disabled = true;
+  if (dvState.aac.includes(letter)) {
+    btn.classList.add('correct');
+  } else {
+    dvState.wrong++;
+    btn.classList.add('wrong');
+  }
+  dvRender();
+  const allFound = [...dvState.aac].every(ch => dvState.guessed.has(ch));
+  if (allFound) dvEnd(true);
+  else if (dvState.wrong >= dvState.maxWrong) dvEnd(false);
+}
+
+function dvEnd(won) {
+  dvState.finished = true;
+  if (dvState.timerInt) clearInterval(dvState.timerInt);
+  const elapsed = dvState.started ? (performance.now() - dvState.startTime) / 1000 : 0;
+  document.getElementById('dvTimer').textContent = elapsed.toFixed(1) + ' s';
+  document.querySelectorAll('#dvKeyboard button').forEach(b => b.disabled = true);
+  const msg = document.getElementById('dvMsg');
+  if (won) {
+    msg.textContent = 'Bravo! Ou jwenn "' + dvState.aac.toUpperCase() + '" an ' + elapsed.toFixed(1) + ' segond, san neye.';
+    msg.className = 'msg-banner win';
+    const best = lsGet('aac_dv_best', null);
+    if (best === null || elapsed < best) lsSet('aac_dv_best', elapsed);
+  } else {
+    document.getElementById('dvSlots').textContent = [...dvState.aac].map(c => c.toUpperCase()).join(' ');
+    msg.textContent = 'Neye! Mo a te "' + dvState.aac.toUpperCase() + '" (' + dvState.word + ' an 1979).';
+    msg.className = 'msg-banner lose';
+  }
+  document.getElementById('dvBest').textContent = (lsGet('aac_dv_best', null) === null) ? '—' : lsGet('aac_dv_best', null).toFixed(1) + ' s';
+}
+document.getElementById('dvNewBtn').addEventListener('click', dvNewRound);
+
+/* ============ JWÈT 2 : Koerans Tematik ============ */
+let tmState = { score: 0, streak: 0, current: null };
+
+function tmNewRound() {
+  const keys = Object.keys(CATEGORIES);
+  const themeKey = keys[Math.floor(Math.random() * keys.length)];
+  const theme = CATEGORIES[themeKey];
+  const themeWords = pickRandom(theme.words, 4);
+  let intruderKey;
+  do { intruderKey = keys[Math.floor(Math.random() * keys.length)]; } while (intruderKey === themeKey);
+  const intruderWords = CATEGORIES[intruderKey].words;
+  const intruder = intruderWords[Math.floor(Math.random() * intruderWords.length)];
+  const options = shuffle([...themeWords, intruder]);
+  tmState.current = { themeKey, intruder };
+
+  document.getElementById('tmTheme').textContent = 'Tèm: ' + theme.label;
+  const grid = document.getElementById('tmGrid');
+  grid.innerHTML = '';
+  options.forEach(w => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'choice-btn';
+    b.textContent = toAcc(w);
+    b.addEventListener('click', () => tmGuess(w, b));
+    grid.appendChild(b);
+  });
+  document.getElementById('tmMsg').textContent = '';
+  document.getElementById('tmMsg').className = 'msg-banner';
+}
+
+function tmGuess(word, btn) {
+  document.querySelectorAll('#tmGrid .choice-btn').forEach(b => b.disabled = true);
+  const msg = document.getElementById('tmMsg');
+  if (word === tmState.current.intruder) {
+    tmState.score++; tmState.streak++;
+    btn.classList.add('correct');
+    msg.textContent = 'Wi! "' + toAcc(word) + '" pa fè pati tèm nan.';
+    msg.className = 'msg-banner win';
+    const best = lsGet('aac_tm_best', 0);
+    if (tmState.streak > best) lsSet('aac_tm_best', tmState.streak);
+  } else {
+    tmState.streak = 0;
+    btn.classList.add('wrong');
+    msg.textContent = 'Non — entri a te "' + toAcc(tmState.current.intruder) + '".';
+    msg.className = 'msg-banner lose';
+  }
+  document.getElementById('tmScore').textContent = tmState.score;
+  document.getElementById('tmStreak').textContent = tmState.streak;
+  document.getElementById('tmBest').textContent = lsGet('aac_tm_best', 0);
+}
+document.getElementById('tmNewBtn').addEventListener('click', tmNewRound);
+
+/* ============ JWÈT 3 : Memwa (1979 <-> AAC) ============ */
+let mmState = null;
+
+function mmNewGame() {
+  if (mmState && mmState.timerInt) clearInterval(mmState.timerInt);
+  const pool = Array.from(new Set([
+    ...DEVINET_WORDS.map(e => e.w),
+    ...Object.values(CATEGORIES).flatMap(c => c.words),
+  ]));
+  const words = pickRandom(pool, 6);
+  let cards = [];
+  words.forEach((w, i) => {
+    cards.push({ id: 'a' + i, pairId: i, text: w, revealed: false, matched: false });
+    cards.push({ id: 'b' + i, pairId: i, text: toAcc(w), revealed: false, matched: false });
+  });
+  cards = shuffle(cards);
+  mmState = {
+    cards, first: null, second: null, lock: false,
+    moves: 0, matched: 0, started: false, startTime: null,
+    finished: false, timerInt: null,
+  };
+  mmRender();
+  document.getElementById('mmTimer').textContent = '0.0 s';
+  /* Kwonomèt la demare sèlman lè w vire premye kat la (gade mmFlip). */
+  const best = lsGet('aac_mm_best_moves', null);
+  document.getElementById('mmBest').textContent = best === null ? '—' : best;
+}
+
+function mmStartTimerIfNeeded() {
+  if (mmState.started) return;
+  mmState.started = true;
+  mmState.startTime = performance.now();
+  mmState.timerInt = setInterval(() => {
+    if (!mmState.finished) {
+      document.getElementById('mmTimer').textContent = ((performance.now() - mmState.startTime) / 1000).toFixed(1) + ' s';
+    }
+  }, 100);
+}
+
+function mmRender() {
+  const grid = document.getElementById('mmGrid');
+  grid.innerHTML = '';
+  mmState.cards.forEach(c => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'mem-card' + (c.matched ? ' matched' : (c.revealed ? ' revealed' : ''));
+    b.textContent = (c.revealed || c.matched) ? c.text : '?';
+    if (c.matched) b.disabled = true;
+    b.addEventListener('click', () => mmFlip(c.id));
+    grid.appendChild(b);
+  });
+  document.getElementById('mmMoves').textContent = mmState.moves;
+}
+
+function mmFlip(id) {
+  if (mmState.lock || mmState.finished) return;
+  const card = mmState.cards.find(c => c.id === id);
+  if (!card || card.matched || card.revealed) return;
+  mmStartTimerIfNeeded();
+  card.revealed = true;
+
+  if (!mmState.first) {
+    mmState.first = card;
+    mmRender();
+    return;
+  }
+  mmState.second = card;
+  mmState.moves++;
+  mmState.lock = true;
+  mmRender();
+  setTimeout(() => {
+    if (mmState.first.pairId === mmState.second.pairId) {
+      mmState.first.matched = true;
+      mmState.second.matched = true;
+      mmState.matched++;
+    } else {
+      mmState.first.revealed = false;
+      mmState.second.revealed = false;
+    }
+    mmState.first = null;
+    mmState.second = null;
+    mmState.lock = false;
+    mmRender();
+    if (mmState.matched === mmState.cards.length / 2) mmEnd();
+  }, 700);
+}
+
+function mmEnd() {
+  mmState.finished = true;
+  if (mmState.timerInt) clearInterval(mmState.timerInt);
+  const elapsed = mmState.started ? (performance.now() - mmState.startTime) / 1000 : 0;
+  document.getElementById('mmTimer').textContent = elapsed.toFixed(1) + ' s';
+  const msg = document.getElementById('mmMsg');
+  msg.textContent = 'Bravo! Ou jwenn tout pè yo an ' + mmState.moves + ' eseye, ' + elapsed.toFixed(1) + ' segond.';
+  msg.className = 'msg-banner win';
+  const best = lsGet('aac_mm_best_moves', null);
+  if (best === null || mmState.moves < best) lsSet('aac_mm_best_moves', mmState.moves);
+  document.getElementById('mmBest').textContent = lsGet('aac_mm_best_moves', null);
+}
+document.getElementById('mmNewBtn').addEventListener('click', mmNewGame);
+
+/* ============ JWÈT 4 : Gramè / Òtograf (kiz) ============ */
+const ORTO_QUESTIONS = [
+  { word: 'chante',  decoys: ['chante', 'sante', 'xante'] },
+  { word: 'chemen',  decoys: ['chemen', 'semen', 'kemen'] },
+  { word: 'kouto',   decoys: ['kouto', 'koto', 'kuto'] },
+  { word: 'grangou', decoys: ['grangou', 'granngou', 'grangu'] },
+  { word: 'long',    decoys: ['long', 'lonj', 'lond'] },
+  { word: 'touche',  decoys: ['touche', 'tuche', 'tocheu'] },
+];
+
+const GRAME_QUESTIONS = [
+  { pre: 'Ayè, mwen',                       post: 'ale nan mache a.',   correct: 'te',   options: ['te','ap','pral','fèk'] },
+  { pre: 'Kounye a, li',                    post: 'manje.',             correct: 'ap',   options: ['ap','te','pral','ta'] },
+  { pre: 'Demen, nou',                      post: 'chante nan legliz.', correct: 'pral', options: ['pral','te','ap','fèk'] },
+  { pre: 'Yo',                              post: 'sòti kounye a.',     correct: 'fèk',  options: ['fèk','pral','ta','te'] },
+  { pre: 'Si m te gen lajan, m',            post: 'achte yon kay.',     correct: 'ta',   options: ['ta','te','ap','pral'] },
+  { pre: 'Machin',                          post: 'nan lakou a.',       correct: 'yo',   options: ['yo','la','a','nan'] },
+];
+
+function buildOrtoQuiz() {
+  return ORTO_QUESTIONS.map(q => {
+    const correct = toAcc(q.word);
+    const options = shuffle([correct, ...q.decoys]);
+    return { prompt: 'Ki jan yo ekri "' + q.word + '" (1979) an AAC?', options, correctAnswer: correct };
+  });
+}
+function buildGrameQuiz() {
+  return GRAME_QUESTIONS.map(q => {
+    const options = shuffle(q.options).map(o => toAcc(o));
+    const prompt = toAcc(q.pre) + ' ___ ' + toAcc(q.post);
+    return { prompt, options, correctAnswer: toAcc(q.correct) };
+  });
+}
+
+let qzState = null;
+
+function qzNewGame() {
+  qzState = { questions: shuffle([...buildOrtoQuiz(), ...buildGrameQuiz()]), idx: 0, score: 0, answered: false };
+  document.getElementById('qzResult').textContent = '';
+  document.getElementById('qzResult').className = 'msg-banner';
+  const best = lsGet('aac_qz_best', null);
+  document.getElementById('qzBest').textContent = best === null ? '—' : best;
+  qzRender();
+}
+
+function qzRender() {
+  const total = qzState.questions.length;
+  if (qzState.idx >= total) { qzFinish(); return; }
+  const q = qzState.questions[qzState.idx];
+  document.getElementById('qzProgress').textContent = 'Kesyon ' + (qzState.idx + 1) + ' / ' + total;
+  document.getElementById('qzScore').textContent = qzState.score;
+  document.getElementById('qzPrompt').textContent = q.prompt;
+  const box = document.getElementById('qzOptions');
+  box.innerHTML = '';
+  q.options.forEach(opt => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'choice-btn';
+    b.textContent = opt;
+    b.addEventListener('click', () => qzAnswer(opt, b, q));
+    box.appendChild(b);
+  });
+  document.getElementById('qzMsg').textContent = '';
+  document.getElementById('qzMsg').className = 'msg-banner';
+  document.getElementById('qzNextBtn').style.display = 'none';
+  qzState.answered = false;
+}
+
+function qzAnswer(opt, btn, q) {
+  if (qzState.answered) return;
+  qzState.answered = true;
+  document.querySelectorAll('#qzOptions .choice-btn').forEach(b => {
+    b.disabled = true;
+    if (b.textContent === q.correctAnswer) b.classList.add('correct');
+  });
+  const msg = document.getElementById('qzMsg');
+  if (opt === q.correctAnswer) {
+    qzState.score++;
+    msg.textContent = 'Kòrèk!';
+    msg.className = 'msg-banner win';
+  } else {
+    btn.classList.add('wrong');
+    msg.textContent = 'Repons kòrèk la se: ' + q.correctAnswer;
+    msg.className = 'msg-banner lose';
+  }
+  document.getElementById('qzScore').textContent = qzState.score;
+  document.getElementById('qzNextBtn').style.display = 'inline-block';
+}
+
+function qzFinish() {
+  const total = qzState.questions.length;
+  document.getElementById('qzProgress').textContent = 'Fini';
+  document.getElementById('qzPrompt').textContent = '';
+  document.getElementById('qzOptions').innerHTML = '';
+  document.getElementById('qzMsg').textContent = '';
+  document.getElementById('qzNextBtn').style.display = 'none';
+  const res = document.getElementById('qzResult');
+  res.textContent = 'Ou fè ' + qzState.score + ' / ' + total + ' pwen.';
+  res.className = 'msg-banner win';
+  const best = lsGet('aac_qz_best', 0);
+  if (qzState.score > best) lsSet('aac_qz_best', qzState.score);
+  document.getElementById('qzBest').textContent = lsGet('aac_qz_best', 0);
+}
+document.getElementById('qzNextBtn').addEventListener('click', () => { qzState.idx++; qzRender(); });
+document.getElementById('qzNewBtn').addEventListener('click', qzNewGame);
+
+/* ============ Demaraj ============ */
+switchGame('devinet');
+</script>
+</body>
+</html>
