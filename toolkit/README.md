@@ -4,7 +4,7 @@
 >
 > **English:** A working prototype (bidirectional converter + interactive demo) supporting a research proposal to simplify four opaque digraphs of the 1979 official Haitian Creole orthography (`ch`, `ou`, `oun`, `ng`) into three standard Unicode monographs (`š`, `ŏ`, `ŋ`), while deliberately leaving `an`, `en`, `on` untouched. The underlying theory reclassifies the traditional 32-letter alphabet as containing only 24 truly irreducible letters — the rest being regular, predictable combinations.
 
-Ce dépôt ne contient pas de théorie supplémentaire : il contient du **code qui vérifie que la théorie fonctionne**. Chaque chiffre cité dans le mémoire (gain de 9,3 % sur le corpus Depestre, 140 → 127 caractères, réduction de l'inventaire alphabétique nominal de 32 à 24 lettres) est reproduit par une suite de tests automatisés, pas seulement affirmé dans un texte.
+Ce dépôt ne contient pas de théorie supplémentaire : il contient du **code qui vérifie que la théorie fonctionne**. Chaque chiffre cité dans le mémoire (gain de 2,5 % à 9,3 % selon le texte — moyenne 5,7 %, IC95 % [3,9–7,5 %] sur 8 textes indépendants —, 140 → 127 caractères pour l'extrait historique, réduction de l'inventaire alphabétique nominal de 32 à 24 lettres) est reproduit par une suite de tests automatisés, pas seulement affirmé dans un texte.
 
 ## L'idée en une phrase
 
@@ -213,7 +213,13 @@ La conversion ACC → 1979 n'est **pas parfaitement réversible** pour la séque
 
 ## Conversion de documents (Word / PDF) et traitement statistique
 
-Le chiffre du mémoire — « gain de 9,3 % sur le corpus Depestre » — repose sur **un seul extrait de 140 caractères**. C'est une démonstration ponctuelle, pas une estimation : elle n'a ni écart-type, ni intervalle de confiance, et rien n'indique si elle se généralise à un texte réel. `converter/document_converter.py` et `converter/document_stats.py` répondent à ça en opérant au niveau du document entier plutôt que sur un extrait choisi.
+Le chiffre initial du mémoire — « gain de 9,3 % » — reposait sur **un seul extrait de 140 caractères**, et cet extrait avait en plus été mal attribué à René Depestre dans une version antérieure de ce dépôt : il s'agit en réalité d'un texte personnel de l'auteur, rédigé dans le cadre du document AAC/AKI (corrigé dans `converter/tests/test_converter.py`, classe `TestCorpusLincoln`). Un seul extrait, quelle que soit son attribution, reste une démonstration ponctuelle, pas une estimation : ni écart-type, ni intervalle de confiance, rien n'indique si elle se généralise.
+
+`converter/corpus.py` répond à ça avec **8 textes indépendants de sources délibérément diverses** : 2 textes personnels de l'auteur, un extrait légal (Constitution de 1987), un extrait international (Déclaration universelle des droits de l'homme, traduction officielle OHCHR), 2 lots de pwovèb kreyòl (tradition orale, domaine public), et 2 extraits littéraires du domaine public — Oswald Durand (« Choukoun », 1883 ; mort en 1906) et Georges Sylvain (« Cric? Crac! », 1901 ; mort en 1925). Volontairement absents : des auteurs dont l'œuvre reste sous droits (Frankétienne, mort en 2025 ; René Depestre ; Georges Castera, mort en 2020) — les reproduire ici serait une violation de copyright, pas une question de citation en passant.
+
+Sur ces 8 textes (`converter/tests/test_corpus_diversity.py`), le gain varie de **2,5 % à 9,3 %** selon le texte, moyenne **5,7 %** (IC95 % [3,9–7,5 %]). Ce n'est pas un échantillon aléatoire représentatif du créole écrit en général — c'est un échantillon de convenance choisi pour sa diversité de registres (personnel, légal, international, oral, littéraire ancien) — mais il montre que le gain n'est pas un artefact d'un seul extrait choisi.
+
+`converter/document_converter.py` et `converter/document_stats.py` vont plus loin encore : ils permettent de mesurer ce même gain, avec le même appareil statistique, sur **n'importe quel document fourni par l'utilisateur** plutôt que sur un corpus fixe.
 
 ```bash
 pip install -r converter/requirements-documents.txt
@@ -245,7 +251,7 @@ Deux leviers, cumulables, pour resserrer les intervalles de confiance :
   - **pooled** — chaque paragraphe de chaque document compte comme une observation indépendante (IC le plus étroit, un peu optimiste) ;
   - **cluster** — chaque document résumé par sa propre moyenne, n = nombre de documents (IC plus large, plus honnête — c'est celui à citer dans un mémoire). Avec seulement 1-2 documents, cet IC "cluster" est volontairement très large : c'est le signal qu'il faut plus de documents, pas plus de paragraphes du même texte.
 
-`converter/tests/test_document_stats.py` vérifie entre autres que le chiffre historique du mémoire (140 → 127 caractères, −9,3 %) reste reproductible tel quel via ce pipeline, et que le test t détecte correctement un gain nul quand le texte ne contient aucune séquence opaque. `converter/tests/test_document_converter.py` vérifie la préservation du gras/italique sur un docx converti.
+`converter/tests/test_document_stats.py` vérifie entre autres que le chiffre historique du mémoire (140 → 127 caractères, −9,3 %, texte personnel de l'auteur) reste reproductible tel quel via ce pipeline, et que le test t détecte correctement un gain nul quand le texte ne contient aucune séquence opaque. `converter/tests/test_corpus_diversity.py` vérifie que l'écart mesuré sur les 8 textes de `corpus.py` (2,5 % à 9,3 %) reste stable, et qu'aucun auteur encore sous droits n'y est jamais réintroduit. `converter/tests/test_document_converter.py` vérifie la préservation du gras/italique sur un docx converti.
 
 ### Version navigateur (`web-demo/documents.html`)
 

@@ -1,10 +1,19 @@
 """
 Tests de non-régression pour acc_converter.
 
-Le test `test_corpus_depestre_matches_memoire` reproduit exactement
+Le test `test_corpus_lincoln_matches_memoire` reproduit exactement
 l'analyse du chapitre IV, section 4.1.2 du mémoire : si ce test échoue,
 les chiffres cités dans le mémoire (140 -> 127 caractères, gain de 9,3 %)
 ne sont plus reproductibles et doivent être corrigés dans le document.
+
+Note d'attribution (corrigée) : ce texte de 140 caractères est un texte
+personnel de l'auteur du mémoire (Lincoln Compère), rédigé dans le cadre
+du document AAC/AKI — il avait été mal étiqueté "Depestre" dans une
+version antérieure de ce dépôt (variable/classe portant ce nom). Pour un
+gain mesuré sur plusieurs textes indépendants et de sources diverses
+(personnel, légal, international, oral, littéraire du domaine public),
+voir `corpus.py` et `test_corpus_diversity.py` : le gain varie de 2,5 %
+à 9,3 % selon le texte (moyenne 5,7 %, IC95 % [3,9–7,5 %] sur 8 textes).
 """
 
 import os
@@ -49,8 +58,14 @@ class TestForwardConversion(unittest.TestCase):
         self.assertEqual(to_acc("yo"), "yo")
 
 
-class TestCorpusDepestre(unittest.TestCase):
-    """Reproduit l'exemple du chapitre IV, section 4.1.2 du mémoire."""
+class TestCorpusLincoln(unittest.TestCase):
+    """Reproduit l'exemple du chapitre IV, section 4.1.2 du mémoire.
+
+    Ce texte de 140 caractères est un texte personnel de l'auteur
+    (Lincoln Compère, document AAC/AKI) — PAS un extrait de René
+    Depestre, contrairement à l'étiquette utilisée dans une version
+    antérieure de ce dépôt (classe et variables renommées en
+    conséquence : TestCorpusDepestre -> TestCorpusLincoln)."""
 
     ORIGINAL = (
         "Chante pou chase lapli nan kò mwen, chante pou san mwen rete cho "

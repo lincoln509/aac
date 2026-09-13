@@ -40,7 +40,7 @@ Le toolkit est une implémentation technique de la réforme proposée. Il compre
 - **Un convertisseur** (Python / JavaScript) entre l'orthographe officielle de 1979 et l'ACC.
 - **Une démo web** interactive (éditeur à deux panneaux, conversion en temps réel).
 - **Une disposition clavier** pour taper `š`, `ŏ` et `ŋ` facilement.
-- **Une suite de tests** qui reproduit les chiffres du mémoire (gain de 9,3 %, réduction à 127 caractères, etc.).
+- **Une suite de tests** qui reproduit les chiffres du mémoire (gain de 2,5 % à 9,3 % selon le texte — moyenne 5,7 %, IC95 % [3,9–7,5 %] sur 8 textes indépendants —, réduction à 127 caractères pour l'extrait historique, etc.).
 
 ➡️ **Accéder au toolkit :** [`toolkit/v1.0.1/`](./toolkit/v1.0.1/) — consultez son README pour l'installation et l'utilisation.
 

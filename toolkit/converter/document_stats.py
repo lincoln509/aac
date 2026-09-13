@@ -3,9 +3,13 @@ document_stats.py
 ==================
 
 Traitement statistique du gain scriptural 1979 -> ACC au niveau *document*
-(par opposition au chiffre unique et non répété du chapitre IV du mémoire,
-"9,3 % sur le corpus Depestre", qui repose sur UN seul extrait de 140
-caractères et ne permet donc aucune inférence sur sa variabilité).
+(par opposition au chiffre unique du chapitre IV du mémoire, "9,3 % sur
+un extrait de 140 caractères" — extrait qui, en plus, avait été mal
+attribué à René Depestre dans une version antérieure de ce dépôt : il
+s'agit en réalité d'un texte personnel de l'auteur du mémoire. Voir
+`corpus.py` pour un gain mesuré sur 8 textes indépendants et de sources
+diverses : 2,5 % à 9,3 % selon le texte, moyenne 5,7 %, IC95 %
+[3,9–7,5 %]).
 
 Ici, chaque paragraphe (ou, à défaut, chaque page) du document fourni
 constitue une observation indépendante. Cela permet de remplacer une

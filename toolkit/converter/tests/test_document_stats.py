@@ -10,24 +10,27 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 from document_stats import build_report, SegmentStat, DocumentStatisticalReport, build_multi_document_report
 
 
-DEPESTRE_1979 = (
+AUTOGRAF_LINCOLN = (
     "Chante pou chase lapli nan kò mwen, chante pou san mwen rete cho nan "
     "tanpèt la, pou klète lang manman nou klere sou ekran toupatou sou latè."
 )
+# Texte personnel de l'auteur (Lincoln Compère, document AAC/AKI) — anciennement
+# mal étiqueté "Depestre" dans ce fichier. Voir corpus.py pour un gain mesuré
+# sur 8 textes indépendants et de sources diverses (2,5 % à 9,3 %).
 
 
 def test_single_segment_matches_memoire_figures():
     """Le chiffre historique du mémoire (140 -> 127, -9,3 %) doit rester
     reproductible tel quel via le pipeline statistique, pas seulement via
     acc_converter.convert()."""
-    report = build_report([("depestre", DEPESTRE_1979)])
+    report = build_report([("lincoln", AUTOGRAF_LINCOLN)])
     assert report.chars_before_total == 140
     assert report.chars_after_total == 127
     assert round(report.gain_percent_global, 1) == 9.3
 
 
 def test_stdev_and_ci_undefined_for_single_segment():
-    report = build_report([("x", DEPESTRE_1979)])
+    report = build_report([("x", AUTOGRAF_LINCOLN)])
     assert math.isnan(report.stdev_gain_percent)
     lo, hi = report.ci95_gain_percent
     assert math.isnan(lo) and math.isnan(hi)
@@ -75,7 +78,7 @@ def test_paired_ttest_not_significant_when_no_gain():
 
 def test_rule_contribution_matches_actual_savings():
     segments = [
-        ("a", DEPESTRE_1979),
+        ("a", AUTOGRAF_LINCOLN),
         ("b", "Chak moun ka wè ou nan lakou a."),
     ]
     report = build_report(segments)
@@ -92,7 +95,7 @@ def test_cohens_d_zero_when_no_variation():
 
 def test_to_dict_and_to_markdown_do_not_crash():
     segments = [
-        ("a", DEPESTRE_1979),
+        ("a", AUTOGRAF_LINCOLN),
         ("b", "Chak moun ka wè ou nan lakou a."),
         ("c", "Timoun yo renmen jwe nan lakou lekòl la."),
     ]
