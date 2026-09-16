@@ -30,19 +30,25 @@ acc-toolkit/
 │   ├── acc_converter.js       # port JavaScript (même comportement)
 │   ├── document_converter.py  # conversion .docx/.pdf avec préservation du format
 │   ├── document_stats.py      # traitement statistique (écart-type, IC, test t, bootstrap)
+│   ├── letter_analysis.py     # fréquence et fonction syllabique (onset/nucleus/coda) des lettres atomiques
+│   ├── corpus.py               # corpus de validation à 8 textes indépendants
 │   ├── requirements-documents.txt
 │   └── tests/
 │       ├── test_converter.py           # tests de non-régression liés au mémoire
 │       ├── test_document_converter.py  # fidélité de mise en forme docx
-│       └── test_document_stats.py      # validité du traitement statistique
+│       ├── test_document_stats.py      # validité du traitement statistique
+│       ├── test_corpus_diversity.py    # écart de gain mesuré sur les 8 textes du corpus
+│       └── test_letter_analysis.py     # fréquence et analyse fonctionnelle des lettres atomiques
 ├── web-demo/
 │   ├── index.html             # démo interactive, un seul fichier
-│   └── documents.html         # conversion de documents entiers (docx/pdf) + rapport statistique
+│   ├── documents.html         # conversion de documents entiers (docx/pdf) + rapport statistique
+│   └── jwet.html               # 4 jeux de pratique de l'orthographe AAC
 ├── keyboard/
 │   ├── ht-t-k0-aac.xml        # disposition clavier CLDR Keyboard 3.0
 │   └── README.md              # guide d'installation par plateforme
 ├── docs/
-│   └── grapheme-table.md      # table de correspondance complète
+│   ├── grapheme-table.md      # table de correspondance complète
+│   └── letter-frequency-analysis.md  # formules de fréquence et d'analyse fonctionnelle syllabique
 ├── assets/
 │   ├── aac-logo.png           # logo (en-tête du site)
 │   ├── aac-logo-square.png    # favicon
@@ -261,6 +267,14 @@ Même traitement statistique, mais glisser-déposer direct dans le navigateur, s
 - **.pdf → texte/.docx** : le texte est extrait paragraphe par paragraphe avec [pdf.js](https://mozilla.github.io/pdf.js/) (regroupement des lignes par position verticale, détection du saut de paragraphe par écart de ligne), puis proposé en téléchargement `.txt` (fidélité de contenu garantie) et `.docx` (mise en page simple, un paragraphe par `<w:p>`). Reconstruire un `.pdf` visuellement fidèle sans backend n'est pas fait ici — utiliser `document_converter.py` pour ça.
 - Les fonctions statistiques (bêta incomplète, CDF/PPF de Student, bootstrap, test t apparié, d de Cohen) sont un port JavaScript direct de `document_stats.py`, validées ligne à ligne contre `scipy.stats.t` avant portage, puis testées de bout en bout dans un vrai navigateur (Playwright) sur les mêmes documents que les tests Python — les deux implémentations produisent des résultats identiques au dixième de point près.
 - Dépendances chargées par CDN (JSZip, pdf.js) : seule cette page en a besoin, `index.html` reste sans dépendance externe.
+
+## Fréquence et fonction syllabique des lettres atomiques
+
+`converter/letter_analysis.py` mesure comment š, ŏ et ŋ se comportent réellement une fois le texte converti : leur fréquence (par 100/1000 caractères, densité atomique globale), leur couverture lexicale (part des mots contenant au moins une lettre atomique), et leur fonction syllabique — attaque, noyau ou coda — via un syllabeur heuristique documenté (règle d'attaque maximale, standard pour une langue à forte préférence CV comme le créole).
+
+Résultat sur les 8 textes de `corpus.py` (627 syllabes, 445 mots) : `ŏ` est, par construction, toujours noyau (100 %) ; `š` est majoritairement attaque (83 %) mais peut être coda (17 %, ex. `bouch` → `bŏš`) ; `ŋ` est majoritairement coda (62 %) mais pas toujours (38 % attaque, ex. `grangou` → `graŋŏ`). Ce dernier point met en évidence un **écart entre le code et le résumé du mémoire** : celui-ci affirme qu'« une règle positionnelle stricte » limite `ng → ŋ` à la fin de syllabe, alors que `acc_converter.py` applique la substitution sans condition de position. `docs/letter-frequency-analysis.md` documente toutes les formules, ce constat, et pourquoi il n'a pas été corrigé silencieusement (une correction changerait tous les gains déjà publiés).
+
+Tests : `converter/tests/test_letter_analysis.py` (16 tests).
 
 ## Par rapport aux travaux existants
 
