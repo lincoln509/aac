@@ -38,15 +38,15 @@ nombre d'occurrences de la lettre `l` (l ∈ {š, ŏ, ŋ}, insensible à la cass
 | pwoveb_lavi | 4 | 1 | 0 | 4,55 % |
 | pwoveb_travay | 2 | 4 | 0 | 5,66 % |
 | durand_choukoun | 11 | 29 | 1 | 6,03 % |
-| sylvain_cigal_founmi | 6 | 20 | 3 | 4,35 % |
+| sylvain_cigal_founmi | 6 | 20 | 0 | 3,88 % |
 
-Densité atomique moyenne (n=8) : **6,11 %** (écart-type 2,48 %, min 2,55 %,
+Densité atomique moyenne (n=8) : **6,05 %** (écart-type 2,53 %, min 2,55 %,
 max 10,24 %) — cohérent avec le gain scriptural déjà mesuré (2,5 % à
-9,3 %, `test_corpus_diversity.py`), puisque le gain provient presque
-entièrement de la fusion de digrammes/trigrammes en une seule lettre
-atomique. `ŏ` domine largement (≈ 62 % des occurrences atomiques toutes
-sources confondues) : `ou` est la séquence opaque la plus fréquente du
-créole écrit.
+9,3 %, moyenne 5,7 %, IC95 % [3,8 % ; 7,5 %], `test_corpus_diversity.py`),
+puisque le gain provient presque entièrement de la fusion de
+digrammes/trigrammes en une seule lettre atomique. `ŏ` domine largement
+(≈ 62 % des occurrences atomiques toutes sources confondues) : `ou` est la
+séquence opaque la plus fréquente du créole écrit.
 
 ---
 
@@ -66,9 +66,9 @@ de lettres atomiques présentes dans le mot `w`.
 **Résultat mesuré** (8 textes concaténés, 445 mots) :
 
 - Couverture globale `C` = **22,0 %** — environ 1 mot créole sur 4-5 contient au moins une lettre atomique.
-- Couverture par lettre : š = 6,5 %, ŏ = 15,5 %, ŋ = 1,8 %.
-- `μ_all` = 0,254 lettre atomique par mot (tous mots confondus).
-- `μ_pos` = 1,153 — un mot touché par la réforme ne contient presque toujours qu'**une seule** lettre atomique (peu de mots cumulent plusieurs digrammes opaques).
+- Couverture par lettre : š = 6,5 %, ŏ = 15,5 %, ŋ = 1,1 %.
+- `μ_all` = 0,247 lettre atomique par mot (tous mots confondus).
+- `μ_pos` = 1,122 — un mot touché par la réforme ne contient presque toujours qu'**une seule** lettre atomique (peu de mots cumulent plusieurs digrammes opaques).
 
 ---
 
@@ -104,39 +104,67 @@ au noyau → `nucleus`, après → `coda`.
 |---|---:|---:|---:|---:|
 | š | 30 | 25 (83 %) | 5 (17 %) | — |
 | ŏ | 75 | — | — | 75 (100 %) |
-| ŋ | 8 | 3 (38 %) | 5 (62 %) | — |
+| ŋ | 5 | 0 (0 %) | 5 (100 %) | — |
 
 `ŏ` est, par construction, **toujours** noyau (il vient toujours de `ou`,
 une voyelle) — vérifié par `test_o_breve_is_always_nucleus`, qui fait
 tourner cette assertion sur les 8 textes du corpus, pas seulement sur un
-exemple isolé.
+exemple isolé. Depuis la correction de la règle positionnelle de `ng` (voir
+ci-dessous), `ŋ` est de la même façon **toujours** coda par construction —
+vérifié par `test_corpus_wide_ng_is_always_coda`.
+
+`š`, en revanche, n'est **pas** toujours en attaque : `bouch` → `bŏš` place
+`š` en coda (17 % des cas mesurés sur le corpus) — attendu, et normal,
+puisque `ch` note un phonème unique (/ʃ/) qui peut occuper n'importe quelle
+position syllabique en créole, pas seulement l'attaque. Ce n'est pas un
+bug : contrairement à `ng`, aucune règle positionnelle n'a jamais été
+revendiquée pour `ch` dans le mémoire.
 
 ---
 
-## Écart constaté avec le résumé du mémoire
+## Correction de la règle positionnelle de `ng` (historique)
 
-Le résumé du mémoire affirme :
+Une version antérieure de cette analyse avait mis en évidence un écart
+entre le code et le résumé du mémoire. Le résumé affirme :
 
 > « Une règle positionnelle stricte encadre la substitution ng → ŋ, limitée
 > aux occurrences en fin de syllabe et/ou de mot. »
 
-**Le code de `acc_converter.py` n'implémente pas cette restriction** : la
-règle `ng → ŋ` s'applique sans condition de position. Exemple concret :
-`grangou` (gran-gou, "ng" à cheval sur deux syllabes) devient `graŋŏ`, où
-`ŋ` se retrouve en **attaque** de la syllabe `ŋŏ` — pas en fin de syllabe.
-C'est exactement ce qui explique que 38 % des occurrences de `ŋ` mesurées
-sur le corpus soient en onset plutôt qu'en coda (table ci-dessus).
+Or `acc_converter.py` appliquait alors `ng → ŋ` sans aucune condition de
+position. Exemple concret : `grangou` (gran-gou, "ng" à cheval sur deux
+syllabes) devenait `graŋŏ`, où `ŋ` se retrouvait en **attaque** de la
+syllabe `ŋŏ` — pas en fin de syllabe. Sur le corpus, cela produisait 38 %
+d'occurrences de `ŋ` en onset plutôt qu'en coda.
 
-`š` non plus n'est pas toujours en attaque : `bouch` → `bŏš` place `š` en
-coda (17 % des cas mesurés) — attendu, puisque `ch` note un phonème unique
-(/ʃ/) qui peut occuper n'importe quelle position syllabique en créole, pas
-seulement l'attaque.
+**Ceci est maintenant corrigé.** `acc_converter.py` n'applique `ng → ŋ` que
+lorsque `ng` n'est *pas* suivi d'une voyelle (donc uniquement en fin de mot,
+en fin de composant d'un mot composé, ou devant une consonne) :
 
-Ce module **mesure et documente** ce comportement réel ; il ne corrige pas
-silencieusement `acc_converter.py`. Une telle correction changerait tous
-les gains scripturaux déjà publiés (mémoire, README, section 4.5 du Livre
-Blanc AKI/ACU) et doit rester une décision explicite de l'auteur, pas un
-effet de bord de cette analyse.
+```text
+grangou  -> grangŏ   (gran-gou : "g" commence la syllabe suivante, ng ne fusionne pas)
+lingis   -> lingis   (lin-gis : idem, inchangé)
+lang     -> laŋ      (ng en fin de mot : fusionne)
+long     -> loŋ
+Bleng-bleng -> Bleŋ-bleŋ
+bling-blong -> bliŋ-bloŋ
+```
+
+La condition doit être testée **avant** la règle `ou → ŏ` : sinon la
+voyelle qui suit `ng` est déjà consommée au moment du test, et la
+condition « pas suivi d'une voyelle » devient toujours vraie à tort — c'est
+exactement ce qui causait le bug initial. `acc_converter.py` applique donc
+désormais la règle `ng` en premier, avant la boucle des autres règles.
+
+Conséquence mesurable : la densité et le gain scriptural du texte
+`sylvain_cigal_founmi` (qui contient trois fois « grangou ») ont
+légèrement baissé (gain : 4,17 % → 3,74 % ; la fusion en `ŋ` économisait un
+caractère à tort à chaque occurrence). L'écart type et la borne basse de
+l'IC95 % du corpus en ont été très légèrement affectés (voir la table
+ci-dessus et `README.md`) ; la moyenne (5,7 %) et l'écart min–max global
+(2,5 %–9,3 %) restent inchangés au premier chiffre après la virgule.
+
+Cette correction rend désormais **exacte** l'affirmation du résumé du
+mémoire sur la règle positionnelle de `ng` — ce n'était pas le cas avant.
 
 ---
 

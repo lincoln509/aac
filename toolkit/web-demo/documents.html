@@ -333,19 +333,23 @@ function sampleStdev(arr) {
 }
 
 const ACC_RULES = [
-  ["Ch", "Š"], ["CH", "Š"], ["ch", "š"],
   ["Ou", "Ŏ"], ["OU", "Ŏ"], ["ou", "ŏ"],
-  ["Ng", "Ŋ"], ["NG", "Ŋ"], ["ng", "ŋ"],
+  ["Ch", "Š"], ["CH", "Š"], ["ch", "š"],
   ["Ui", "Wi"], ["UI", "WI"], ["ui", "wi"],
 ];
+// "ng" -> "ŋ" seulement si NON suivi d'une voyelle (limite de syllabe) —
+// évalué AVANT ACC_RULES, sinon la voyelle qui suit "ng" est déjà
+// consommée par la règle "ou" au moment du test.
+const NG_RULE = /(Ng|NG|ng)(?![aeiouàèòAEIOUÀÈÒ])/g;
+const NG_REPLACEMENTS = { "Ng": "Ŋ", "NG": "Ŋ", "ng": "ŋ" };
 function toAcc(text) {
-  let result = text;
+  let result = text.replace(NG_RULE, (m) => NG_REPLACEMENTS[m]);
   for (const [pattern, repl] of ACC_RULES) result = result.split(pattern).join(repl);
   return result;
 }
 function diffSummary(text) {
   const count = (re) => (text.match(re) || []).length;
-  return { ch: count(/[Cc][Hh]/g), ou: count(/[Oo][Uu]/g), ng: count(/[Nn][Gg]/g), ui: count(/[Uu][Ii]/g) };
+  return { ch: count(/[Cc][Hh]/g), ou: count(/[Oo][Uu]/g), ng: (text.match(NG_RULE) || []).length, ui: count(/[Uu][Ii]/g) };
 }
 
 function buildDocumentReport(segments, { confidenceLevel = 0.95, bootstrapResamples = 10000, bootstrapSeed = 42 } = {}) {

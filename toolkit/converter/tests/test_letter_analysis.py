@@ -110,20 +110,27 @@ def test_o_breve_is_always_nucleus():
             raise AssertionError(f"ŏ trouvé hors noyau dans : {entry['texte'][:60]}")
 
 
-def test_ng_positional_rule_is_not_actually_enforced_by_the_converter():
-    """Documente et fige l'écart connu avec le résumé du mémoire : le
-    convertisseur actuel ne restreint PAS ng->ŋ à la fin de syllabe.
-    'grangou' (gran+gou) en est la preuve concrète : ce ŋ se retrouve en
-    onset de la syllabe suivante, pas en coda de la précédente."""
+def test_ng_positional_rule_is_now_correctly_enforced():
+    """La règle positionnelle décrite dans le mémoire ("ng" -> "ŋ"
+    seulement en fin de syllabe/mot) est maintenant réellement appliquée
+    par acc_converter.py (corrigé -- voir acc_converter.py, en-tête de
+    fichier, et l'historique git pour le commit correspondant).
+
+    'grangou' (gran-gou) : le "g" commence la syllabe suivante -> "ng" ne
+    fusionne PAS, contrairement à 'lang'/'long' (ng en fin de mot)."""
     from acc_converter import to_acc
 
-    assert to_acc("grangou") == "graŋŏ"
-    syllables = syllabify("graŋŏ")
-    # ŋ appartient à la syllabe qui contient le ŏ (onset), pas à "gra" (qui serait coda)
-    assert any(syl.startswith("ŋ") for syl in syllables), (
-        "Si ce test échoue, le convertisseur a peut-être été corrigé pour "
-        "respecter la règle positionnelle du mémoire — mettre à jour "
-        "docs/letter-frequency-analysis.md en conséquence."
+    assert to_acc("grangou") == "grangŏ"
+    assert to_acc("lingis") == "lingis"
+    assert to_acc("lang") == "laŋ"
+    assert to_acc("long") == "loŋ"
+    assert to_acc("Bleng-bleng") == "Bleŋ-bleŋ"
+    assert to_acc("bling-blong") == "bliŋ-bloŋ"
+
+    syllables = syllabify(to_acc("grangou"))
+    assert not any(syl.startswith("ŋ") for syl in syllables), (
+        "ŋ ne doit plus jamais apparaître en attaque de syllabe : la règle "
+        "positionnelle garantit qu'il n'existe qu'en fin de syllabe (coda)."
     )
 
 
@@ -155,6 +162,21 @@ def test_corpus_wide_sh_is_not_always_onset():
     assert total_sh > 0
     assert rep.positions["š"]["coda"] > 0, "aucune occurrence coda de š trouvée sur le corpus"
     assert rep.positions["š"]["onset"] > 0
+
+
+def test_corpus_wide_ng_is_always_coda():
+    """Conséquence directe de la règle positionnelle (maintenant appliquée
+    par acc_converter.py, voir test_ng_positional_rule_is_now_correctly_
+    enforced) : sur les 8 textes du corpus, ŋ n'apparaît plus jamais qu'en
+    coda. S'il apparaissait en onset, ce serait la preuve d'une régression
+    de la règle positionnelle."""
+    texts = {k: v["texte"] for k, v in CORPUS.items()}
+    tout = " ".join(texts.values())
+    rep = syllable_functional_analysis(tout)
+    total_ng = sum(rep.positions["ŋ"].values())
+    assert total_ng > 0
+    assert rep.positions["ŋ"]["onset"] == 0
+    assert rep.positions["ŋ"]["coda"] == total_ng
 
 
 if __name__ == "__main__":

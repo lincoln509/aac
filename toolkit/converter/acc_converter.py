@@ -10,11 +10,26 @@ Graphie Créole Haïtienne ».
 Règles appliquées (voir Chapitre III du mémoire) :
     ch  -> š   (U+0161)   /ʃ/
     ou  -> ŏ   (U+014F)   /u/   (et donc "oun" -> "ŏn" automatiquement)
-    ng  -> ŋ   (U+014B)   /ɲ/
+    ng  -> ŋ   (U+014B)   /ŋ/   -- SEULEMENT en fin de syllabe/mot (voir plus bas)
     ui  -> wi             /ɥi/ ~ /jw/
 
 Séquences volontairement NON modifiées (déjà transparentes) :
     an, en, on
+
+Règle positionnelle de "ng" -> "ŋ" (Chapitre III du mémoire) :
+    "ng" ne représente le phonème nasal unique /ŋ/ que lorsque le "n" ferme
+    une syllabe et que le "g" ne peut pas commencer la syllabe suivante --
+    en pratique, quand "ng" n'est PAS suivi d'une voyelle (fin de mot, fin
+    de composant dans un mot composé, ou suivi d'une consonne). Quand "ng"
+    est suivi d'une voyelle, "n" et "g" sont deux consonnes distinctes
+    appartenant à deux syllabes différentes (le "g" commence la syllabe
+    suivante) et ne fusionnent PAS :
+        laŋ, loŋ, bleŋ-bleŋ, bliŋ-bloŋ   (ng en fin de syllabe -> ŋ)
+        grangŏ (gran-gou), lingis (lin-gis)   (ng suivi d'une voyelle -> inchangé)
+    Cette règle doit être évaluée AVANT la règle "ou" -> "ŏ" : sinon la
+    voyelle qui suit "ng" est déjà consommée par "ou" au moment du test, et
+    la condition "pas suivi d'une voyelle" devient toujours vraie à tort
+    (c'était le bug de la version précédente : "grangou" -> "graŋŏ").
 
 Ce module est volontairement dépourvu de dépendances externes.
 """
@@ -25,20 +40,27 @@ from dataclasses import dataclass, field
 
 # ---------------------------------------------------------------------------
 # Table des règles (1979 -> ACC), appliquées dans cet ordre précis.
-# L'ordre importe : "ou" doit être traité avant que "ng" ou "ch" ne
-# puissent interférer sur les mêmes segments de texte.
+# L'ordre importe :
+#   1. "ng" doit être évaluée AVANT "ou" (voir note ci-dessus sur la règle
+#      positionnelle -- sinon la voyelle qui suit "ng" est déjà remplacée).
+#   2. "ou" doit être traitée avant que "ch" ne puisse interférer sur les
+#      mêmes segments de texte (aucune interaction directe en pratique,
+#      mais l'ordre est conservé pour rester proche de la version d'origine).
 # ---------------------------------------------------------------------------
 
+# "ng" -> "ŋ" seulement si NON suivi d'une voyelle (limite de syllabe).
+# Regex plutôt que .replace() simple : c'est la seule règle qui a besoin
+# de regarder le caractère suivant avant de décider.
+_NG_RULE = re.compile(r"(Ng|NG|ng)(?![aeiouàèòAEIOUÀÈÒ])")
+_NG_REPLACEMENTS = {"Ng": "Ŋ", "NG": "Ŋ", "ng": "ŋ"}
+
 _FORWARD_RULES: list[tuple[str, str]] = [
-    (r"Ch", "Š"),
-    (r"CH", "Š"),
-    (r"ch", "š"),
     (r"Ou", "Ŏ"),
     (r"OU", "Ŏ"),
     (r"ou", "ŏ"),
-    (r"Ng", "Ŋ"),
-    (r"NG", "Ŋ"),
-    (r"ng", "ŋ"),
+    (r"Ch", "Š"),
+    (r"CH", "Š"),
+    (r"ch", "š"),
     (r"Ui", "Wi"),
     (r"UI", "WI"),
     (r"ui", "wi"),
@@ -114,7 +136,7 @@ class ConversionReport:
 
 def to_acc(text: str) -> str:
     """Convertit un texte de l'orthographe officielle 1979 vers l'ACC."""
-    result = text
+    result = _NG_RULE.sub(lambda m: _NG_REPLACEMENTS[m.group(1)], text)
     for pattern, repl in _FORWARD_RULES:
         result = result.replace(pattern, repl)
     return result
@@ -159,11 +181,17 @@ def convert(text: str, *, report: bool = False):
 
 def diff_summary(text: str) -> dict[str, int]:
     """Compte les occurrences de chaque séquence opaque dans un texte 1979,
-    utile pour reproduire l'analyse détaillée du chapitre IV du mémoire."""
+    utile pour reproduire l'analyse détaillée du chapitre IV du mémoire.
+
+    "ng" n'est compté que lorsqu'il est réellement opaque (non suivi d'une
+    voyelle, voir la règle positionnelle documentée en tête de fichier) --
+    les occurrences comme "grangou" (gran-gou), où "n" et "g" appartiennent
+    à deux syllabes différentes, ne sont pas des séquences opaques et sont
+    donc exclues de ce compte."""
     return {
         "ch": len(re.findall(r"[Cc][Hh]", text)),
         "ou": len(re.findall(r"[Oo][Uu]", text)),
-        "ng": len(re.findall(r"[Nn][Gg]", text)),
+        "ng": len(_NG_RULE.findall(text)),
         "ui": len(re.findall(r"[Uu][Ii]", text)),
     }
 

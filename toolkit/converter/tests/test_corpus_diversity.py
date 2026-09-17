@@ -60,7 +60,7 @@ def test_pooled_mean_and_ci_match_measured_values():
     multi = build_multi_document_report(as_documents())
     assert round(multi.pooled.mean_gain_percent, 1) == 5.7
     lo, hi = multi.pooled.ci95_gain_percent
-    assert round(lo, 1) == 3.9
+    assert round(lo, 1) == 3.8
     assert round(hi, 1) == 7.5
 
 

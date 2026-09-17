@@ -5,11 +5,19 @@
  */
 
 const FORWARD_RULES = [
-  ["Ch", "Š"], ["CH", "Š"], ["ch", "š"],
   ["Ou", "Ŏ"], ["OU", "Ŏ"], ["ou", "ŏ"],
-  ["Ng", "Ŋ"], ["NG", "Ŋ"], ["ng", "ŋ"],
+  ["Ch", "Š"], ["CH", "Š"], ["ch", "š"],
   ["Ui", "Wi"], ["UI", "WI"], ["ui", "wi"],
 ];
+
+// "ng" -> "ŋ" seulement si NON suivi d'une voyelle (limite de syllabe) :
+// "n" doit fermer une syllabe et "g" ne doit pas pouvoir commencer la
+// suivante (ex. "lang"/"long" -> fusionne ; "grangou"/"lingis" -> non,
+// "gran-gou"/"lin-gis" placent "g" en attaque de la syllabe suivante).
+// Évalué AVANT FORWARD_RULES, sinon la voyelle qui suit "ng" est déjà
+// consommée par la règle "ou" au moment du test.
+const NG_RULE = /(Ng|NG|ng)(?![aeiouàèòAEIOUÀÈÒ])/g;
+const NG_REPLACEMENTS = { "Ng": "Ŋ", "NG": "Ŋ", "ng": "ŋ" };
 
 const BACKWARD_RULES = [
   ["Š", "Ch"], ["š", "ch"],
@@ -20,7 +28,7 @@ const BACKWARD_RULES = [
 const WI_WORDS_NEVER_FROM_UI = new Set(["wi", "kiwi", "sandwi"]);
 
 function toAcc(text) {
-  let result = text;
+  let result = text.replace(NG_RULE, (m) => NG_REPLACEMENTS[m]);
   for (const [pattern, repl] of FORWARD_RULES) {
     result = result.split(pattern).join(repl);
   }
@@ -52,7 +60,7 @@ function diffSummary(text) {
   return {
     ch: count(/[Cc][Hh]/g),
     ou: count(/[Oo][Uu]/g),
-    ng: count(/[Nn][Gg]/g),
+    ng: (text.match(NG_RULE) || []).length,
     ui: count(/[Uu][Ii]/g),
   };
 }

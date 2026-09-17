@@ -16,18 +16,13 @@ Trois niveaux d'analyse, chacun avec ses formules :
 Toutes les formules sont documentées dans docs/letter-frequency-analysis.md ;
 ce module n'en est que l'implémentation.
 
-IMPORTANT — écart connu avec le mémoire (voir docs/letter-frequency-analysis.md,
-section « Écart constaté ») : le mémoire (résumé) affirme qu'"une règle
-positionnelle stricte encadre la substitution ng -> ŋ, limitée aux
-occurrences en fin de syllabe et/ou de mot". Le code actuel de
-acc_converter.py n'implémente PAS cette restriction : "ng" est converti en
-"ŋ" sans condition de position (ex. "grangou" -> "graŋŏ", alors que "gr-AN-
-gou" place ce "ng" à cheval sur deux syllabes, pas en fin de syllabe). Ce
-module documente et mesure le comportement RÉEL du code, sans le corriger
-silencieusement -- une correction de acc_converter.py changerait tous les
-gains scripturaux déjà publiés (mémoire, README, section 4.5 du Livre Blanc
-AKI/ACU) et doit être une décision explicite, pas un effet de bord de cette
-analyse.
+Note historique : une version antérieure de ce module documentait un écart
+entre le comportement de acc_converter.py et le résumé du mémoire (la règle
+positionnelle "ng -> ŋ seulement en fin de syllabe" n'était pas appliquée
+par le code). Cet écart a été corrigé dans acc_converter.py (voir son
+en-tête de fichier) : la fonction syllable_functional_analysis() ci-dessous
+sert maintenant aussi de test de non-régression pour cette règle -- voir
+test_corpus_wide_ng_is_always_coda dans test_letter_analysis.py.
 """
 
 from __future__ import annotations

@@ -13,7 +13,7 @@ version antérieure de ce dépôt (variable/classe portant ce nom). Pour un
 gain mesuré sur plusieurs textes indépendants et de sources diverses
 (personnel, légal, international, oral, littéraire du domaine public),
 voir `corpus.py` et `test_corpus_diversity.py` : le gain varie de 2,5 %
-à 9,3 % selon le texte (moyenne 5,7 %, IC95 % [3,9–7,5 %] sur 8 textes).
+à 9,3 % selon le texte (moyenne 5,7 %, IC95 % [3,8–7,5 %] sur 8 textes).
 """
 
 import os
