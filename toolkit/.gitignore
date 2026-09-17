@@ -6,3 +6,11 @@ node_modules/
 .idea
 .txt
 *.txt
+
+
+tmp/readme.txt
+tmp/style2.txt
+
+# not git unecessary github files
+.github
+.githooks_test

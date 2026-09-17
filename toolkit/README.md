@@ -219,7 +219,7 @@ La conversion ACC → 1979 n'est **pas parfaitement réversible** pour la séque
 
 ## Conversion de documents (Word / PDF) et traitement statistique
 
-Le chiffre initial du mémoire — « gain de 9,3 % » — reposait sur **un seul extrait de 140 caractères**, et cet extrait avait en plus été mal attribué à René Depestre dans une version antérieure de ce dépôt : il s'agit en réalité d'un texte personnel de l'auteur, rédigé dans le cadre du document AAC/AKI (corrigé dans `converter/tests/test_converter.py`, classe `TestCorpusLincoln`). Un seul extrait, quelle que soit son attribution, reste une démonstration ponctuelle, pas une estimation : ni écart-type, ni intervalle de confiance, rien n'indique si elle se généralise.
+Le chiffre initial du mémoire — « gain de 9,3 % » — reposait sur un échantillon, **un seul extrait de 140 caractères**, et cet extrait avait en plus été mal attribué à René Depestre dans une version antérieure de ce dépôt : il s'agit en réalité d'un de mes textes personnels, pris d'un corpus de plusieurs textes et d'auteurs différents — René Depestre, Jacques Roumain, Jacques Stephene Alexis, Frankétiene etc.—, rédigé dans le cadre du document AAC/AKI afin l'étude d'évaluation de gain du système proposé (corrigé dans `converter/tests/test_converter.py`, classe `TestCorpusLincoln`). Un seul extrait, quelle que soit son attribution, reste une démonstration ponctuelle, pas une estimation : ni écart-type, ni intervalle de confiance, rien n'indique si elle se généralise.
 
 `converter/corpus.py` répond à ça avec **8 textes indépendants de sources délibérément diverses** : 2 textes personnels de l'auteur, un extrait légal (Constitution de 1987), un extrait international (Déclaration universelle des droits de l'homme, traduction officielle OHCHR), 2 lots de pwovèb kreyòl (tradition orale, domaine public), et 2 extraits littéraires du domaine public — Oswald Durand (« Choukoun », 1883 ; mort en 1906) et Georges Sylvain (« Cric? Crac! », 1901 ; mort en 1925). Volontairement absents : des auteurs dont l'œuvre reste sous droits (Frankétienne, mort en 2025 ; René Depestre ; Georges Castera, mort en 2020) — les reproduire ici serait une violation de copyright, pas une question de citation en passant.
 
@@ -285,9 +285,10 @@ Ce prototype n'invente pas le principe d'un alphabet à monogrammes pour le cré
 Ce dépôt est le complément technique d'un ensemble documentaire plus large :
 
 - **Édition livre** (format 6×9 po, page de titre, avec ISBN en d'obtention depuis la BNH, dépôt légal) — la même démonstration scientifique, mise en forme pour une diffusion en dehors du cadre strictement académique.
-- **Mémoire complet** (format Letter, ~70 pages) — la démonstration scientifique intégrale : histoire de la graphie créole, diagnostic, théorie de l'alphabet atomique, protocole d'implémentation, évaluation d'impact, chapitre dédié au traitement automatique du langage (tokenisation, GPT/deepseek/Claude etc.), annexes phonologique et Unicode complètes.
+- **Mémoire complet** (format Letter, ~90 pages) — la démonstration scientifique intégrale : histoire de la graphie créole, diagnostic, théorie de l'alphabet atomique, protocole d'implémentation, évaluation d'impact, chapitre dédié au traitement automatique du langage (tokenisation, GPT/deepseek/Claude etc.), annexes phonologique et Unicode complètes.
 - **ht-t-k0-aac.xml** — Disposition clavier CLDR (Keyboard 3.0, UTS #35 Part 7) pour l'Alphabet Atomique Créole (AAC).
 - **Un manuel de transition technique vers l'AAC** — Qui contient les spécifications des dispositions clavier (physique/virtuelle), Guide de conversion pour éditeurs et des protocoles de la phase pilote.
+- **Un abécédaire (Le premier livre écrit en AAC Complet)** — Un support concret pour un enfant qui apprend à lire — Preuve ultime que la théorie fonctionne à l'usage.
 
 
 Ces documents ne sont pas inclus, à l'exception de ht-t-k0-aac.xml, qui s'y trouve dans le dossier : [keyboard/ht-t-k0-aac.xml](keyboard/ht-t-k0-aac.xml), dans ce dépôt (ce sont des fichiers Word volumineux, peu adaptés à un suivi git), mais définissent l'intégralité du raisonnement dont ce code n'est que la vérification.

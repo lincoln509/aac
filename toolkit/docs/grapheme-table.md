@@ -17,15 +17,15 @@ Référence complète des sept séquences plurigraphiques de l'orthographe offic
 ## Comparaison avec les propositions post-1979
 
 | Son (API) | Officiel 1979 / AKA 2017 | Gourdet (2022, linéarisme) | ACC |
-|-----------|---------------------------|------------------------------|-----|
-| /ʃ/ | ch | c | š |
-| /u/ | ou | u | ŏ |
-| /ũ/ | oun | ü | ŏ + n (automatique) |
-| /ã/ | an | ä | an (inchangé) |
-| /ɛ̃/ | en | ë | en (inchangé) |
-| /õ/ | on | ö | on (inchangé) |
-| /ɲ/ | ng | ng (non traité) | ŋ |
-| /ɥi/ | ui | yw | wi |
+|-----------|---------------------------|----------------------------|-----|
+| /ʃ/ | ch | c                          | š |
+| /u/ | ou | u                          | ŏ |
+| /ũ/ | oun | ü                          | ŏ + n (automatique) |
+| /ã/ | an | ä                          | an (inchangé) |
+| /ɛ̃/ | en | ë                          | en (inchangé) |
+| /õ/ | on | ö                          | on (inchangé) |
+| /ɲ/ | ng | g̈ (g tréma)        | ŋ |
+| /ɥi/ | ui | yw                         | wi |
 
 **Différence de fond** : Gourdet applique la logique monogrammatique aux sept séquences, y compris les trois nasales. L'ACC s'en distingue en jugeant `an`, `en`, `on` déjà phonotactiquement transparentes (voir mémoire, section 3.2), et les laisse donc inchangées — une intervention volontairement plus restreinte, ciblant exclusivement les quatre séquences réellement opaques.
 
