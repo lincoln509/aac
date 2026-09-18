@@ -334,6 +334,33 @@ def corpus_report(texts: dict[str, str]) -> dict:
 if __name__ == "__main__":
     import sys
 
+    if "--corpus" in sys.argv:
+        # python3 letter_analysis.py --corpus : fréquence + fonction
+        # syllabique agrégées sur les 8 textes de corpus.py.
+        from corpus import CORPUS
+
+        texts = {k: v["texte"] for k, v in CORPUS.items()}
+        agg = corpus_report(texts)
+        print("=== Densité atomique par texte ===")
+        for name, r in agg["per_document"].items():
+            print(f"  {name:22s} n_š={r.counts['š']:3d} n_ŏ={r.counts['ŏ']:3d} n_ŋ={r.counts['ŋ']:2d}  D={r.atomic_density*100:5.2f}%")
+        print(
+            f"  moyenne={agg['mean_density_percent']:.2f}%  "
+            f"min={agg['min_density_percent']:.2f}%  max={agg['max_density_percent']:.2f}%  "
+            f"écart-type={agg['stdev_density_percent']:.2f}%"
+        )
+        print()
+        tout = " ".join(texts.values())
+        w = word_level_analysis(tout)
+        print("=== Analyse lexicale agrégée (8 textes) ===")
+        print(f"  {w.n_words} mots, couverture globale C = {w.coverage*100:.1f}%")
+        print(f"  Couverture par lettre : {[(l, f'{c*100:.1f}%') for l, c in w.per_letter_coverage.items()]}")
+        print(f"  Moyenne/mot (tous) = {w.mean_per_word_all:.3f} ; moyenne/mot (concernés) = {w.mean_per_word_concerned:.3f}")
+        print()
+        print("=== Analyse fonctionnelle syllabique agrégée (8 textes) ===")
+        print(syllable_functional_analysis(tout).summary())
+        sys.exit(0)
+
     text = sys.argv[1] if len(sys.argv) > 1 else (
         "Chante pou chase lapli nan kò mwen, chante pou san mwen rete cho nan "
         "tanpèt la, pou klète lang manman nou klere sou ekran toupatou sou latè."
@@ -353,3 +380,5 @@ if __name__ == "__main__":
     print()
     print("=== Analyse fonctionnelle syllabique ===")
     print(r["syllable_functional"].summary())
+    print()
+    print("Astuce : python3 letter_analysis.py --corpus pour l'agrégat sur les 8 textes de corpus.py.")

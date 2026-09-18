@@ -166,3 +166,28 @@ def as_documents() -> dict[str, list[tuple[str, str]]]:
     """Convertit CORPUS au format attendu par
     document_stats.build_multi_document_report : {nom_fichier: [(label, texte)]}."""
     return {key: [("texte_complet", entry["texte"])] for key, entry in CORPUS.items()}
+
+
+if __name__ == "__main__":
+    # python3 corpus.py : évalue et affiche le gain scriptural de chaque
+    # texte du corpus, individuellement, sans passer par pytest.
+    from acc_converter import to_acc
+    from document_stats import build_multi_document_report
+
+    print(f"{'Texte':<24s} {'Auteur / source':<45s} {'1979':>6s} {'AAC':>6s}  {'Gain':>7s}")
+    print("-" * 92)
+    for key, entry in CORPUS.items():
+        before = entry["texte"]
+        after = to_acc(before)
+        gain = (len(before) - len(after)) / len(before) * 100
+        print(f"{key:<24s} {entry['auteur']:<45s} {len(before):>6d} {len(after):>6d}  {gain:>6.2f} %")
+
+    multi = build_multi_document_report(as_documents())
+    gains = [r.gain_percent_global for r in multi.per_document.values()]
+    lo, hi = multi.pooled.ci95_gain_percent
+    print("-" * 92)
+    print(
+        f"n={len(gains)}  min={min(gains):.2f} %  max={max(gains):.2f} %  "
+        f"moyenne={multi.pooled.mean_gain_percent:.2f} %  "
+        f"IC95 %=[{lo:.2f} % ; {hi:.2f} %]"
+    )

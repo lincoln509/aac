@@ -274,7 +274,47 @@ Même traitement statistique, mais glisser-déposer direct dans le navigateur, s
 
 Résultat sur les 8 textes de `corpus.py` (627 syllabes, 445 mots) : `ŏ` est, par construction, toujours noyau (100 %) ; `š` est majoritairement attaque (83 %) mais peut être coda (17 %, ex. `bouch` → `bŏš`, ce qui est normal — aucune règle positionnelle n'a jamais été revendiquée pour `ch`) ; `ŋ` est désormais **toujours** coda (100 %), depuis la correction de la règle positionnelle de `acc_converter.py` : `ng → ŋ` ne s'applique plus que lorsque `ng` n'est pas suivi d'une voyelle (`grangou` → `grangŏ`, pas `graŋŏ`), ce qui rend exacte l'affirmation du résumé du mémoire sur ce point. `docs/letter-frequency-analysis.md` documente toutes les formules et l'historique de cette correction.
 
-Tests : `converter/tests/test_letter_analysis.py` (16 tests).
+Tests : `converter/tests/test_letter_analysis.py` (17 tests). Pour un rapport lisible plutôt qu'un simple pass/fail, `python3 letter_analysis.py --corpus` (depuis `converter/`) affiche la densité atomique et la fonction syllabique agrégées sur les 8 textes, texte par texte.
+
+## Tests
+
+Le dépôt compte 51 tests répartis sur 5 fichiers, tous dans `converter/tests/`. Depuis `toolkit/converter/` :
+
+```bash
+pip install pytest scipy numpy python-docx reportlab pdfplumber --break-system-packages   # dépendances
+python3 -m pytest tests/ -v                # tout le monde, un test par ligne
+python3 -m pytest tests/test_letter_analysis.py -v   # un seul fichier
+```
+
+`reportlab` et `pdfplumber` ne servent qu'à `test_document_converter.py` (conversion PDF↔docx) : sans eux, ce fichier échoue à l'import — lancer `python3 -m pytest tests/ --ignore=tests/test_document_converter.py` pour tester le reste (49 tests) sans les installer.
+
+| Fichier | Tests | Couvre |
+|---|---:|---|
+| `test_converter.py` | 14 | règles de conversion 1979 ↔ AAC, non-régression du chiffre du mémoire |
+| `test_document_stats.py` | 13 | moyenne, écart-type, IC95 %, test t, bootstrap |
+| `test_corpus_diversity.py` | 5 | écart de gain mesuré sur les 8 textes (2,5 %–9,3 %) |
+| `test_letter_analysis.py` | 17 | fréquence, couverture lexicale, fonction syllabique onset/nucleus/coda |
+| `test_document_converter.py` | 2 | fidélité de mise en forme docx/pdf (nécessite reportlab/pdfplumber) |
+
+**Voir le résultat pour chaque texte du corpus individuellement** (pas seulement pass/fail) : `pytest` ne montre que la réussite d'une assertion, pas les valeurs mesurées. Pour ça, deux scripts s'exécutent directement et impriment un tableau détaillé :
+
+```bash
+python3 corpus.py                    # 1979 -> AAC, gain %, pour chacun des 8 textes
+python3 letter_analysis.py --corpus  # densité, couverture lexicale, fonction syllabique, par texte
+```
+
+Le premier reproduit exactement la table de la section 4.1.2 du mémoire ; le second, la section 4.1.4.
+
+## Jwèt — jeux de pratique de l'orthographe AAC
+
+`web-demo/jwet.html` — quatre mini-jeux autonomes (un seul fichier HTML, aucune dépendance externe) pour pratiquer l'orthographe AAC en s'amusant :
+
+- **Devinèt Mo** — pendu/noyade : deviner un mot lettre par lettre en AAC, chronométré (démarre au premier coup joué), cinq erreurs avant que le personnage soit submergé (SVG animé). Le clavier ne propose que les 26 lettres AAC réellement nécessaires.
+- **Koerans Tematik** — 5 thèmes (pati kò, fanmi, koulè, manje, bèt) : 4 mots du thème et 1 intrus à repérer, score et série.
+- **Memwa** — 12 cartes / 6 paires : chaque paire marie l'orthographe 1979 et AAC du même mot, pratique directe de la conversion.
+- **Gramè/Òtograf** — 12 questions mêlant orthographe (« comment s'écrit X en AAC ? ») et grammaire (marqueurs de temps te/ap/pral/fèk/ta, marqueur pluriel yo).
+
+Tout le contenu créole est généré à l'exécution par la même fonction `toAcc()` que `converter/acc_converter.js` (embarquée dans la page) à partir de mots en orthographe 1979 — aucune orthographe AAC n'est tapée à la main, pour éviter les erreurs de transcription. `python3 -m http.server` (ou `scripts/serve.py`) depuis `web-demo/`, puis ouvrir `jwet.html`, suffit pour y jouer en local.
 
 ## Par rapport aux travaux existants
 
