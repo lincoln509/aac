@@ -229,8 +229,8 @@ Sur ces 8 textes (`converter/tests/test_corpus_diversity.py`), le gain varie de 
 
 ```bash
 pip install -r converter/requirements-documents.txt
-python converter/document_converter.py memoire.docx memoire_acc.docx --report rapport.md
-python converter/document_converter.py chapitre.pdf chapitre_acc.pdf --report rapport.json
+python converter/document_converter.py convert memoire.docx memoire_acc.docx --report rapport.md
+python converter/document_converter.py convert chapitre.pdf chapitre_acc.pdf --report rapport.json
 ```
 
 - **`.docx` → `.docx`** : fidélité totale. Seul le texte à l'intérieur des runs Word existants est modifié (`run.text = to_acc(run.text)`) — gras, italique, polices, styles de titre et tableaux restent identiques à l'original. Limite documentée : une séquence `ch`/`ou`/`ng` coupée exactement à la frontière entre deux runs (rare, généralement après une correction manuelle) n'est pas convertie ; le script le signale sur stderr.
@@ -310,7 +310,7 @@ Le premier reproduit exactement la table de la section 4.1.2 du mémoire ; le se
 `web-demo/jwet.html` — quatre mini-jeux autonomes (un seul fichier HTML, aucune dépendance externe) pour pratiquer l'orthographe AAC en s'amusant :
 
 - **Devinèt Mo** — pendu/noyade : deviner un mot lettre par lettre en AAC, chronométré (démarre au premier coup joué), cinq erreurs avant que le personnage soit submergé (SVG animé). Le clavier ne propose que les 26 lettres AAC réellement nécessaires.
-- **Koerans Tematik** — 5 thèmes (pati kò, fanmi, koulè, manje, bèt) : 4 mots du thème et 1 intrus à repérer, score et série.
+- **Tèm Sanblay** — 5 thèmes (pati kò, fanmi, koulè, manje, bèt) : 4 mots du thème et 1 intrus à repérer, score et série.
 - **Memwa** — 12 cartes / 6 paires : chaque paire marie l'orthographe 1979 et AAC du même mot, pratique directe de la conversion.
 - **Gramè/Òtograf** — 12 questions mêlant orthographe (« comment s'écrit X en AAC ? ») et grammaire (marqueurs de temps te/ap/pral/fèk/ta, marqueur pluriel yo).
 
@@ -325,7 +325,7 @@ Ce prototype n'invente pas le principe d'un alphabet à monogrammes pour le cré
 Ce dépôt est le complément technique d'un ensemble documentaire plus large :
 
 - **Édition livre** (format 6×9 po, page de titre, avec ISBN en d'obtention depuis la BNH, dépôt légal) — la même démonstration scientifique, mise en forme pour une diffusion en dehors du cadre strictement académique.
-- **Mémoire complet** (format Letter, ~90 pages) — la démonstration scientifique intégrale : histoire de la graphie créole, diagnostic, théorie de l'alphabet atomique, protocole d'implémentation, évaluation d'impact, chapitre dédié au traitement automatique du langage (tokenisation, GPT/deepseek/Claude etc.), annexes phonologique et Unicode complètes.
+- **Mémoire complet** (format Letter, ~100 pages) — la démonstration scientifique intégrale : histoire de la graphie créole, diagnostic, théorie de l'alphabet atomique, protocole d'implémentation, évaluation d'impact, chapitre dédié au traitement automatique du langage (tokenisation, GPT/deepseek/Claude etc.), annexes phonologique et Unicode complètes.
 - **ht-t-k0-aac.xml** — Disposition clavier CLDR (Keyboard 3.0, UTS #35 Part 7) pour l'Alphabet Atomique Créole (AAC).
 - **Un manuel de transition technique vers l'AAC** — Qui contient les spécifications des dispositions clavier (physique/virtuelle), Guide de conversion pour éditeurs et des protocoles de la phase pilote.
 - **Un abécédaire (Le premier livre écrit en AAC Complet)** — Un support concret pour un enfant qui apprend à lire — Preuve ultime que la théorie fonctionne à l'usage.

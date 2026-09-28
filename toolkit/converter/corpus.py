@@ -44,7 +44,7 @@ CORPUS: dict[str, dict[str, str]] = {
     "lincoln_chant": {
         "auteur": "Lincoln Compère",
         "source": "Texte personnel, document AAC/AKI",
-        "annee": "2024",
+        "annee": "2025",
         "texte": (
             "Chante pou chase lapli nan kò mwen, chante pou san mwen rete cho nan "
             "tanpèt la, pou klète lang manman nou klere sou ekran toupatou sou latè."
@@ -53,9 +53,23 @@ CORPUS: dict[str, dict[str, str]] = {
     "lincoln_dwa_travay": {
         "auteur": "Lincoln Compère",
         "source": "Texte personnel, document AAC/AKI",
-        "annee": "2024",
+        "annee": "2025",
         "texte": "Chak moun gen dwa pou yo chèche travay san pwoblèm nan peyi a.",
     },
+
+    # "lincoln_lang_manmanm": {
+    #     "auteur": "Lincoln Compère",
+    #     "source": "Texte personnel, document AAC/AKI",
+    #     "annee": "2025",
+    #     "texte": (
+    #         "Mwen pa nan tete lang ak movezè, move lanyon, moun san zantray"
+    #         "Mwen se yon natif natal, nèg lakay ki pap janmen manje zong devan lennmi."
+    #         "Tankou Kapwa lanmò, tankou Desalin, tankou Mari Jàn, mwen ap goumen pou nansyon sa."
+    #         "mwen ap goumen pou lang manman m. M’ap kontinye pale lang manman m ak fyète"
+    #         "san m pa bliye grangou ki blayi nan peyi an mwen."
+    #     ),
+    # },
+
     "konstitisyon_1987": {
         "auteur": "Assemblée constituante haïtienne",
         "source": "Constitution de la République d'Haïti, 1987 (Atik 1 + Atik 5) — domaine public",

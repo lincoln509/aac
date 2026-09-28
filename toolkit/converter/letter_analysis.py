@@ -40,12 +40,18 @@ from acc_converter import to_acc
 ATOMIC_LETTERS = ("š", "ŏ", "ŋ")
 
 # Voyelles reconnues comme noyau syllabique dans le texte AAC (voir
-# syllabify() plus bas) : les voyelles orales du 1979 (a e è i o ò), la
-# voyelle atomique ŏ, et les nasales an/en/on qui restent des digrammes
+# syllabify() plus bas) : les voyelles orales du 1979 (a à e è i o ò u),
+# la voyelle atomique ŏ, et les nasales an/en/on qui restent des digrammes
 # à 2 lettres en AAC (non touchées par la réforme) -- leur second membre
 # (n) N'EST PAS une voyelle, donc seule la première lettre (a/e/o) compte
 # comme noyau ; "an" occupe alors noyau+coda sur un seul phonème nasal.
-VOWELS = set("aeiòèoiuŏ")
+# NOTE : doit rester synchronisé avec la classe de voyelles utilisée par
+# NG_RULE dans acc_converter.py/.js (aeiouàèò, + majuscules) -- "à" a été
+# ajouté ici pour lever une incohérence où syllabify() ne reconnaissait
+# pas "à" comme noyau et retombait sur une classification "onset" par
+# défaut pour tout le mot (y compris pour les lettres atomiques qu'il
+# contenait).
+VOWELS = set("aeiòèouŏà")
 
 
 @dataclass
@@ -220,7 +226,7 @@ def word_level_analysis(text_1979: str) -> WordLevelReport:
 # convertisseur PLACE RÉELLEMENT chaque lettre atomique -- pas à trancher
 # un débat phonologique.
 
-CONSONANTS_PATTERN = re.compile(r"[^aeiòèoiuŏ]", re.IGNORECASE)
+CONSONANTS_PATTERN = re.compile(r"[^aeiòèouŏà]", re.IGNORECASE)
 
 
 def syllabify(word: str) -> list[str]:

@@ -12,7 +12,9 @@ et produit un rapport statistique comparatif (voir document_stats.py).
         Limite connue : une séquence "ch"/"ou"/"ng" coupée pile à la
         frontière entre deux runs (rare — survient surtout après une
         correction manuelle ou un correcteur orthographique Word) n'est
-        pas convertie. `document_converter.py --check` signale ces cas.
+        pas convertie. La commande `convert` signale ces cas comme
+        avertissements (voir ConversionResult.boundary_crossing_warnings
+        et la sortie du rapport).
 
 .pdf  : fidélité textuelle, pas visuelle. Un PDF n'a pas de notion de
         "texte modifiable" — remplacer du texte en conservant exactement
@@ -78,7 +80,7 @@ class ConversionResult:
 # DOCX
 # ---------------------------------------------------------------------------
 
-_OPAQUE_SEQUENCES = ("ch", "Ch", "CH", "ou", "Ou", "OU", "ng", "Ng", "NG", "ui", "Ui", "UI")
+_OPAQUE_SEQUENCES = ("ch", "Ch", "CH", "cH","ou", "Ou", "OU", "oU", "ng", "Ng", "NG","nG", "ui", "Ui", "UI", "uI")
 
 
 def _convert_paragraph_runs(paragraph, warnings: list[str], location: str) -> str:
@@ -166,6 +168,16 @@ def convert_pdf(input_path: str, output_path: str) -> ConversionResult:
     story = []
     for label, text, _ in paragraphs:
         converted = to_acc(text).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+        # CORRECTIF (revue de code) : un bloc peut contenir des retours à la
+        # ligne internes (ex. un poème découpé vers par vers dans le corpus,
+        # voir corpus.py) quand le découpage sur "\n\n" a produit plusieurs
+        # blocs mais qu'un bloc individuel contient encore des "\n" simples.
+        # reportlab.platypus.Paragraph n'interprète PAS "\n" comme un retour
+        # à la ligne (contrairement à du texte brut) -- sans ce remplacement,
+        # les vers étaient silencieusement aplatis sur une seule ligne dans
+        # le PDF reconstruit. On échappe d'abord (ci-dessus), PUIS on insère
+        # les balises <br/> pour ne pas échapper les balises elles-mêmes.
+        converted = converted.replace("\n", "<br/>")
         story.append(Paragraph(converted, body_style))
         story.append(Spacer(1, 8))
     doc.build(story)
@@ -272,6 +284,24 @@ def _write_report(report_path_str, dict_payload, markdown_payload):
 
 
 def main(argv=None):
+    argv = sys.argv[1:] if argv is None else list(argv)
+
+    # CORRECTIF (revue de code, M1) : la commande documentée dans le README
+    # ("document_converter.py entrée.docx sortie.docx --report ...", sans
+    # sous-commande) échouait ("invalid choice") depuis l'ajout de la
+    # sous-commande "convert". Plutôt que de casser les scripts existants
+    # ou les habitudes du README, on insère "convert" automatiquement
+    # quand le premier argument n'est ni une sous-commande connue, ni une
+    # option (-h/--help), ni un argument vide.
+    known = {"convert", "analyze", "-h", "--help"}
+    if argv and argv[0] not in known and not argv[0].startswith("-"):
+        print(
+            "(sous-commande omise : `convert` supposée -- "
+            "utilisez `document_converter.py convert ...` explicitement pour éviter cet avertissement)",
+            file=sys.stderr,
+        )
+        argv = ["convert"] + argv
+
     parser = argparse.ArgumentParser(description="Convertit un/des document(s) (.docx/.pdf) en ACC avec rapport statistique.")
     sub = parser.add_subparsers(dest="command", required=True)
 

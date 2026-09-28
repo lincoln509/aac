@@ -225,11 +225,11 @@ en fin de composant d'un mot composé, ou devant une consonne) :
 
 ```text
 grangou  -> grangŏ   (gran-gou : "g" commence la syllabe suivante, ng ne fusionne pas)
-lingis   -> lingis   (lin-gis : idem, inchangé)
+lengis   -> lengis   (lin-gis : idem, inchangé)
 lang     -> laŋ      (ng en fin de mot : fusionne)
 long     -> loŋ
 Bleng-bleng -> Bleŋ-bleŋ
-bling-blong -> bliŋ-bloŋ
+bling-bleng -> bliŋ-bleŋ
 ```
 
 La condition doit être testée **avant** la règle `ou → ŏ` : sinon la

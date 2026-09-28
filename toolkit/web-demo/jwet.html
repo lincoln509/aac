@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Jwèt — Pratike Òtograf AAC</title>
-<meta name="description" content="Kat jwèt entèraktif pou pratike Alfabè Atomik Kreyòl (AAC) : devinèt mo ki kwonometre e ki 'neye' apre erè, koerans tematik, memwa 1979/AAC, ak kesyon gramè.">
+<meta name="description" content="Kat jwèt entèraktif pou pratike Alfabè Atomik Kreyòl (AAC) : devinèt mo ki kwonometre e ki 'neye' apre erè, Tèm Sanblay, memwa 1979/AAC, ak kesyon gramè.">
 
 <link rel="icon" type="image/png" href="../assets/aac-logo-square.png">
 <link rel="apple-touch-icon" href="../assets/aac-logo-square.png">
@@ -43,7 +43,7 @@
   .brand-word{font-family:var(--mono); font-size:13px; letter-spacing:.1em; color:var(--ink-soft);}
   .toplinks{display:flex; gap:20px; font-family:var(--mono); font-size:12.5px;}
   .toplinks a{color:var(--ink-soft); text-decoration:none;}
-  .toplinks a:hover, .toplinks a.active{color:var(--primary);}
+  .toplinks a:hover, .toplinks a.active{color:var(--primary); text-decoration:underline;}
 
   header.hero{padding:56px 0 44px; border-bottom:1px solid var(--rule);}
   .eyebrow{
@@ -204,33 +204,34 @@
 
 <div class="wrap">
   <div class="topbar">
-    <a class="brand" href="index.html">
-      <img src="../assets/aac-logo.png" alt="Logo AAC">
-      <span class="brand-word">aac.ht</span>
+    <a class="brand" href="index.html" style="border-style:double; border-radius: 10px;">
+      <img src="../assets/aac_symbole.png" alt="Logo AAC">
+      <span class="brand-word" style="margin-left: -20px;  padding-right: 15px">AAC</span>
     </a>
     <nav class="toplinks">
       <a href="index.html">Konvètisè</a>
-      <a href="documents.html">Dokiman</a>
+      <a href="documents.html" style="color:var(--ink-soft); text-decoration:none;">Dokiman</a>
       <a href="jwet.html" class="active">Jwèt</a>
+
     </nav>
   </div>
 
   <header class="hero">
     <p class="eyebrow">Jwèt · Pratike AAC</p>
     <h1>Aprann AAC la san w pa wè l ap pase.</h1>
-    <p class="lede">Kat jwèt kout pou pratike òtograf <code class="pill">š</code> <code class="pill">ŏ</code> <code class="pill">ŋ</code> yo epi ranfòse memwa w : yon devinèt mo ki kwonometre e ki fè w pi pre nan dlo chak fwa w manke, yon jwèt koerans tematik, yon jwèt memwa ki parye òtograf 1979 ak AAC, ak yon ti kiz gramè.</p>
+    <p class="lede">Kat jwèt kout pou pratike òtograf <code class="pill">š</code> <code class="pill">ŏ</code> <code class="pill">ŋ</code> yo epi ranfòse memwa w : yon devinèt mo ki kwonometre e ki fè w pi pre nan dlo chak fwa w manke, yon jwèt Tèm Sanblay, yon jwèt memwa ki parye òtograf 1979 ak AAC, ak yon ti kiz gramè.</p>
   </header>
 
   <section>
     <div class="game-tabs" id="gameTabs">
       <button class="game-tab active" data-game="devinet" type="button">Devinèt Mo</button>
-      <button class="game-tab" data-game="tematik" type="button">Koerans Tematik</button>
+      <button class="game-tab" data-game="tematik" type="button">Tèm Sanblay</button>
       <button class="game-tab" data-game="memwa" type="button">Memwa</button>
       <button class="game-tab" data-game="grame" type="button">Gramè</button>
     </div>
   </section>
 
-  <!-- ============ JWÈT 1 : DEVINÈT MO (noyaj) ============ -->
+  <!-- ============ JWÈT 1 : DEVINÈT MO (nwayaj) ============ -->
   <section id="game-devinet" class="game-panel active">
     <h2>Devinèt Mo — pa kite l neye</h2>
     <p class="section-note">Devine mo a, lèt pa lèt, ekri an AAC. Chak move repons fè dlo a moute — senk erè, epi pèsonaj la neye. Tan w kwonometre depi premye lèt ou tape a.</p>
@@ -265,9 +266,9 @@
     </div>
   </section>
 
-  <!-- ============ JWÈT 2 : KOERANS TEMATIK ============ -->
+  <!-- ============ JWÈT 2 : Tèm Sanblay ============ -->
   <section id="game-tematik" class="game-panel">
-    <h2>Koerans Tematik — jwenn moun ki pa fè pati</h2>
+    <h2>Tèm Sanblay — jwenn mŏn (moun) ki pa fè pati</h2>
     <p class="section-note">Kat mo fè pati menm tèm nan (pati kò, fanmi, koulè, manje, bèt) — yon sèl se yon entri ki soti nan yon lòt tèm. Klike sou li.</p>
 
     <div class="stat-grid" style="margin-bottom:16px;">
@@ -285,7 +286,7 @@
 
   <!-- ============ JWÈT 3 : MEMWA (1979 <-> AAC) ============ -->
   <section id="game-memwa" class="game-panel">
-    <h2>Memwa — parye 1979 ak AAC</h2>
+    <h2>Memwa — parye òtograf 1979 ak òtograf AAC a</h2>
     <p class="section-note">Douz kat, sis pè : yon kat ekri mo a an òtograf 1979, lòt la ekri menm mo a an AAC. Jwenn tou de kat ki reprezante menm mo a, ak mwens eseye posib.</p>
 
     <div class="stat-grid" style="margin-bottom:16px;">
@@ -329,30 +330,180 @@
 </div>
 
 <script>
-/* ============ Konvètisè AAC (menm règ ak converter/acc_converter.js) ============
-   Enliye dirèkteman pou paj sa a ka mache san sèvè, menm jan ak index.html. */
-const FORWARD_RULES = [
-  ["Ch", "Š"], ["CH", "Š"], ["ch", "š"],
-  ["Ou", "Ŏ"], ["OU", "Ŏ"], ["ou", "ŏ"],
-  ["Ui", "Wi"], ["UI", "WI"], ["ui", "wi"],
-];
-/* "ng" pa toujou reprezante yon sèl son /ŋ/. Se sèlman lè "n" fèmen yon silab
-   e "g" ta dwe kòmanse yon lòt silab (donk "ng" swiv pa yon vwayèl, tankou
-   nan "grangou" = gran+gou) yo rete de konsòn separe — "ng" pa fizyone.
-   Se sèlman lè "ng" pa swiv pa yon vwayèl (fen mo, oswa devan yon konsòn,
-   tankou nan "long" oswa "lang") li reprezante yon sèl nazal e li vin Ŋ. */
-function toAcc(text) {
-  let result = text;
-  /* Desizyon "ng" an dwe fèt sou tèks ORIJINAL la anvan lòt règ yo (sitou "ou")
-     manje vwayèl la — otreman "ŏ" pa rekonèt kòm vwayèl ankò e "ng" ta konvèti mal. */
-  result = result.replace(/Ng(?![aeiouàèòAEIOUÀÈÒ])/g, "Ŋ");
-  result = result.replace(/NG(?![aeiouàèòAEIOUÀÈÒ])/g, "Ŋ");
-  result = result.replace(/ng(?![aeiouàèòAEIOUÀÈÒ])/g, "ŋ");
-  for (const [pattern, repl] of FORWARD_RULES) {
-    result = result.split(pattern).join(repl);
+/* ============ Konvètisè AAC ============
+   CORRECTIF (revue de code, C3) : ce bloc est généré automatiquement à
+   partir de converter/acc_converter.js par scripts/sync_converter.py.
+   NE PAS ÉDITER À LA MAIN entre les marqueurs. */
+// ACC-CONVERTER:BEGIN
+  /**
+   * acc_converter.js
+   * Port JavaScript de acc_converter.py — mêmes règles, même comportement.
+   * Aucune dépendance externe. Utilisable côté navigateur ou en Node.js.
+   *
+   * IMPORTANT : ce fichier est la SEULE copie exécutable du convertisseur JS
+   * (CORRECTIF, revue de code, C3). Il ne doit plus être recopié à la main
+   * dans web-demo/*.html : ces pages l'incluent via scripts/sync_converter.py,
+   * qui injecte ce fichier tel quel entre des marqueurs ACC-CONVERTER:BEGIN /
+   * ACC-CONVERTER:END. Toute divergence entre une page web et ce fichier est
+   * un bug — ne jamais modifier le code entre ces marqueurs à la main.
+   */
+
+  // "ng" -> "ŋ" seulement si NON suivi d'une voyelle (limite de syllabe) :
+  // évalué AVANT les règles de FORWARD_RULES (voir acc_converter.py).
+  const NG_RULE = /(Ng|NG|ng|nG)(?![aeiouàèòAEIOUÀÈÒ])/g;
+  const NG_REPLACEMENTS = { "Ng": "Ŋ", "NG": "Ŋ", "ng": "ŋ", "nG": "ŋ" };
+
+  // CORRECTIF (revue de code, M5) : règles insensibles à la casse et
+  // préservant la casse trouvée (MAJUSCULES -> MAJUSCULES, Titre -> Titre,
+  // minuscules -> minuscules), au lieu des 3 casses figées d'origine
+  // (qui ne géraient pas "cH", "oU"...). Miroir exact de
+  // `_make_case_preserving_sub` dans acc_converter.py.
+  function caseAwareRepl(lowerRepl) {
+    return (m) => {
+      if (m === m.toUpperCase() && m !== m.toLowerCase()) return lowerRepl.toUpperCase();
+      if (m[0] === m[0].toUpperCase() && m[0] !== m[0].toLowerCase()) {
+        return lowerRepl[0].toUpperCase() + lowerRepl.slice(1);
+      }
+      return lowerRepl;
+    };
   }
-  return result;
-}
+
+  const FORWARD_RULES = [
+    [/ou/gi, caseAwareRepl("ŏ")],
+    [/ch/gi, caseAwareRepl("š")],
+    [/ui/gi, caseAwareRepl("wi")],
+  ];
+
+  function toAcc(text) {
+    let result = text.replace(NG_RULE, (m) => NG_REPLACEMENTS[m]);
+    for (const [rx, repl] of FORWARD_RULES) {
+      result = result.replace(rx, repl);
+    }
+    return result;
+  }
+
+  // ---------------------------------------------------------------------
+  // CORRECTIF CRITIQUE (revue de code, C1) — voir acc_converter.py pour le
+  // détail : "wi" n'est plus jamais reconverti en "ui" par défaut, car
+  // aucune preuve de corpus ne le justifie et cela corrompait des mots
+  // courants de 1979 (swiv, lwil, kwit, nwit, pwi, fwi...).
+  // ---------------------------------------------------------------------
+  const WI_WORDS_FROM_UI = new Set([]); // liste blanche, vide tant que non confirmée
+  // Conservé pour compatibilité ascendante uniquement (plus utilisé ci-dessous).
+  const WI_WORDS_NEVER_FROM_UI = new Set(["wi", "kiwi", "sandwich", "sandwitch"]);
+
+  // CORRECTIF (revue de code, suite de M5) — décision de casse au niveau du
+  // mot entier plutôt que du caractère isolé (miroir de `_decode_word` /
+  // `_word_case_mode` dans acc_converter.py). Un caractère spécial isolé
+  // (Š/Ŏ/Ŋ) est toujours "majuscule" au sens de la casse Unicode : on ne
+  // peut pas savoir, à partir de lui seul, s'il vient d'un digramme "Ch"
+  // (Titre) ou "CH" (MAJUSCULES) sans regarder le reste du mot.
+  const BACKWARD_MAP_LOWER = { "š": "ch", "ŏ": "ou", "ŋ": "ng" };
+
+  function isAlpha(ch) {
+    return /\p{L}/u.test(ch);
+  }
+
+  function wordCaseMode(word) {
+    const cased = [...word].filter(isAlpha);
+    if (cased.length === 0) return "lower";
+    const isUp = (c) => c === c.toUpperCase() && c !== c.toLowerCase();
+    const isLo = (c) => c === c.toLowerCase() && c !== c.toUpperCase();
+    if (cased.every(isUp)) return "upper";
+    if (cased.every(isLo)) return "lower";
+    if (isUp(cased[0]) && cased.slice(1).every(isLo)) return "title";
+    return "mixed";
+  }
+
+  function decodeWord(word) {
+    const mode = wordCaseMode(word);
+    const chars = [...word];
+    return chars
+      .map((ch, i) => {
+        const lower = ch.toLowerCase();
+        const digraph = BACKWARD_MAP_LOWER[lower];
+        if (digraph === undefined) return ch;
+        if (mode === "upper") return digraph.toUpperCase();
+        if (mode === "title") return i === 0 ? digraph[0].toUpperCase() + digraph.slice(1) : digraph;
+        if (mode === "lower") return digraph;
+        // "mixed" (rare) : repli sur la casse du caractère lui-même
+        return ch === ch.toUpperCase() && ch !== ch.toLowerCase() ? digraph.toUpperCase() : digraph;
+      })
+      .join("");
+  }
+
+  function decodeBackwardDigraphs(text) {
+    return text.replace(/[\p{L}]+/gu, (word) => decodeWord(word));
+  }
+
+  /**
+   * convertWi contrôle le traitement de "wi" (voir la note dans
+   * acc_converter.py) :
+   *   - "none"    (défaut) : "wi" n'est jamais reconverti en "ui".
+   *   - "lexicon" : seuls les mots de WI_WORDS_FROM_UI sont reconvertis.
+   *   - "always"  : ancien comportement mécanique, incorrect sur du texte
+   *                 réel, gardé pour compatibilité et les tests.
+   * `useLexicon` (ancien paramètre booléen) reste accepté pour compatibilité
+   * ascendante : true -> "lexicon", false -> "always".
+   */
+  function to1979(text, convertWi = "none") {
+    if (convertWi === true) convertWi = "lexicon";
+    if (convertWi === false) convertWi = "always";
+
+    let result = decodeBackwardDigraphs(text);
+
+    if (convertWi === "none") return result;
+
+    if (convertWi === "always") {
+      return result.replace(/Wi/g, "Ui").replace(/wi/g, "ui");
+    }
+
+    // "lexicon" : liste blanche uniquement.
+    return result.replace(/[\p{L}]+/gu, (word) => {
+      const bare = word.toLowerCase();
+      if (!WI_WORDS_FROM_UI.has(bare)) return word;
+      return word.replace(/[Ww]i/g, (m) => (m[0] === "W" ? "Ui" : "ui"));
+    });
+  }
+
+  function diffSummary(text) {
+    const count = (re) => (text.match(re) || []).length;
+    return {
+      ch: count(/[Cc][Hh]/g),
+      ou: count(/[Oo][Uu]/g),
+      ng: (text.match(NG_RULE) || []).length,
+      ui: count(/[Uu][Ii]/g),
+    };
+  }
+
+  function convertWithReport(text) {
+    const converted = toAcc(text);
+    const noSpace = (s) => s.replace(/ /g, "");
+    const before = text.length;
+    const after = converted.length;
+    const beforeNS = noSpace(text).length;
+    const afterNS = noSpace(converted).length;
+    return {
+      original: text,
+      converted,
+      charsTotalBefore: before,
+      charsTotalAfter: after,
+      charsNoSpaceBefore: beforeNS,
+      charsNoSpaceAfter: afterNS,
+      gainPercentTotal: before === 0 ? 0 : ((before - after) / before) * 100,
+      gainPercentNoSpace: beforeNS === 0 ? 0 : ((beforeNS - afterNS) / beforeNS) * 100,
+    };
+  }
+
+  // Export pour Node.js / bundlers, tout en restant utilisable directement
+  // via <script> dans le navigateur (attache à window si présent).
+  if (typeof module !== "undefined" && module.exports) {
+    module.exports = { toAcc, to1979, diffSummary, convertWithReport, WI_WORDS_FROM_UI, WI_WORDS_NEVER_FROM_UI };
+  }
+  if (typeof window !== "undefined") {
+    window.ACCConverter = { toAcc, to1979, diffSummary, convertWithReport };
+  }
+  // ACC-CONVERTER:END
 
 /* ============ Itilitè jeneral ============ */
 function shuffle(arr) {
@@ -374,11 +525,13 @@ function lsSet(key, val) {
 
 /* ============ Done : bank mo (òtograf 1979 — AAC jenere otomatikman) ============ */
 const CATEGORIES = {
-  pati_ko: { label: 'Pati kò', words: ['tèt','je','bouch','nen','zòrèy','men','pye','dan','lang','dwèt','do','vant','jenou','kou','zepòl'] },
-  fanmi:   { label: 'Fanmi',   words: ['manman','papa','pitit','frè','sè','granmè','granpè','matant','tonton','kouzen','mari','madanm'] },
-  koulè:   { label: 'Koulè',   words: ['wouj','ble','jòn','vèt','nwa','blan','gri','woz','mov','mawon'] },
-  manje:   { label: 'Manje',   words: ['diri','pwa','bannann','mayi','vyann','ze','pen','sòs','fwi','sèl'] },
-  bèt:     { label: 'Bèt',     words: ['chen','chat','kabrit','poul','bèf','chwal','kochon','mouton','rat','zwazo','pwason','kodenn'] },
+  pati_ko: { label: 'Pati kò', words: ['tèt','je','bouch','nen','zòrèy','men','pye','dan','lang','dwèt','do','vant','jenou','kou','zepòl','zo','po','kè','fwon','manton','jarèt'] },
+  fanmi:   { label: 'Fanmi',   words: ['manman','papa','pitit','frè','sè','granmè','granpè','matant','tonton','kouzen','mari','madanm','bòpè','bèlmè','fiyèl','parenn','marenn'] },
+  koulè:   { label: 'Koulè',   words: ['wouj','ble','jòn','vèt','nwa','blan','gri','woz','mov','mawon','krèm','dore','ajan'] },
+  manje:   { label: 'Manje',   words: ['diri','pwa','bannann','mayi','vyann','ze','pen','sòs','fwi','sèl','sik','lèt','bè','siwo','kafe','legim','sitwon'] },
+  bèt:     { label: 'Bèt',     words: ['chen','chat','kabrit','poul','bèf','chwal','kochon','mouton','rat','zwazo','pwason','kodenn','bourik','krapo','foumi','papiyon','mouch'] },
+  aksyon:  { label: 'Aksyon',  words: ['manje','bwè','dòmi','mache','kouri','pale','gade','tande','li','ekri','danse','jwe','travay','aprann','chante'] },
+  nati:    { label: 'Nati',    words: ['solèy','lalin','zetwal','lanmè','rivyè','mòn','pyebwa','fèy','flè','syèl','van','lapli','tè','dlo','sab'] },
 };
 
 const DEVINET_WORDS = [
@@ -400,8 +553,23 @@ const DEVINET_WORDS = [
   { w:'wouj',    hint:'Koulè san',                          cat:'Koulè' },
   { w:'chwal',   hint:'Bèt yo monte',                       cat:'Bèt' },
   { w:'bouch',   hint:'Pati kò ou manje avè l',             cat:'Pati kò' },
+  { w:'manje',   hint:'Sa ou fè ak bouch ou lè ou grangou',  cat:'Vèb' },
+  { w:'dòmi',    hint:'Sa ou fè lannwit sou kabann',         cat:'Vèb' },
+  { w:'solèy',   hint:'Li klere lajounen',                   cat:'Nati' },
+  { w:'lalin',   hint:'Li klere lannwit',                    cat:'Nati' },
+  { w:'zetwal',  hint:'Ou wè yo nan syèl lannwit',           cat:'Nati' },
+  { w:'lanmè',   hint:'Gwo dlo sale',                        cat:'Nati' },
+  { w:'pyebwa',  hint:'Li gen fèy ak rasin',                 cat:'Nati' },
+  { w:'bourik',  hint:'Bèt ki pote chay',                    cat:'Bèt' },
+  { w:'papiyon', hint:'Bèt ki gen zèl ki gen koulè',         cat:'Bèt' },
+  { w:'legim',   hint:'Manje ki soti nan jaden',             cat:'Manje' },
+  { w:'sitwon',  hint:'Fwi ki si',                           cat:'Manje' },
+  { w:'fenèt',   hint:'Ou gade deyò nan li',                 cat:'Kay' },
+  { w:'papye',   hint:'Ou ekri sou li',                      cat:'Zouti' },
+  { w:'lajan',   hint:'Ou sèvi ak li pou achte bagay',       cat:'Ekonomi' },
+  { w:'chapo',   hint:'Ou mete l sou tèt ou',                cat:'Rad' },
+  { w:'jwe',     hint:'Sa timoun renmen fè',                 cat:'Vèb' },
 ];
-
 /* ============ Tabs ============ */
 const initialized = { devinet:false, tematik:false, memwa:false, grame:false };
 function switchGame(name) {
@@ -419,7 +587,7 @@ document.querySelectorAll('.game-tab').forEach(btn => {
   btn.addEventListener('click', () => switchGame(btn.dataset.game));
 });
 
-/* ============ JWÈT 1 : Devinèt Mo (noyaj) ============ */
+/* ============ JWÈT 1 : Devinèt Mo (nwayaj) ============ */
 const DV_KEYBOARD_LETTERS = 'abdefgijklmnŋoòŏèprsštvwyz'.split('').sort((a, b) => a.localeCompare(b, 'fr'));
 let dvState = null;
 
@@ -512,7 +680,7 @@ function dvEnd(won) {
 }
 document.getElementById('dvNewBtn').addEventListener('click', dvNewRound);
 
-/* ============ JWÈT 2 : Koerans Tematik ============ */
+/* ============ JWÈT 2 : Tèm Sanblay ============ */
 let tmState = { score: 0, streak: 0, current: null };
 
 function tmNewRound() {
@@ -673,6 +841,7 @@ const ORTO_QUESTIONS = [
   { word: 'grangou', decoys: ['grangou', 'granngou', 'grangu'] },
   { word: 'long',    decoys: ['long', 'lonj', 'lond'] },
   { word: 'touche',  decoys: ['touche', 'tuche', 'tocheu'] },
+  { word: 'bouje',  decoys: ['bouje', 'bouje', 'bojeu'] },
 ];
 
 const GRAME_QUESTIONS = [

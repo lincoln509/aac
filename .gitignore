@@ -6,3 +6,4 @@ node_modules/
 .idea
 .txt
 *.txt
+toolkit/tmp/desc.txt

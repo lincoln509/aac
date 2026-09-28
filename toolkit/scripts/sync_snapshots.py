@@ -56,6 +56,7 @@ FILES: dict[str, str] = {
     "test": "converter/tests/test_converter.py",
     "kbxml": "keyboard/ht-t-k0-aac.xml",
     "kbguide": "keyboard/README.md",
+    "freq": "docs/letter-frequency-analysis.md",
 }
 
 

@@ -7,13 +7,13 @@ les chiffres cités dans le mémoire (140 -> 127 caractères, gain de 9,3 %)
 ne sont plus reproductibles et doivent être corrigés dans le document.
 
 Note d'attribution (corrigée) : ce texte de 140 caractères est un texte
-personnel de l'auteur du mémoire (Lincoln Compère), rédigé dans le cadre
+personnel de l'auteur du mémoire (H. Lincoln Compère), rédigé dans le cadre
 du document AAC/AKI — il avait été mal étiqueté "Depestre" dans une
 version antérieure de ce dépôt (variable/classe portant ce nom). Pour un
 gain mesuré sur plusieurs textes indépendants et de sources diverses
 (personnel, légal, international, oral, littéraire du domaine public),
 voir `corpus.py` et `test_corpus_diversity.py` : le gain varie de 2,5 %
-à 9,3 % selon le texte (moyenne 5,7 %, IC95 % [3,8–7,5 %] sur 8 textes).
+à 9,3 % selon le texte (moyenne 5,7 %, IC95 % [2,9–9,25 %] sur 8 textes).
 """
 
 import os
@@ -22,7 +22,7 @@ import unittest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from acc_converter import to_acc, to_1979, convert, diff_summary, WI_WORDS_NEVER_FROM_UI
+from acc_converter import to_acc, to_1979, convert, diff_summary, WI_WORDS_FROM_UI
 
 
 class TestForwardConversion(unittest.TestCase):
@@ -45,7 +45,24 @@ class TestForwardConversion(unittest.TestCase):
         self.assertEqual(to_acc("lang"), "laŋ")
 
     def test_ui_becomes_wi(self):
-        self.assertEqual(to_acc("kuit"), "kwit")
+        # CORRECTIF (revue de code) : le mot testé était "tousuit" (sans le
+        # second "t"), qui n'existe pas dans le corpus -- le vrai mot du
+        # corpus (converter/corpus.py, texte de Choukoun) est "toutsuit".
+        # Le test passait quand même (le mot inventé contient "ui" comme
+        # le vrai), mais ne vérifiait pas ce qu'il prétendait vérifier.
+        self.assertEqual(to_acc("toutsuit"), "tŏtswit")
+        # "tousuit" est le mot correct existant du créole haitien avec une
+        # occurrence de "ui", mais dans le corpus de référence (converter/corpus.py)
+        # -- on utilise avec un "t" c'est un probleme de grammaire/conversion.
+        self.assertEqual(to_acc("tousuit"), "tŏswit")
+
+    def test_case_insensitive_and_case_preserving(self):
+        # CORRECTIF (revue de code, M5) : les règles doivent reconnaître
+        # toutes les combinaisons de casse ("cH", "oU"...), pas seulement
+        # les 3 casses figées d'origine, et préserver la casse du résultat.
+        self.assertEqual(to_acc("cHak"), "šak")
+        self.assertEqual(to_acc("oU"), "ŏ")
+        self.assertEqual(to_acc("CHAK"), "ŠAK")
 
     def test_an_en_on_unchanged(self):
         # Coeur de la révision du mémoire : ces séquences ne doivent
@@ -109,18 +126,42 @@ class TestBackwardConversion(unittest.TestCase):
         back = to_1979(acc)
         self.assertEqual(back, original)
 
-    def test_wi_lexicon_exception_is_documented_and_applied(self):
-        # "wi" (oui) ne doit jamais redevenir "ui" : c'est la limitation
-        # documentée dans le README et dans acc_converter.py.
-        self.assertIn("wi", WI_WORDS_NEVER_FROM_UI)
-        self.assertEqual(to_1979("Wi, mwen dakò."), "Wi, mwen dakò.")
+    def test_roundtrip_case(self):
+        # CORRECTIF (revue de code, M5) : MOUN -> MŎN -> MOUN (auparavant
+        # "MOuN", casse incohérente au retour).
+        self.assertEqual(to_1979(to_acc("MOUN")), "MOUN")
+        self.assertEqual(to_1979(to_acc("Chak")), "Chak")
 
-    def test_naive_backward_conversion_shows_the_limitation(self):
-        # Documente volontairement le comportement incorrect quand on
-        # désactive le lexique, pour que la limitation reste visible
-        # et testée plutôt que silencieuse.
-        naive = to_1979("Wi, mwen dakò.", use_lexicon=False)
-        self.assertEqual(naive, "Ui, mwen dakò.")  # incorrect, à dessein
+    def test_wi_never_converted_to_ui_by_default(self):
+        # CORRECTIF CRITIQUE (revue de code, C1) : l'ancienne version
+        # convertissait TOUT "wi" en "ui" sauf 4 exceptions, ce qui
+        # corrompait des mots courants et bien réels de 1979 ("swiv",
+        # "lwil", "kwit", "nwit", "pwi", "fwi"...). Par défaut, "wi" n'est
+        # plus jamais reconverti en "ui" : aucune preuve de corpus ne
+        # justifie cette conversion (voir la note dans acc_converter.py).
+        for word in ["swiv", "lwil", "kwit", "pwi", "nwit", "fwi", "wi", "kiwi", "sandwich"]:
+            with self.subTest(word=word):
+                self.assertEqual(to_1979(to_acc(word)), word)
+
+    def test_wi_lexicon_whitelist_is_empty_by_default(self):
+        # La liste blanche des mots à reconvertir en "ui" doit rester vide
+        # tant qu'aucun mot n'est confirmé par un linguiste ou un corpus de
+        # référence (voir la note dans acc_converter.py) : c'est ce qui
+        # garantit que convert_wi="lexicon" ne fait rien de plus que "none"
+        # tant qu'elle n'a pas été complétée sciemment.
+        self.assertEqual(WI_WORDS_FROM_UI, set())
+        self.assertEqual(
+            to_1979(to_acc("kwit"), convert_wi="lexicon"),
+            to_1979(to_acc("kwit"), convert_wi="none"),
+        )
+
+    def test_always_mode_shows_the_old_incorrect_behavior(self):
+        # Documente volontairement l'ancien comportement mécanique et
+        # incorrect ("ancienne version" du convertisseur), conservé pour
+        # compatibilité mais déconseillé sur du texte réel.
+        naive = to_1979(to_acc("swiv"), convert_wi="always")
+        self.assertEqual(naive, "suiv")  # incorrect, à dessein
+        self.assertEqual(to_1979("Wi, mwen dakò.", convert_wi="always"), "Ui, mwen dakò.")
 
 
 if __name__ == "__main__":

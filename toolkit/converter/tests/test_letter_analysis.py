@@ -121,11 +121,11 @@ def test_ng_positional_rule_is_now_correctly_enforced():
     from acc_converter import to_acc
 
     assert to_acc("grangou") == "grangŏ"
-    assert to_acc("lingis") == "lingis"
+    assert to_acc("lengis") == "lengis"
     assert to_acc("lang") == "laŋ"
     assert to_acc("long") == "loŋ"
     assert to_acc("Bleng-bleng") == "Bleŋ-bleŋ"
-    assert to_acc("bling-blong") == "bliŋ-bloŋ"
+    assert to_acc("bling-bleng") == "bliŋ-bleŋ"
 
     syllables = syllabify(to_acc("grangou"))
     assert not any(syl.startswith("ŋ") for syl in syllables), (

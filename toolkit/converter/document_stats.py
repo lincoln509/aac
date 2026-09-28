@@ -44,6 +44,23 @@ from scipy import stats as sp_stats
 from acc_converter import diff_summary, to_acc
 
 
+# CORRECTIF (revue de code, M4) : `to_dict()` pouvait contenir des valeurs
+# `NaN` (ex. quand n=1 ou que Shapiro/corrélation ne sont pas applicables),
+# ce qui rend `json.dumps(...)` INVALIDE au sens strict de la norme JSON
+# (NaN n'existe pas en JSON -- json.dumps l'écrit quand même par défaut,
+# produisant un fichier illisible par la plupart des autres parseurs).
+# `_json_safe` remplace récursivement NaN/Inf par `None` (-> `null` en
+# JSON), qui est la représentation JSON standard d'une valeur absente.
+def _json_safe(obj):
+    if isinstance(obj, float):
+        return None if (math.isnan(obj) or math.isinf(obj)) else obj
+    if isinstance(obj, dict):
+        return {k: _json_safe(v) for k, v in obj.items()}
+    if isinstance(obj, (list, tuple)):
+        return [_json_safe(v) for v in obj]
+    return obj
+
+
 @dataclass
 class SegmentStat:
     """Une observation = un paragraphe (ou une page, en repli)."""
@@ -146,9 +163,9 @@ class DocumentStatisticalReport:
         H1 (unilatérale) : le texte 1979 a plus de caractères que l'ACC.
         """
         if self.n < 2:
-            return {"t_stat": float("nan"), "p_value": float("nan"), "df": 0}
+            return {"t_stat": float("nan"), "p_value": float("nan"), "df": 0, "applicable": False}
         t_stat, p_value = sp_stats.ttest_rel(self._before, self._after, alternative="greater")
-        return {"t_stat": float(t_stat), "p_value": float(p_value), "df": self.n - 1}
+        return {"t_stat": float(t_stat), "p_value": float(p_value), "df": self.n - 1, "applicable": True}
 
     @property
     def shapiro_normality(self) -> dict:
@@ -223,7 +240,7 @@ class DocumentStatisticalReport:
         On retire ce signe au hasard `n_permutations` fois et on regarde
         combien de fois la moyenne obtenue dépasse la moyenne observée."""
         if self.n < 2:
-            return {"observed_mean_diff": float("nan"), "p_value": float("nan"), "n_permutations": 0}
+            return {"observed_mean_diff": float("nan"), "p_value": float("nan"), "n_permutations": 0, "applicable": False}
         diffs = self._before - self._after
         observed = float(np.mean(diffs))
         rng = np.random.default_rng(self.bootstrap_seed + 2)
@@ -232,7 +249,7 @@ class DocumentStatisticalReport:
         perm_means = (signs * diffs).mean(axis=1)
         # p unilatérale : H1 = l'effet observé est positif (before > after)
         p_value = float((np.sum(perm_means >= observed) + 1) / (n_perm + 1))
-        return {"observed_mean_diff": observed, "p_value": p_value, "n_permutations": n_perm}
+        return {"observed_mean_diff": observed, "p_value": p_value, "n_permutations": n_perm, "applicable": True}
 
     @property
     def length_gain_correlation(self) -> dict:
@@ -248,16 +265,25 @@ class DocumentStatisticalReport:
         return {"r": float(r), "p_value": float(p), "applicable": True}
 
     def power_analysis(self, target_n_values=(10, 20, 30, 50, 100), alpha=0.05, n_simulations=2000, seed=None) -> dict:
-        """Puissance statistique estimée par simulation (bootstrap
-        paramétrique) : pour chaque taille d'échantillon candidate, on
-        tire `n_simulations` échantillons (ré-échantillonnage avec remise
-        des différences par-paragraphe observées), on refait le test t
-        apparié à chaque tirage, et on compte la proportion de fois où
-        p < alpha. Répond à « combien de paragraphes faut-il pour un
-        résultat robuste ? » sans supposer une forme de distribution
-        (contrairement à une formule de puissance analytique classique)."""
+        """Puissance statistique estimée par simulation : pour chaque taille
+        d'échantillon candidate, on tire `n_simulations` échantillons par
+        ré-échantillonnage bootstrap (avec remise) des différences
+        par-paragraphe RÉELLEMENT observées -- pas d'hypothèse de forme de
+        distribution sur les données d'origine -- puis on applique un test t
+        classique à chaque tirage simulé et on compte la proportion de fois
+        où p < alpha. Répond à « combien de paragraphes faut-il pour un
+        résultat robuste ? ».
+
+        Note (CORRECTIF, revue de code, M4) : `n_simulations` (2000 par
+        défaut) est INDÉPENDANT de `bootstrap_resamples` (10 000, utilisé
+        pour les IC bootstrap ailleurs dans cette classe) -- ce sont deux
+        simulations distinctes. Le nombre de tirages réellement utilisé est
+        inclus dans le résultat (clé "n_simulations") pour que le rapport
+        Markdown l'affiche correctement plutôt que de supposer qu'il vaut
+        `bootstrap_resamples`.
+        """
         if self.n < 2:
-            return {"achieved_power_at_n": float("nan"), "by_n": {}, "required_n_80pct": None}
+            return {"achieved_power_at_n": float("nan"), "by_n": {}, "required_n_80pct": None, "n_simulations": n_simulations}
         rng = np.random.default_rng(seed if seed is not None else self.bootstrap_seed + 3)
         diffs = (self._before - self._after)
 
@@ -289,6 +315,7 @@ class DocumentStatisticalReport:
             "current_n": self.n,
             "by_n": by_n,
             "required_n_80pct": required_n_80pct,
+            "n_simulations": n_simulations,
         }
 
     # ---- décomposition par règle -------------------------------------------
@@ -338,11 +365,13 @@ class DocumentStatisticalReport:
                 "t": round(ttest["t_stat"], 3),
                 "p_value": ttest["p_value"],
                 "df": ttest["df"],
+                "applicable": ttest["applicable"],
             },
             "permutation_test_before_gt_after": {
                 "observed_mean_diff_chars": round(perm["observed_mean_diff"], 3) if self.n > 1 else None,
                 "p_value": perm["p_value"],
                 "n_permutations": perm["n_permutations"],
+                "applicable": perm["applicable"],
             },
             "shapiro_normality_on_gains": {
                 "W": round(shapiro["w_stat"], 3) if shapiro["applicable"] else None,
@@ -360,7 +389,7 @@ class DocumentStatisticalReport:
         }
         if include_power_analysis:
             out["power_analysis"] = self.power_analysis()
-        return out
+        return _json_safe(out)
 
     def to_markdown(self, title: str = "Rapport statistique de conversion 1979 -> ACC", include_power_analysis: bool = False) -> str:
         d = self.to_dict(include_power_analysis=include_power_analysis)
@@ -373,14 +402,25 @@ class DocumentStatisticalReport:
         corr = d["length_gain_correlation"]
         d_ci = d["cohens_d_ci95_bootstrap"]
 
-        p_str = "< 0.001" if tt["p_value"] < 0.001 else f"{tt['p_value']:.4f}"
-        sig = "significatif" if tt["p_value"] < 0.05 else "NON significatif"
+        # CORRECTIF (revue de code, M4) : auparavant, quand le test n'était
+        # pas applicable (n<2), p_value valait NaN et `nan < 0.05` est
+        # toujours faux en Python -- le rapport affichait donc à tort
+        # "NON significatif" pour un test qui n'avait tout simplement pas
+        # eu lieu. On distingue maintenant explicitement les deux cas via
+        # le champ "applicable".
+        if tt["applicable"]:
+            p_str = "< 0.001" if tt["p_value"] < 0.001 else f"{tt['p_value']:.4f}"
+            sig = "significatif" if tt["p_value"] < 0.05 else "NON significatif"
+        else:
+            p_str = "n/a"
+            sig = "non applicable (n<2)"
         pm_p_str = "n/a"
-        pm_sig = ""
-        if pm["p_value"] is not None:
+        pm_sig = "non applicable (n<2)"
+        if pm["applicable"]:
             pm_p_str = "< 0.001" if pm["p_value"] < 0.001 else f"{pm['p_value']:.4f}"
             pm_sig = "significatif" if pm["p_value"] < 0.05 else "NON significatif"
 
+        t_str = f"t({tt['df']}) = {tt['t']}" if tt["applicable"] else "test t"
         lines = [
             f"# {title}",
             "",
@@ -398,7 +438,7 @@ class DocumentStatisticalReport:
             "",
             "## Le gain est-il réel, ou un artefact d'échantillonnage ? (trois tests indépendants)",
             "",
-            f"1. Test t apparié (paramétrique) : t({tt['df']}) = {tt['t']}, p = {p_str} → **{sig}** au seuil 5 %.",
+            f"1. Test t apparié (paramétrique) : {t_str}, p = {p_str} → **{sig}** au seuil 5 %.",
             f"2. Test de permutation (Monte Carlo, {pm['n_permutations']} tirages, sans hypothèse de distribution) : "
             f"p = {pm_p_str} → **{pm_sig}**.",
         ]
@@ -442,7 +482,7 @@ class DocumentStatisticalReport:
                 "",
                 "## Combien de paragraphes faut-il pour un résultat robuste ?",
                 "",
-                f"Puissance estimée par simulation (ré-échantillonnage des écarts observés, {self.bootstrap_resamples} tirages "
+                f"Puissance estimée par simulation (ré-échantillonnage bootstrap des écarts observés, {pa['n_simulations']} tirages "
                 f"par taille testée) à l'échantillon actuel (n={pa['current_n']}) : **{pa['achieved_power_at_n']}**"
                 f" (probabilité de détecter l'effet observé si l'expérience était répétée).",
                 f"Taille d'échantillon nécessaire pour une puissance de 80 % : "
