@@ -1,9 +1,9 @@
 """
-acc_converter.py
+aac_converter.py
 =================
 
 Convertisseur bidirectionnel entre l'orthographe officielle du créole
-haïtien (décret du 28 septembre 1979) et l'Alphabet Atomique Créole (ACC),
+haïtien (décret du 28 septembre 1979) et l'Alphabet Atomique Créole (AAC),
 tel que défini dans le mémoire « Pour une Rationalisation Atomique de la
 Graphie Créole Haïtienne ».
 
@@ -39,7 +39,7 @@ import re
 from dataclasses import dataclass, field
 
 # ---------------------------------------------------------------------------
-# Table des règles (1979 -> ACC), appliquées dans cet ordre précis.
+# Table des règles (1979 -> AAC), appliquées dans cet ordre précis.
 # L'ordre importe :
 #   1. "ng" doit être évaluée AVANT "ou" (voir note ci-dessus sur la règle
 #      positionnelle -- sinon la voyelle qui suit "ng" est déjà remplacée).
@@ -85,7 +85,7 @@ _FORWARD_RULES = [
 # CORRECTIF (revue de code, suite de M5) — casse en conversion inverse.
 #
 # Un digramme 1979 de 2 lettres ("ch", "ou", "ng") est compressé en 1 seul
-# codepoint ACC ("š", "ŏ", "ŋ"), qui n'a que 2 formes de casse (majuscule /
+# codepoint AAC ("š", "ŏ", "ŋ"), qui n'a que 2 formes de casse (majuscule /
 # minuscule) alors que le digramme d'origine en a 3 ("ch"/"Ch"/"CH"). Décider
 # de la casse à partir du SEUL caractère trouvé (ex. Š.isupper() est toujours
 # vrai) ne peut donc pas distinguer "Ch" (Titre) de "CH" (MAJUSCULES) : c'est
@@ -164,7 +164,7 @@ def _decode_backward_digraphs(text: str) -> str:
 # ---------------------------------------------------------------------------
 
 # Mots confirmés comme s'écrivant "ui" en orthographe 1979 (donc à reconvertir
-# depuis leur forme ACC "wi"). Vide par défaut : à compléter uniquement sur
+# depuis leur forme AAC "wi"). Vide par défaut : à compléter uniquement sur
 # preuve de corpus ou validation linguistique, jamais par supposition.
 WI_WORDS_FROM_UI: set[str] = set()
 
@@ -216,8 +216,8 @@ class ConversionReport:
         return (self.chars_no_space_before - self.chars_no_space_after) / self.chars_no_space_before * 100
 
 
-def to_acc(text: str) -> str:
-    """Convertit un texte de l'orthographe officielle 1979 vers l'ACC."""
+def to_aac(text: str) -> str:
+    """Convertit un texte de l'orthographe officielle 1979 vers l'AAC."""
     result = _NG_RULE.sub(lambda m: _NG_REPLACEMENTS[m.group(1)], text)
     for rx, repl in _FORWARD_RULES:
         result = rx.sub(repl, result)
@@ -225,7 +225,7 @@ def to_acc(text: str) -> str:
 
 
 def to_1979(text: str, *, convert_wi: str = "none", use_lexicon: bool | None = None) -> str:
-    """Convertit un texte ACC vers l'orthographe officielle 1979.
+    """Convertit un texte AAC vers l'orthographe officielle 1979.
 
     convert_wi contrôle le traitement de "wi" (voir la note ci-dessus) :
       - "none"    (défaut) : "wi" n'est jamais reconverti en "ui" -- c'est
@@ -269,12 +269,12 @@ def to_1979(text: str, *, convert_wi: str = "none", use_lexicon: bool | None = N
 
 
 def convert(text: str, *, report: bool = False):
-    """Convertit 1979 -> ACC. Si report=True, renvoie un ConversionReport
+    """Convertit 1979 -> AAC. Si report=True, renvoie un ConversionReport
     avec les statistiques de gain scriptural au lieu du texte seul."""
-    acc = to_acc(text)
+    aac = to_aac(text)
     if not report:
-        return acc
-    return ConversionReport(original=text, converted=acc)
+        return aac
+    return ConversionReport(original=text, converted=aac)
 
 
 def diff_summary(text: str) -> dict[str, int]:
@@ -297,12 +297,12 @@ def diff_summary(text: str) -> dict[str, int]:
 if __name__ == "__main__":
     import sys
 
-    if len(sys.argv) < 3 or sys.argv[1] not in ("to-acc", "to-1979"):
-        print("Usage: python acc_converter.py [to-acc|to-1979] \"texte à convertir\"")
+    if len(sys.argv) < 3 or sys.argv[1] not in ("to-aac", "to-1979"):
+        print("Usage: python aac_converter.py [to-aac|to-1979] \"texte à convertir\"")
         sys.exit(1)
 
     direction, text = sys.argv[1], sys.argv[2]
-    if direction == "to-acc":
+    if direction == "to-aac":
         rep = convert(text, report=True)
         print(rep.converted)
         print(

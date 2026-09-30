@@ -86,12 +86,12 @@
     <!-- ==================================================================
          Twa lèt AAC yo — koripondan pou s/o/n, miniskil ak majiskil
          ================================================================== -->
-    <key id="s_acc" output="š"/> <!-- U+0161 -->
-    <key id="S_acc" output="Š"/> <!-- U+0160 -->
-    <key id="o_acc" output="ŏ"/> <!-- U+014F -->
-    <key id="O_acc" output="Ŏ"/> <!-- U+014E -->
-    <key id="n_acc" output="ŋ"/> <!-- U+014B -->
-    <key id="N_acc" output="Ŋ"/> <!-- U+014A -->
+    <key id="s_aac" output="š"/> <!-- U+0161 -->
+    <key id="S_aac" output="Š"/> <!-- U+0160 -->
+    <key id="o_aac" output="ŏ"/> <!-- U+014F -->
+    <key id="O_aac" output="Ŏ"/> <!-- U+014E -->
+    <key id="n_aac" output="ŋ"/> <!-- U+014B -->
+    <key id="N_aac" output="Ŋ"/> <!-- U+014A -->
 
     <!-- ==================================================================
          Vwayèl aksante ki deja nan òtograf 1979 la (à, è, ò) — sèlman
@@ -112,12 +112,12 @@
          okenn efè sou fòm "us" la (longPressKeyIds senpleman inyore sou
          yon klavye fizik).
          ================================================================== -->
-    <key id="s" output="s" longPressKeyIds="s_acc"/>
-    <key id="S" output="S" longPressKeyIds="S_acc"/>
-    <key id="o" output="o" longPressKeyIds="o_grave o_acc" longPressDefaultKeyId="o_acc"/>
-    <key id="O" output="O" longPressKeyIds="O_grave O_acc" longPressDefaultKeyId="O_acc"/>
-    <key id="n" output="n" longPressKeyIds="n_acc"/>
-    <key id="N" output="N" longPressKeyIds="N_acc"/>
+    <key id="s" output="s" longPressKeyIds="s_aac"/>
+    <key id="S" output="S" longPressKeyIds="S_aac"/>
+    <key id="o" output="o" longPressKeyIds="o_grave o_aac" longPressDefaultKeyId="o_aac"/>
+    <key id="O" output="O" longPressKeyIds="O_grave O_aac" longPressDefaultKeyId="O_aac"/>
+    <key id="n" output="n" longPressKeyIds="n_aac"/>
+    <key id="N" output="N" longPressKeyIds="N_aac"/>
     <key id="a" output="a" longPressKeyIds="a_grave"/>
     <key id="A" output="A" longPressKeyIds="A_grave"/>
     <key id="e" output="e" longPressKeyIds="e_grave"/>
@@ -169,30 +169,30 @@
 
     <layer modifiers="altR">
       <row keys="grave 1 2 3 4 5 6 7 8 9 0 minus equal"/>
-      <row keys="q w e r t y u i o_acc p bracketleft bracketright backslash"/>
-      <row keys="a s_acc d f g h j k l semicolon apostrophe"/>
-      <row keys="z x c v b n_acc m comma period slash"/>
+      <row keys="q w e r t y u i o_aac p bracketleft bracketright backslash"/>
+      <row keys="a s_aac d f g h j k l semicolon apostrophe"/>
+      <row keys="z x c v b n_aac m comma period slash"/>
     </layer>
 
     <layer modifiers="altR shift">
       <row keys="asciitilde exclam at numbersign dollar percent caret ampersand asterisk parenleft parenright underscore plus"/>
-      <row keys="Q W E R T Y U I O_acc P braceleft braceright bar"/>
-      <row keys="A S_acc D F G H J K L colon quotedbl"/>
-      <row keys="Z X C V B N_acc M less greater question"/>
+      <row keys="Q W E R T Y U I O_aac P braceleft braceright bar"/>
+      <row keys="A S_aac D F G H J K L colon quotedbl"/>
+      <row keys="Z X C V B N_aac M less greater question"/>
     </layer>
 
     <layer modifiers="altR caps">
       <row keys="grave 1 2 3 4 5 6 7 8 9 0 minus equal"/>
-      <row keys="Q W E R T Y U I O_acc P bracketleft bracketright backslash"/>
-      <row keys="A S_acc D F G H J K L semicolon apostrophe"/>
-      <row keys="Z X C V B N_acc M comma period slash"/>
+      <row keys="Q W E R T Y U I O_aac P bracketleft bracketright backslash"/>
+      <row keys="A S_aac D F G H J K L semicolon apostrophe"/>
+      <row keys="Z X C V B N_aac M comma period slash"/>
     </layer>
 
     <layer modifiers="altR caps shift">
       <row keys="asciitilde exclam at numbersign dollar percent caret ampersand asterisk parenleft parenright underscore plus"/>
-      <row keys="q w e r t y u i o_acc p braceleft braceright bar"/>
-      <row keys="a s_acc d f g h j k l colon quotedbl"/>
-      <row keys="z x c v b n_acc m less greater question"/>
+      <row keys="q w e r t y u i o_aac p braceleft braceright bar"/>
+      <row keys="a s_aac d f g h j k l colon quotedbl"/>
+      <row keys="z x c v b n_aac m less greater question"/>
     </layer>
 
   </layers>

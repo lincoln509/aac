@@ -17,9 +17,9 @@ Toutes les formules sont documentées dans docs/letter-frequency-analysis.md ;
 ce module n'en est que l'implémentation.
 
 Note historique : une version antérieure de ce module documentait un écart
-entre le comportement de acc_converter.py et le résumé du mémoire (la règle
+entre le comportement de aac_converter.py et le résumé du mémoire (la règle
 positionnelle "ng -> ŋ seulement en fin de syllabe" n'était pas appliquée
-par le code). Cet écart a été corrigé dans acc_converter.py (voir son
+par le code). Cet écart a été corrigé dans aac_converter.py (voir son
 en-tête de fichier) : la fonction syllable_functional_analysis() ci-dessous
 sert maintenant aussi de test de non-régression pour cette règle -- voir
 test_corpus_wide_ng_is_always_coda dans test_letter_analysis.py.
@@ -31,7 +31,7 @@ import re
 import statistics
 from dataclasses import dataclass, field
 
-from acc_converter import to_acc
+from aac_converter import to_aac
 
 # ---------------------------------------------------------------------------
 # 1) Fréquence des lettres atomiques
@@ -46,7 +46,7 @@ ATOMIC_LETTERS = ("š", "ŏ", "ŋ")
 # (n) N'EST PAS une voyelle, donc seule la première lettre (a/e/o) compte
 # comme noyau ; "an" occupe alors noyau+coda sur un seul phonème nasal.
 # NOTE : doit rester synchronisé avec la classe de voyelles utilisée par
-# NG_RULE dans acc_converter.py/.js (aeiouàèò, + majuscules) -- "à" a été
+# NG_RULE dans aac_converter.py/.js (aeiouàèò, + majuscules) -- "à" a été
 # ajouté ici pour lever une incohérence où syllabify() ne reconnaissait
 # pas "à" comme noyau et retombait sur une classification "onset" par
 # défaut pour tout le mot (y compris pour les lettres atomiques qu'il
@@ -110,7 +110,7 @@ class AtomicFrequencyReport:
 
 def atomic_letter_frequencies(text_1979: str) -> AtomicFrequencyReport:
     """Calcule les fréquences des lettres atomiques sur la conversion AAC de text_1979."""
-    aac = to_acc(text_1979)
+    aac = to_aac(text_1979)
     lower = aac.lower()
     counts = {l: lower.count(l) for l in ATOMIC_LETTERS}
     return AtomicFrequencyReport(text_aac=aac, counts=counts, total_chars=len(aac))
@@ -174,7 +174,7 @@ class WordLevelReport:
 
 
 def word_level_analysis(text_1979: str) -> WordLevelReport:
-    aac = to_acc(text_1979)
+    aac = to_aac(text_1979)
     words = _tokenize_words(aac)
     per_letter_word_count = {l: 0 for l in ATOMIC_LETTERS}
     distribution: dict[int, int] = {}
@@ -292,7 +292,7 @@ class SyllableFunctionalReport:
 
 
 def syllable_functional_analysis(text_1979: str) -> SyllableFunctionalReport:
-    aac = to_acc(text_1979)
+    aac = to_aac(text_1979)
     words = _tokenize_words(aac)
     positions = {l: {"onset": 0, "nucleus": 0, "coda": 0} for l in ATOMIC_LETTERS}
     n_syllables = 0

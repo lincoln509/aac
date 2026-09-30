@@ -13,7 +13,7 @@ Trois niveaux d'analyse, chacun avec ses définitions formelles, puis un
 ## Notations préliminaires
 
 Soit $\Sigma$ l'alphabet du texte converti en AAC, et $T = (c_1, c_2, \dots, c_N) \in \Sigma^N$
-la séquence des $N$ caractères de ce texte **converti** (`to_acc(texte_1979)`),
+la séquence des $N$ caractères de ce texte **converti** (`to_aac(texte_1979)`),
 espaces inclus — comme pour le calcul du gain scriptural dans `document_stats.py`.
 On mesure la présence des lettres atomiques une fois qu'elles existent, pas
 sur l'original.
@@ -213,13 +213,13 @@ entre le code et le résumé du mémoire. Le résumé affirme :
 > « Une règle positionnelle stricte encadre la substitution ng → ŋ, limitée
 > aux occurrences en fin de syllabe et/ou de mot. »
 
-Or `acc_converter.py` appliquait alors `ng → ŋ` sans aucune condition de
+Or `aac_converter.py` appliquait alors `ng → ŋ` sans aucune condition de
 position. Exemple concret : `grangou` (gran-gou, "ng" à cheval sur deux
 syllabes) devenait `graŋŏ`, où `ŋ` se retrouvait en **attaque** de la
 syllabe `ŋŏ` — pas en fin de syllabe. Sur le corpus, cela produisait 38 %
 d'occurrences de `ŋ` en onset plutôt qu'en coda.
 
-**Ceci est maintenant corrigé.** `acc_converter.py` n'applique `ng → ŋ` que
+**Ceci est maintenant corrigé.** `aac_converter.py` n'applique `ng → ŋ` que
 lorsque `ng` n'est *pas* suivi d'une voyelle (donc uniquement en fin de mot,
 en fin de composant d'un mot composé, ou devant une consonne) :
 
@@ -235,7 +235,7 @@ bling-bleng -> bliŋ-bleŋ
 La condition doit être testée **avant** la règle `ou → ŏ` : sinon la
 voyelle qui suit `ng` est déjà consommée au moment du test, et la
 condition « pas suivi d'une voyelle » devient toujours vraie à tort — c'est
-exactement ce qui causait le bug initial. `acc_converter.py` applique donc
+exactement ce qui causait le bug initial. `aac_converter.py` applique donc
 désormais la règle `ng` en premier, avant la boucle des autres règles.
 
 Conséquence mesurable : la densité et le gain scriptural du texte

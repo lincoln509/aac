@@ -14,8 +14,12 @@ on:
       - "LICENSE"
       - "converter/**"
       - "keyboard/**"
-      - "web-demo/index.html"
-      - "scripts/sync_snapshots.py"
+      - "docs/letter-frequency-analysis.md"
+      - "docs/grapheme-table.md"
+#      - "web-demo/index.html"
+      - "web-demo/**"
+#      - "scripts/sync_snapshots.py"
+      - "scripts/**"
 
 permissions:
   contents: write

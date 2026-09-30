@@ -1,4 +1,4 @@
-# ACC — Alphabet Atomique Créole
+# AAC — Alphabet Atomique Créole
 
 > Prototype technique accompagnant le mémoire *« Pour une Rationalisation Atomique de la Graphie Créole Haïtienne — De la Réforme Orthographique de 1979 à l'Alphabet Atomique Créole »*.
 >
@@ -14,9 +14,9 @@ L'orthographe créole de 1979 compte traditionnellement 32 « lettres », mais p
 
 Un ingénieur qui propose une réforme d'écriture doit, à un moment, cesser d'en parler et la faire tourner. Ce dépôt fait exactement ça :
 
-- **Un convertisseur bidirectionnel** (Python + JavaScript, sans dépendance externe) entre l'orthographe officielle de 1979 et l'ACC.
+- **Un convertisseur bidirectionnel** (Python + JavaScript, sans dépendance externe) entre l'orthographe officielle de 1979 et l'AAC.
 - **Une suite de tests** qui rejoue l'exemple du chapitre IV du mémoire et échoue si les chiffres cités deviennent faux.
-- **Une démo web interactive** à page unique, déployable telle quelle sur GitHub Pages, sans étape de build. Les deux panneaux (1979 / ACC) sont éditables et se convertissent automatiquement l'un l'autre, dans les deux sens, sans bouton à cliquer.
+- **Une démo web interactive** à page unique, déployable telle quelle sur GitHub Pages, sans étape de build. Les deux panneaux (1979 / AAC) sont éditables et se convertissent automatiquement l'un l'autre, dans les deux sens, sans bouton à cliquer.
 - **Une visionneuse de fichiers intégrée** à la démo : README, LICENSE et le code source (Python/JS/tests) se lisent directement sur la page, dans une fenêtre modale avec coloration syntaxique légère, sans quitter le site.
 - **Une disposition clavier complète** (`keyboard/ht-t-k0-aac.xml`, format [CLDR Keyboard 3.0](https://www.unicode.org/reports/tr35/tr35-keyboards.html)) pour taper š, ŏ et ŋ directement au clavier — AltGr sur ordinateur, appui long sur mobile — plus un guide d'installation par plateforme.
 - **Une conversion de documents Word/PDF entiers**, avec préservation du format d'origine, accompagnée d'un vrai traitement statistique du gain (écart-type, intervalle de confiance à 95 %, test t apparié, bootstrap) plutôt qu'un chiffre unique. Disponible en ligne de commande (`converter/document_converter.py`, fidélité maximale) **et** directement dans le navigateur (`web-demo/documents.html`, glisser-déposer, sans backend) — voir « Conversion de documents » plus bas.
@@ -24,10 +24,10 @@ Un ingénieur qui propose une réforme d'écriture doit, à un moment, cesser d'
 ## Structure du dépôt
 
 ```
-acc-toolkit/
+aac-toolkit/
 ├── converter/
-│   ├── acc_converter.py       # implémentation de référence (Python)
-│   ├── acc_converter.js       # port JavaScript (même comportement)
+│   ├── aac_converter.py       # implémentation de référence (Python)
+│   ├── aac_converter.js       # port JavaScript (même comportement)
 │   ├── document_converter.py  # conversion .docx/.pdf avec préservation du format
 │   ├── document_stats.py      # traitement statistique (écart-type, IC, test t, bootstrap)
 │   ├── letter_analysis.py     # fréquence et fonction syllabique (onset/nucleus/coda) des lettres atomiques
@@ -103,7 +103,7 @@ python3 scripts/sync_snapshots.py --check  # vérifie seulement (utile en CI)
 **Python**
 
 ```bash
-python3 converter/acc_converter.py to-acc "Chak moun gen dwa pou yo chèche travay san pwoblèm nan peyi a."
+python3 converter/aac_converter.py to-aac "Chak moun gen dwa pou yo chèche travay san pwoblèm nan peyi a."
 # -> Šak mŏn gen dwa pŏ yo šèše travay san pwoblèm nan peyi a.
 
 python3 -m unittest converter.tests.test_converter -v
@@ -112,7 +112,7 @@ python3 -m unittest converter.tests.test_converter -v
 **JavaScript / Node**
 
 ```bash
-node -e "const {toAcc} = require('./converter/acc_converter.js'); console.log(toAcc('Chante pou chase lapli.'))"
+node -e "const {toAac} = require('./converter/aac_converter.js'); console.log(toAac('Chante pou chase lapli.'))"
 ```
 
 **Démo web**
@@ -201,7 +201,7 @@ exposer, ajoutez-les à `BLOCKED_PREFIXES` en haut de
 
 ## Les règles implémentées
 
-| Son (API) | 1979    | ACC | Codepoint | Statut        |
+| Son (API) | 1979    | AAC | Codepoint | Statut        |
 |-----------|---------|-----|-----------|---------------|
 | /ʃ/       | ch      | š   | U+0161    | Remplacé      |
 | /u/, /ũ/  | ou, oun | ŏ   | U+014F    | Remplacé      |
@@ -215,7 +215,7 @@ Détail complet et justification linguistique : [`docs/grapheme-table.md`](docs/
 
 ## Limite connue et documentée
 
-La conversion ACC → 1979 n'est **pas parfaitement réversible** pour la séquence `wi` : ce groupe existait déjà dans l'orthographe de 1979 pour des mots qui n'ont jamais été écrits `ui` (l'exemple le plus fréquent est `wi`, « oui »). Le convertisseur inclut une petite liste d'exceptions lexicales (`WI_WORDS_NEVER_FROM_UI`) pour gérer les cas les plus courants, mais une fidélité totale demanderait un lexique complet — c'est justement l'un des livrables prévus en phase 2 de la feuille de route du mémoire (constitution d'un corpus de référence bilingue). Ce n'est pas caché : c'est testé explicitement dans `test_converter.py`.
+La conversion AAC → 1979 n'est **pas parfaitement réversible** pour la séquence `wi` : ce groupe existait déjà dans l'orthographe de 1979 pour des mots qui n'ont jamais été écrits `ui` (l'exemple le plus fréquent est `wi`, « oui »). Le convertisseur inclut une petite liste d'exceptions lexicales (`WI_WORDS_NEVER_FROM_UI`) pour gérer les cas les plus courants, mais une fidélité totale demanderait un lexique complet — c'est justement l'un des livrables prévus en phase 2 de la feuille de route du mémoire (constitution d'un corpus de référence bilingue). Ce n'est pas caché : c'est testé explicitement dans `test_converter.py`.
 
 ## Conversion de documents (Word / PDF) et traitement statistique
 
@@ -229,11 +229,11 @@ Sur ces 8 textes (`converter/tests/test_corpus_diversity.py`), le gain varie de 
 
 ```bash
 pip install -r converter/requirements-documents.txt
-python converter/document_converter.py convert memoire.docx memoire_acc.docx --report rapport.md
-python converter/document_converter.py convert chapitre.pdf chapitre_acc.pdf --report rapport.json
+python converter/document_converter.py convert memoire.docx memoire_aac.docx --report rapport.md
+python converter/document_converter.py convert chapitre.pdf chapitre_aac.pdf --report rapport.json
 ```
 
-- **`.docx` → `.docx`** : fidélité totale. Seul le texte à l'intérieur des runs Word existants est modifié (`run.text = to_acc(run.text)`) — gras, italique, polices, styles de titre et tableaux restent identiques à l'original. Limite documentée : une séquence `ch`/`ou`/`ng` coupée exactement à la frontière entre deux runs (rare, généralement après une correction manuelle) n'est pas convertie ; le script le signale sur stderr.
+- **`.docx` → `.docx`** : fidélité totale. Seul le texte à l'intérieur des runs Word existants est modifié (`run.text = to_aac(run.text)`) — gras, italique, polices, styles de titre et tableaux restent identiques à l'original. Limite documentée : une séquence `ch`/`ou`/`ng` coupée exactement à la frontière entre deux runs (rare, généralement après une correction manuelle) n'est pas convertie ; le script le signale sur stderr.
 - **`.pdf` → `.pdf`** : fidélité textuelle, pas visuelle. Un PDF n'a pas de « texte modifiable » — le texte est extrait paragraphe par paragraphe (`pdfplumber`) puis un nouveau PDF est reconstruit (`reportlab`, police DejaVu Sans pour que š/ŏ/ŋ s'affichent correctement) avec la même taille de page. Pour un document essentiellement textuel le résultat est très proche de l'original ; pour une mise en page complexe (colonnes, texte sur image), le contenu reste correct mais la mise en page ne l'est pas — vérifier visuellement, ou repartir du `.docx` source s'il existe.
 
 Chaque **paragraphe** du document devient une observation indépendante, ce qui permet un vrai traitement statistique plutôt qu'un chiffre unique :
@@ -272,7 +272,7 @@ Même traitement statistique, mais glisser-déposer direct dans le navigateur, s
 
 `converter/letter_analysis.py` mesure comment š, ŏ et ŋ se comportent réellement une fois le texte converti : leur fréquence (par 100/1000 caractères, densité atomique globale), leur couverture lexicale (part des mots contenant au moins une lettre atomique), et leur fonction syllabique — attaque, noyau ou coda — via un syllabeur heuristique documenté (règle d'attaque maximale, standard pour une langue à forte préférence CV comme le créole).
 
-Résultat sur les 8 textes de `corpus.py` (627 syllabes, 445 mots) : `ŏ` est, par construction, toujours noyau (100 %) ; `š` est majoritairement attaque (83 %) mais peut être coda (17 %, ex. `bouch` → `bŏš`, ce qui est normal — aucune règle positionnelle n'a jamais été revendiquée pour `ch`) ; `ŋ` est désormais **toujours** coda (100 %), depuis la correction de la règle positionnelle de `acc_converter.py` : `ng → ŋ` ne s'applique plus que lorsque `ng` n'est pas suivi d'une voyelle (`grangou` → `grangŏ`, pas `graŋŏ`), ce qui rend exacte l'affirmation du résumé du mémoire sur ce point. `docs/letter-frequency-analysis.md` documente toutes les formules et l'historique de cette correction.
+Résultat sur les 8 textes de `corpus.py` (627 syllabes, 445 mots) : `ŏ` est, par construction, toujours noyau (100 %) ; `š` est majoritairement attaque (83 %) mais peut être coda (17 %, ex. `bouch` → `bŏš`, ce qui est normal — aucune règle positionnelle n'a jamais été revendiquée pour `ch`) ; `ŋ` est désormais **toujours** coda (100 %), depuis la correction de la règle positionnelle de `aac_converter.py` : `ng → ŋ` ne s'applique plus que lorsque `ng` n'est pas suivi d'une voyelle (`grangou` → `grangŏ`, pas `graŋŏ`), ce qui rend exacte l'affirmation du résumé du mémoire sur ce point. `docs/letter-frequency-analysis.md` documente toutes les formules et l'historique de cette correction.
 
 Tests : `converter/tests/test_letter_analysis.py` (17 tests). Pour un rapport lisible plutôt qu'un simple pass/fail, `python3 letter_analysis.py --corpus` (depuis `converter/`) affiche la densité atomique et la fonction syllabique agrégées sur les 8 textes, texte par texte.
 
@@ -314,11 +314,11 @@ Le premier reproduit exactement la table de la section 4.1.2 du mémoire ; le se
 - **Memwa** — 12 cartes / 6 paires : chaque paire marie l'orthographe 1979 et AAC du même mot, pratique directe de la conversion.
 - **Gramè/Òtograf** — 12 questions mêlant orthographe (« comment s'écrit X en AAC ? ») et grammaire (marqueurs de temps te/ap/pral/fèk/ta, marqueur pluriel yo).
 
-Tout le contenu créole est généré à l'exécution par la même fonction `toAcc()` que `converter/acc_converter.js` (embarquée dans la page) à partir de mots en orthographe 1979 — aucune orthographe AAC n'est tapée à la main, pour éviter les erreurs de transcription. `python3 -m http.server` (ou `scripts/serve.py`) depuis `web-demo/`, puis ouvrir `jwet.html`, suffit pour y jouer en local.
+Tout le contenu créole est généré à l'exécution par la même fonction `toAac()` que `converter/aac_converter.js` (embarquée dans la page) à partir de mots en orthographe 1979 — aucune orthographe AAC n'est tapée à la main, pour éviter les erreurs de transcription. `python3 -m http.server` (ou `scripts/serve.py`) depuis `web-demo/`, puis ouvrir `jwet.html`, suffit pour y jouer en local.
 
 ## Par rapport aux travaux existants
 
-Ce prototype n'invente pas le principe d'un alphabet à monogrammes pour le créole : le linguiste Frantz Gourdet en a publié une version plus ambitieuse en 2022 (*Rechèch Etid Kreyòl*, théorie du linéarisme), qui touche également `an`, `en`, `on`. L'ACC s'en distingue délibérément en laissant ces trois séquences inchangées — voir la section 3.5 du mémoire pour la justification complète de ce choix.
+Ce prototype n'invente pas le principe d'un alphabet à monogrammes pour le créole : le linguiste Frantz Gourdet en a publié une version plus ambitieuse en 2022 (*Rechèch Etid Kreyòl*, théorie du linéarisme), qui touche également `an`, `en`, `on`. L'AAC s'en distingue délibérément en laissant ces trois séquences inchangées — voir la section 3.5 du mémoire pour la justification complète de ce choix.
 
 ## Documents associés
 

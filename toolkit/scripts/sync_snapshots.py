@@ -51,8 +51,8 @@ INDEX_HTML = ROOT / "web-demo" / "index.html"
 FILES: dict[str, str] = {
     "readme": "README.md",
     "license": "LICENSE",
-    "py": "converter/acc_converter.py",
-    "js": "converter/acc_converter.js",
+    "py": "converter/aac_converter.py",
+    "js": "converter/aac_converter.js",
     "test": "converter/tests/test_converter.py",
     "kbxml": "keyboard/ht-t-k0-aac.xml",
     "kbguide": "keyboard/README.md",

@@ -31,7 +31,7 @@ vraies statistiques de langue.
 Ayisyen) : a, an, b, ch, d, e, è, en, f, g, h, i, j, k, l, m, n, ng, o, ò,
 on, ou, oun, p, r, s, t, ui, v, w, y, z. Le texte est segmenté en 32 unités
 par plus-longue-correspondance, avec la **même règle positionnelle** que
-`acc_converter.NG_RULE` pour « ng » (nasale uniquement si non suivie d'une
+`aac_converter.NG_RULE` pour « ng » (nasale uniquement si non suivie d'une
 voyelle — sinon « n » et « g » comptent comme deux consonnes séparées, ex.
 *gran-gou*). `à` est traité comme allophone accentué de `a` (non listé comme
 lettre distincte dans l'alphabet officiel).
@@ -39,7 +39,7 @@ lettre distincte dans l'alphabet officiel).
 **Alphabet AAC (24 lettres)** : celui codé dans `alphabet_complet.py`
 (`abdefgijklmnoprstvwyz` + `š,ŏ,ŋ`). **Limite déjà signalée (revue de code,
 M7), reconfirmée ici avec des chiffres exacts** : ce jeu de 24 caractères
-ne couvre que **7674 des 7883 caractères** du texte ACC réel
+ne couvre que **7674 des 7883 caractères** du texte AAC réel
 (97,35 %) — les **209 caractères restants (2,65 %)**
 sont `è`, `ò` et `à`, qui existent dans le texte converti mais n'appartiennent
 pas à l'ensemble déclaré. Les tableaux ci-dessous respectent la demande
@@ -53,41 +53,44 @@ côté, pour que le lecteur puisse juger lui-même si ce choix lui convient.
 
 ### 1979 (32 unités)
 
-| Lettre 1979 | Occurrences | Fréquence |
-|---|---:|---:|
-| a | 741 | 10.31 % |
-| i | 614 | 8.54 % |
-| e | 558 | 7.76 % |
-| t | 518 | 7.21 % |
-| k | 455 | 6.33 % |
-| l | 424 | 5.90 % |
-| s | 393 | 5.47 % |
-| p | 300 | 4.17 % |
-| y | 297 | 4.13 % |
-| o | 247 | 3.44 % |
-| m | 237 | 3.30 % |
-| an | 231 | 3.21 % |
-| r | 212 | 2.95 % |
-| on | 209 | 2.91 % |
-| d | 201 | 2.80 % |
-| w | 199 | 2.77 % |
-| ou | 197 | 2.74 % |
-| en | 178 | 2.48 % |
-| è | 157 | 2.18 % |
-| n | 139 | 1.93 % |
-| g | 111 | 1.54 % |
-| b | 102 | 1.42 % |
-| v | 87 | 1.21 % |
-| f | 75 | 1.04 % |
-| oun | 75 | 1.04 % |
-| j | 62 | 0.86 % |
-| z | 60 | 0.83 % |
-| ò | 51 | 0.71 % |
-| ch | 50 | 0.70 % |
-| ng | 6 | 0.08 % |
-| ui | 2 | 0.03 % |
-| h | 0 | 0.00 % |
-| **Total** | **7188** | **100.00 %** |
+| Lettre 1979 | Occurrences |    Fréquence | *  |  Lettre AAC |    Occurrences | Fréquence (sur les 24) |
+|-------------|------------:|-------------:|:--:|------------:|---------------:|-------------------:|
+| a           |         741 |      10.31 % | -  |           a |            971 |                12.65 % |
+| i           |         614 |       8.54 % | -  |           i |            616 |                 8.03 % |
+| e           |         558 |       7.76 % | -  |           e |            736 |                 9.59 % |
+| t           |         518 |       7.21 % | -  |           t |            518 |                 6.75 % |
+| k           |         455 |       6.33 % | -  |           k |            455 |                 5.93 % |
+| l           |         424 |       5.90 % | -  |           l |            424 |                 5.53 % |
+| s           |         393 |       5.47 % | -  |           s |            393 |                 5.12 % |
+| p           |         300 |       4.17 % | -  |           p |            300 |                 3.91 % |
+| y           |         297 |       4.13 % | -  |           y |            297 |                 3.87 % |
+| o           |         247 |       3.44 % | -  |           o |            456 |                 5.94 % |
+| m           |         237 |       3.30 % | -  |           m |            237 |                 3.09 % |
+| an          |         231 |       3.21 % | -  |          an |              0 |                 0.00 % |
+| r           |         212 |       2.95 % | -  |           r |            212 |                 2.76 % |
+| on          |         209 |       2.91 % | -  |          on |              0 |                 0.00 % |
+| d           |         201 |       2.80 % | -  |           d |            201 |                 2.62 % |
+| w           |         199 |       2.77 % | -  |           w |            201 |                 2.62 % |
+| ou          |         197 |       2.74 % | -  |          ou |              0 |                 0.00 % |
+| en          |         178 |       2.48 % | -  |          en |              0 |                 0.00 % |
+| è           |         157 |       2.18 % | -  |           è |              0 |                  0.0 % |
+| n           |         139 |       1.93 % | -  |           n |            832 |                10.84 % |
+| g           |         111 |       1.54 % | -  |           g |            111 |                 1.45 % |
+| b           |         102 |       1.42 % | -  |           b |            102 |                 1.33 % |
+| v           |          87 |       1.21 % | -  |           v |             87 |                 1.13 % |
+| f           |          75 |       1.04 % | -  |           f |             75 |                 0.98 % |
+| oun         |          75 |       1.04 % | -  |         oun |              0 |                 0.00 % |
+| j           |          62 |       0.86 % | -  |           j |             62 |                 0.81 % |
+| z           |          60 |       0.83 % | -  |           z |             60 |                 0.78 % |
+| ò           |          51 |       0.71 % | -  |           ò |              0 |                 0.00 % |
+| ch          |          50 |       0.70 % | -  |          ch |              0 |                 0.00 % |
+| ng          |           6 |       0.08 % | -  |          ng |              0 |                 0.00 % |
+| ui          |           2 |       0.03 % | -  |          ui |              0 |                 0.00 % |
+| h           |           0 |       0.00 % | -  |           h |              0 |                 0.00 % |
+| ŏ           |           0 |       0.00 % | -  |           ŏ |            272 |                 3.54 % |
+| ŋ           |           0 |       0.00 % | -  |           ŋ |              6 |                 0.08 % |
+| š           |           0 |      0.00 %  | -  |           š |             50 |                 0.65 % |
+| **Total**   |    **7188** | **100.00 %** | -  |   **Total** |       **7674** |            **100.00%** |
 
 ### AAC (24 lettres codées)
 
@@ -119,17 +122,17 @@ côté, pour que le lecteur puisse juger lui-même si ce choix lui convient.
 | ŋ | 6 | 0.08 % |
 | **Total** | **7674** | **100.00 %** |
 
-### Caractères ACC hors des 24 lettres codées (è, ò, à)
+### Caractères AAC hors des 24 lettres codées (è, ò, à)
 
-| Caractère | Occurrences | % du total ACC |
-|---|---:|---:|
-| è | 157 | 1.99 % |
-| ò | 51 | 0.65 % |
-| à | 1 | 0.01 % |
+| Caractère | Occurrences | % du total AAC |
+|---|---:|---------------:|
+| è | 157 |         1.99 % |
+| ò | 51 |         0.65 % |
+| à | 1 |         0.01 % |
 
 **Lecture** : à eux seuls, `a`, `n`, `e`, `i`, `t` couvrent déjà
 47.9 %
-des caractères ACC — la distribution reste très inégale dans les deux
+des caractères AAC — la distribution reste très inégale dans les deux
 systèmes (c'est justement ce que l'entropie normalisée, section 2, permet
 de quantifier plutôt que de constater à l'œil).
 
@@ -241,7 +244,7 @@ groupe), mais reste une simplification, pas une vérité universelle.
 ## 4. Bigrammes complets (24 × 24)
 
 Comptés à l'intérieur des mots uniquement (jamais à cheval sur un espace ou
-une apostrophe), sur les 7883 caractères ACC du corpus combiné. Une
+une apostrophe), sur les 7883 caractères AAC du corpus combiné. Une
 paire est exclue de la matrice dès que l'un de ses deux caractères tombe
 hors des 24 lettres codées (`è`, `ò`, `à` — voir §0) : 338 paires sur
 5839 (≈ 5,8 %) sont dans ce cas et n'apparaissent pas ci-dessous.
@@ -297,7 +300,7 @@ l'ensemble des séquences 1979 pouvant produire la lettre/unité AAC `p_i`
 version précédente affichait `Bi-univocité totale : Amb(...) = 0`,
 **codé en dur**, sans être calculé à partir d'une quelconque définition de
 `T`. `B` est ici réellement calculé à partir des règles de conversion
-documentées (`acc_converter.py`, `docs/grapheme-table.md`), pas seulement
+documentées (`aac_converter.py`, `docs/grapheme-table.md`), pas seulement
 observé sur le corpus (un cas rare mais réel n'apparaîtrait pas forcément
 dans un échantillon de 7188 lettres).
 
@@ -316,10 +319,10 @@ indépendant de sa fréquence d'occurrence dans tel ou tel échantillon.
 
 **Ambiguïté supplémentaire, hors alphabet des 24 lettres — la séquence
 « wi »** (déjà quantifiée en pratique lors de la revue de code, correctif
-C1) : en ACC, la séquence `wi` a **deux** origines 1979 possibles —
+C1) : en AAC, la séquence `wi` a **deux** origines 1979 possibles —
 `wi` (*wi* = oui, *kiwi*...) ou `ui` (converti). `T(wi) = 2`, donc
 `1/T(wi) = 0,5` — c'est précisément pour cette raison que la conversion
-inverse ACC → 1979 ne peut **pas**, par défaut, reconvertir `wi` en `ui` :
+inverse AAC → 1979 ne peut **pas**, par défaut, reconvertir `wi` en `ui` :
 aucune règle mécanique ne peut discriminer les deux cas sans un lexique.
 Cette ambiguïté n'est pas comptée dans le `B` ci-dessus (elle porte sur une
 séquence de deux caractères, pas sur une lettre unique de l'alphabet à 24),
@@ -331,13 +334,13 @@ système : contrairement à `ŋ`, elle concerne des mots réellement fréquents
 
 ## 6. Résumé
 
-| Question | Réponse chiffrée |
-|---|---|
-| H_AAC > H_1979 ? | **Non** — 0.8991 < 0.9015 (écart 0.0024, non robuste à ce n) |
-| Bi-univocité des 24 lettres (B) | **0,9792** (1 lettre à risque structurel : ŋ) |
+| Question | Réponse chiffrée                                                    |
+|---|---------------------------------------------------------------------|
+| H_AAC > H_1979 ? | **Non** — 0.8991 < 0.9015 (écart 0.0024, non robuste à ce n)        |
+| Bi-univocité des 24 lettres (B) | **0,9792** (1 lettre à risque structurel : ŋ)                       |
 | Ambiguïté résiduelle la plus concrète | `wi` (T=2), hors des 24 lettres, déjà gérée par `convert_wi="none"` |
-| Couverture réelle des « 24 lettres AAC » | **97.35 %** du texte ACC (reste : è, ò, à) |
-| Bigrammes dominants | `an`, `on`, `en` (nasales, non fusionnées par choix) |
+| Couverture réelle des « 24 lettres AAC » | **97.35 %** du texte AAC (reste : è, ò, à)                          |
+| Bigrammes dominants | `an`, `on`, `en` (nasales, non fusionnées par choix)                |
 
 **À retenir pour la suite du mémoire** : l'argument le plus solide en
 faveur de l'AAC reste le **gain scriptural mesuré** (`corpus.py`,

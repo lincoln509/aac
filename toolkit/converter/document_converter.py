@@ -3,7 +3,7 @@ document_converter.py
 ======================
 
 Convertit un document Word (.docx) ou PDF (.pdf) rédigé en créole,
-orthographe officielle de 1979, vers l'Alphabet Atomique Créole (ACC),
+orthographe officielle de 1979, vers l'Alphabet Atomique Créole (AAC),
 et produit un rapport statistique comparatif (voir document_stats.py).
 
 .docx : fidélité totale. On ne touche qu'au texte à l'intérieur des
@@ -45,14 +45,14 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 
-from acc_converter import to_acc
+from aac_converter import to_aac
 from document_stats import build_report, build_multi_document_report
 
 # Les polices de base (Helvetica/Times, encodage WinAnsi) n'ont pas les
 # glyphes š/ŏ/ŋ (Latin Extended-A, U+014F et U+014B en particulier) :
 # reportlab les affiche comme des rectangles noirs. DejaVu Sans les
 # couvre. Si elle est absente du système, on retombe sur Helvetica —
-# auquel cas les caractères ACC composés seront mal rendus (le texte
+# auquel cas les caractères AAC composés seront mal rendus (le texte
 # reste correct en UTF-8 dans le PDF, seul le rendu visuel est affecté).
 _DEJAVU_REGULAR = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
 _DEJAVU_BOLD = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
@@ -92,13 +92,13 @@ def _convert_paragraph_runs(paragraph, warnings: list[str], location: str) -> st
 
     for run in paragraph.runs:
         if run.text:
-            run.text = to_acc(run.text)
+            run.text = to_aac(run.text)
 
     # Détection best-effort des séquences coupées entre deux runs :
     # si le texte concaténé transformé run-par-run diffère de la
     # transformation du texte concaténé en un bloc, une séquence a
     # chevauché une frontière.
-    naive_full_convert = to_acc(joined_before)
+    naive_full_convert = to_aac(joined_before)
     actual_full_convert = "".join(r.text for r in paragraph.runs)
     if naive_full_convert != actual_full_convert and joined_before.strip():
         warnings.append(f"{location}: possible séquence coupée entre deux runs Word — vérifier manuellement.")
@@ -167,7 +167,7 @@ def convert_pdf(input_path: str, output_path: str) -> ConversionResult:
 
     story = []
     for label, text, _ in paragraphs:
-        converted = to_acc(text).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+        converted = to_aac(text).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
         # CORRECTIF (revue de code) : un bloc peut contenir des retours à la
         # ligne internes (ex. un poème découpé vers par vers dans le corpus,
         # voir corpus.py) quand le découpage sur "\n\n" a produit plusieurs
@@ -302,7 +302,7 @@ def main(argv=None):
         )
         argv = ["convert"] + argv
 
-    parser = argparse.ArgumentParser(description="Convertit un/des document(s) (.docx/.pdf) en ACC avec rapport statistique.")
+    parser = argparse.ArgumentParser(description="Convertit un/des document(s) (.docx/.pdf) en AAC avec rapport statistique.")
     sub = parser.add_subparsers(dest="command", required=True)
 
     p_convert = sub.add_parser("convert", help="Convertit UN document et écrit le fichier converti (fidélité de format).")

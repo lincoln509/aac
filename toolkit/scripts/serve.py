@@ -2,7 +2,7 @@
 """
 scripts/serve.py
 ==================
-Serveur de développement local pour tester acc-toolkit/ avant déploiement,
+Serveur de développement local pour tester aac-toolkit/ avant déploiement,
 qui NE fait PAS ce que `python3 -m http.server` fait par défaut :
 
   - `http.server` nu liste le contenu de n'importe quel dossier sans

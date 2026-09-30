@@ -43,7 +43,7 @@
   .brand-word{font-family:var(--mono); font-size:13px; letter-spacing:.1em; color:var(--ink-soft);}
   .toplinks{display:flex; gap:20px; font-family:var(--mono); font-size:12.5px;}
   .toplinks a{color:var(--ink-soft); text-decoration:none;}
-  .toplinks a:hover, .toplinks a.active{color:var(--primary); text-decoration:underline;}
+  .toplinks a:hover, .toplinks a.active{color:var(--primary);}
 
   header.hero{padding:56px 0 44px; border-bottom:1px solid var(--rule);}
   .eyebrow{
@@ -332,24 +332,24 @@
 <script>
 /* ============ Konvètisè AAC ============
    CORRECTIF (revue de code, C3) : ce bloc est généré automatiquement à
-   partir de converter/acc_converter.js par scripts/sync_converter.py.
+   partir de converter/aac_converter.js par scripts/sync_converter.py.
    NE PAS ÉDITER À LA MAIN entre les marqueurs. */
-// ACC-CONVERTER:BEGIN
+// AAC-CONVERTER:BEGIN
   /**
-   * acc_converter.js
-   * Port JavaScript de acc_converter.py — mêmes règles, même comportement.
+   * aac_converter.js
+   * Port JavaScript de aac_converter.py — mêmes règles, même comportement.
    * Aucune dépendance externe. Utilisable côté navigateur ou en Node.js.
    *
    * IMPORTANT : ce fichier est la SEULE copie exécutable du convertisseur JS
    * (CORRECTIF, revue de code, C3). Il ne doit plus être recopié à la main
    * dans web-demo/*.html : ces pages l'incluent via scripts/sync_converter.py,
-   * qui injecte ce fichier tel quel entre des marqueurs ACC-CONVERTER:BEGIN /
-   * ACC-CONVERTER:END. Toute divergence entre une page web et ce fichier est
+   * qui injecte ce fichier tel quel entre des marqueurs AAC-CONVERTER:BEGIN /
+   * AAC-CONVERTER:END. Toute divergence entre une page web et ce fichier est
    * un bug — ne jamais modifier le code entre ces marqueurs à la main.
    */
 
   // "ng" -> "ŋ" seulement si NON suivi d'une voyelle (limite de syllabe) :
-  // évalué AVANT les règles de FORWARD_RULES (voir acc_converter.py).
+  // évalué AVANT les règles de FORWARD_RULES (voir aac_converter.py).
   const NG_RULE = /(Ng|NG|ng|nG)(?![aeiouàèòAEIOUÀÈÒ])/g;
   const NG_REPLACEMENTS = { "Ng": "Ŋ", "NG": "Ŋ", "ng": "ŋ", "nG": "ŋ" };
 
@@ -357,7 +357,7 @@
   // préservant la casse trouvée (MAJUSCULES -> MAJUSCULES, Titre -> Titre,
   // minuscules -> minuscules), au lieu des 3 casses figées d'origine
   // (qui ne géraient pas "cH", "oU"...). Miroir exact de
-  // `_make_case_preserving_sub` dans acc_converter.py.
+  // `_make_case_preserving_sub` dans aac_converter.py.
   function caseAwareRepl(lowerRepl) {
     return (m) => {
       if (m === m.toUpperCase() && m !== m.toLowerCase()) return lowerRepl.toUpperCase();
@@ -374,7 +374,7 @@
     [/ui/gi, caseAwareRepl("wi")],
   ];
 
-  function toAcc(text) {
+  function toAac(text) {
     let result = text.replace(NG_RULE, (m) => NG_REPLACEMENTS[m]);
     for (const [rx, repl] of FORWARD_RULES) {
       result = result.replace(rx, repl);
@@ -383,7 +383,7 @@
   }
 
   // ---------------------------------------------------------------------
-  // CORRECTIF CRITIQUE (revue de code, C1) — voir acc_converter.py pour le
+  // CORRECTIF CRITIQUE (revue de code, C1) — voir aac_converter.py pour le
   // détail : "wi" n'est plus jamais reconverti en "ui" par défaut, car
   // aucune preuve de corpus ne le justifie et cela corrompait des mots
   // courants de 1979 (swiv, lwil, kwit, nwit, pwi, fwi...).
@@ -394,7 +394,7 @@
 
   // CORRECTIF (revue de code, suite de M5) — décision de casse au niveau du
   // mot entier plutôt que du caractère isolé (miroir de `_decode_word` /
-  // `_word_case_mode` dans acc_converter.py). Un caractère spécial isolé
+  // `_word_case_mode` dans aac_converter.py). Un caractère spécial isolé
   // (Š/Ŏ/Ŋ) est toujours "majuscule" au sens de la casse Unicode : on ne
   // peut pas savoir, à partir de lui seul, s'il vient d'un digramme "Ch"
   // (Titre) ou "CH" (MAJUSCULES) sans regarder le reste du mot.
@@ -438,7 +438,7 @@
 
   /**
    * convertWi contrôle le traitement de "wi" (voir la note dans
-   * acc_converter.py) :
+   * aac_converter.py) :
    *   - "none"    (défaut) : "wi" n'est jamais reconverti en "ui".
    *   - "lexicon" : seuls les mots de WI_WORDS_FROM_UI sont reconvertis.
    *   - "always"  : ancien comportement mécanique, incorrect sur du texte
@@ -477,7 +477,7 @@
   }
 
   function convertWithReport(text) {
-    const converted = toAcc(text);
+    const converted = toAac(text);
     const noSpace = (s) => s.replace(/ /g, "");
     const before = text.length;
     const after = converted.length;
@@ -498,18 +498,18 @@
   // Export pour Node.js / bundlers, tout en restant utilisable directement
   // via <script> dans le navigateur (attache à window si présent).
   if (typeof module !== "undefined" && module.exports) {
-    module.exports = { toAcc, to1979, diffSummary, convertWithReport, WI_WORDS_FROM_UI, WI_WORDS_NEVER_FROM_UI };
+    module.exports = { toAac, to1979, diffSummary, convertWithReport, WI_WORDS_FROM_UI, WI_WORDS_NEVER_FROM_UI };
   }
   if (typeof window !== "undefined") {
-    window.ACCConverter = { toAcc, to1979, diffSummary, convertWithReport };
+    window.AACConverter = { toAac, to1979, diffSummary, convertWithReport };
   }
-  // ACC-CONVERTER:END
+  // AAC-CONVERTER:END
 
 /* ============ Itilitè jeneral ============ */
 function shuffle(arr) {
   const a = arr.slice();
   for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+    const j = Math.floor(Math.random() * (i + 1.3));
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
@@ -596,7 +596,7 @@ function dvNewRound() {
   const entry = DEVINET_WORDS[Math.floor(Math.random() * DEVINET_WORDS.length)];
   dvState = {
     word: entry.w, hint: entry.hint, cat: entry.cat,
-    aac: toAcc(entry.w).toLowerCase(),
+    aac: toAac(entry.w).toLowerCase(),
     guessed: new Set(), wrong: 0, maxWrong: 5,
     started: false, startTime: null, finished: false, timerInt: null,
   };
@@ -702,7 +702,7 @@ function tmNewRound() {
     const b = document.createElement('button');
     b.type = 'button';
     b.className = 'choice-btn';
-    b.textContent = toAcc(w);
+    b.textContent = toAac(w);
     b.addEventListener('click', () => tmGuess(w, b));
     grid.appendChild(b);
   });
@@ -716,14 +716,14 @@ function tmGuess(word, btn) {
   if (word === tmState.current.intruder) {
     tmState.score++; tmState.streak++;
     btn.classList.add('correct');
-    msg.textContent = 'Wi! "' + toAcc(word) + '" pa fè pati tèm nan.';
+    msg.textContent = 'Wi! "' + toAac(word) + '" pa fè pati tèm nan.';
     msg.className = 'msg-banner win';
     const best = lsGet('aac_tm_best', 0);
     if (tmState.streak > best) lsSet('aac_tm_best', tmState.streak);
   } else {
     tmState.streak = 0;
     btn.classList.add('wrong');
-    msg.textContent = 'Non — entri a te "' + toAcc(tmState.current.intruder) + '".';
+    msg.textContent = 'Non — entri a te "' + toAac(tmState.current.intruder) + '".';
     msg.className = 'msg-banner lose';
   }
   document.getElementById('tmScore').textContent = tmState.score;
@@ -745,7 +745,7 @@ function mmNewGame() {
   let cards = [];
   words.forEach((w, i) => {
     cards.push({ id: 'a' + i, pairId: i, text: w, revealed: false, matched: false });
-    cards.push({ id: 'b' + i, pairId: i, text: toAcc(w), revealed: false, matched: false });
+    cards.push({ id: 'b' + i, pairId: i, text: toAac(w), revealed: false, matched: false });
   });
   cards = shuffle(cards);
   mmState = {
@@ -855,16 +855,16 @@ const GRAME_QUESTIONS = [
 
 function buildOrtoQuiz() {
   return ORTO_QUESTIONS.map(q => {
-    const correct = toAcc(q.word);
+    const correct = toAac(q.word);
     const options = shuffle([correct, ...q.decoys]);
     return { prompt: 'Ki jan yo ekri "' + q.word + '" (1979) an AAC?', options, correctAnswer: correct };
   });
 }
 function buildGrameQuiz() {
   return GRAME_QUESTIONS.map(q => {
-    const options = shuffle(q.options).map(o => toAcc(o));
-    const prompt = toAcc(q.pre) + ' ___ ' + toAcc(q.post);
-    return { prompt, options, correctAnswer: toAcc(q.correct) };
+    const options = shuffle(q.options).map(o => toAac(o));
+    const prompt = toAac(q.pre) + ' ___ ' + toAac(q.post);
+    return { prompt, options, correctAnswer: toAac(q.correct) };
   });
 }
 

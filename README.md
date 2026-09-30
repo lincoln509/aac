@@ -1,8 +1,8 @@
-# ACC — Alphabet Atomique Créole
+# AAC — Alphabet Atomique Créole
 
 ![AAC-OG_X_normal.svg](AAC-OG_X_normal.svg)
 
-Bienvenue sur le dépôt officiel du projet **ACC (Alphabet Atomique Créole)**.
+Bienvenue sur le dépôt officiel du projet **AAC (Alphabet Atomique Créole)**.
 
 Ce dépôt rassemble :
 
@@ -12,17 +12,17 @@ Ce dépôt rassemble :
 ---
 
 ## Contenu du dépôt
-| Élément                                                                                 | Description |
-|:----------------------------------------------------------------------------------------| :--- |
-| 📄 [`Alphabet Atomique Creole Livre - v1.2.0`](https://doi.org/10.5281/zenodo.21540458) | Le mémoire complet, version livre (6×9 po). |
-| 🧰 [`toolkit/`](./toolkit/)                                                              | Le toolkit ACC, toujours à jour sur `main` (convertisseur, démo web, jeux de pratique, clavier, tests). |
-| 🏷️ [Toutes les versions (tags)](https://github.com/lincoln509/aac/tags)                | Historique des versions du toolkit (`v1.0.0`, `v1.0.1`, `v1.1.0`, `v1.1.1`, ...). |
+| Élément                                                                                 | Description                                                                                             |
+|:----------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------------------------|
+| 📄 [`Alphabet Atomique Creole Livre - v1.2.0`](https://doi.org/10.5281/zenodo.21540458) | Le mémoire complet, version livre (6×9 po).                                                             |
+| 🧰 [`toolkit/`](./toolkit/)                                                              | Le toolkit AAC, toujours à jour sur `main` (convertisseur, démo web, jeux de pratique, clavier, tests). |
+| 🏷️ [Toutes les versions (tags)](https://github.com/lincoln509/aac/tags)                | Historique des versions du toolkit (`v1.0.0`, `v1.0.1`, `v1.1.0`, `v1.1.1`, ...).                       |
 
 ---
 
 ## À propos du livre
 
-Le livre détaille la théorie derrière l'ACC : un alphabet rationalisé pour le créole haïtien, réduisant l'inventaire de 32 à 24 lettres atomiques. Il contient l'historique, la justification linguistique, le protocole d'implémentation, les résultats chiffrés et des annexes complètes.
+Le livre détaille la théorie derrière l'AAC : un alphabet rationalisé pour le créole haïtien, réduisant l'inventaire de 32 à 24 lettres atomiques. Il contient l'historique, la justification linguistique, le protocole d'implémentation, les résultats chiffrés et des annexes complètes.
 
 [//]: # (➡️ **Accéder au livre :** [`Alphabet Atomique Creole Livre - v1.2.0.pdf`]&#40;./Alphabet%20Atomique%20Creole%20Livre%20-%20v1.2.0.pdf&#41;)
 ➡️ **Accéder au livre :** [`Alphabet Atomique Creole Livre - v1.2.0`](https://doi.org/10.5281/zenodo.21540458)
@@ -33,12 +33,12 @@ Le livre détaille la théorie derrière l'ACC : un alphabet rationalisé pour l
 
 Le toolkit est une implémentation technique de la réforme proposée. Il comprend :
 
-- **Un convertisseur** (Python / JavaScript) entre l'orthographe officielle de 1979 et l'ACC.
+- **Un convertisseur** (Python / JavaScript) entre l'orthographe officielle de 1979 et l'AAC.
 - **Une démo web** interactive (éditeur à deux panneaux, conversion en temps réel).
 - **Une disposition clavier** pour taper `š`, `ŏ` et `ŋ` facilement.
 - **Une suite de tests** qui reproduit les chiffres du mémoire (gain de 2,5 % à 9,3 % selon le texte — moyenne 5,7 %, IC95 % [3,8–7,5 %] sur 8 textes indépendants —, réduction à 127 caractères pour l'extrait historique, etc.).
 
-➡️ **Accéder au toolkit :** [`toolkit/`](./toolkit/) — consultez son README pour l'installation et l'utilisation.
+➡️ **Accéder au toolkit :** [`toolkit/`](./aac/toolkit/) — consultez son README pour l'installation et l'utilisation.
 
 ---
 

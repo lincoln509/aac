@@ -10,7 +10,7 @@ public (Oswald Durand 1883, Georges Sylvain 1901 — tous deux morts il
 y a un siècle ou plus).
 
 Ce test fige l'écart réellement mesuré : si quelqu'un modifie corpus.py
-ou acc_converter.py d'une façon qui change sensiblement ces chiffres,
+ou aac_converter.py d'une façon qui change sensiblement ces chiffres,
 ce test doit échouer et la documentation (README.md) doit être mise à
 jour en conséquence — pas l'inverse.
 """

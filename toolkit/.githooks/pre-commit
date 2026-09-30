@@ -1,7 +1,8 @@
 #!/bin/sh
 # .githooks/pre-commit
 #
-# Relance automatiquement scripts/sync_snapshots.py avant chaque commit.
+# Relance automatiquement scripts/sync_converter.py, sync_corpus.py et
+# sync_snapshots.py avant chaque commit.
 # Si des fichiers surveillés (README.md, LICENSE, converter/*, keyboard/*)
 # ont changé, cet instantané intégré dans web-demo/index.html est remis à
 # jour et ajouté au commit en cours — vous n'avez plus jamais à y penser.
@@ -22,12 +23,16 @@ if ! command -v python3 >/dev/null 2>&1; then
     exit 0
 fi
 
+# Ordre : d'abord les générateurs de code (JS converti + corpus), puis
+# l'instantané hors-ligne qui embarque l'état final des fichiers surveillés.
+python3 scripts/sync_converter.py
+python3 scripts/sync_corpus.py
 python3 scripts/sync_snapshots.py
 
-# Si le script a modifié web-demo/index.html, on l'ajoute au commit en cours
-if ! git diff --quiet -- web-demo/index.html; then
-    git add web-demo/index.html
-    echo "pre-commit: web-demo/index.html mis à jour et ajouté au commit."
+# Si un script a modifié une page web-demo, on l'ajoute au commit en cours
+if ! git diff --quiet -- web-demo; then
+    git add web-demo
+    echo "pre-commit: web-demo/ mis à jour et ajouté au commit."
 fi
 
 exit 0

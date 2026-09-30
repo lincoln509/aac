@@ -1,0 +1,20 @@
+# CORRECTIF (revue de code, M9) : l'ancien .gitignore excluait par erreur
+# .github/ (le workflow de CI n'était donc jamais versionné) et *.txt
+# (ce qui excluait aussi converter/requirements-documents.txt, requis par
+# le README pour installer les dépendances des tests). Voir aussi
+# .gitattributes (fins de ligne) pour la 2e partie du correctif M9.
+
+__pycache__/
+*.pyc
+.DS_Store
+node_modules/
+.idea/
+.githooks_test/
+.pytest_cache/
+
+# Fichiers texte "scratch" locaux uniquement (pas de dépendances requises,
+# pas de documentation versionnée) -- remplace l'ancien blocage global
+# `*.txt` qui excluait par erreur converter/requirements-documents.txt.
+tmp/readme.txt
+tmp/style2.txt
+tmp/README_Game.txt

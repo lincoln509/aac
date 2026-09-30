@@ -2,7 +2,7 @@
 document_stats.py
 ==================
 
-Traitement statistique du gain scriptural 1979 -> ACC au niveau *document*
+Traitement statistique du gain scriptural 1979 -> AAC au niveau *document*
 (par opposition au chiffre unique du chapitre IV du mémoire, "9,3 % sur
 un extrait de 140 caractères" — extrait qui, en plus, avait été mal
 attribué à René Depestre dans une version antérieure de ce dépôt : il
@@ -41,7 +41,7 @@ import math
 import numpy as np
 from scipy import stats as sp_stats
 
-from acc_converter import diff_summary, to_acc
+from aac_converter import diff_summary, to_aac
 
 
 # CORRECTIF (revue de code, M4) : `to_dict()` pouvait contenir des valeurs
@@ -160,7 +160,7 @@ class DocumentStatisticalReport:
     @property
     def paired_ttest(self) -> dict:
         """H0 : pas de différence entre nb de caractères avant/après.
-        H1 (unilatérale) : le texte 1979 a plus de caractères que l'ACC.
+        H1 (unilatérale) : le texte 1979 a plus de caractères que l'AAC.
         """
         if self.n < 2:
             return {"t_stat": float("nan"), "p_value": float("nan"), "df": 0, "applicable": False}
@@ -391,7 +391,7 @@ class DocumentStatisticalReport:
             out["power_analysis"] = self.power_analysis()
         return _json_safe(out)
 
-    def to_markdown(self, title: str = "Rapport statistique de conversion 1979 -> ACC", include_power_analysis: bool = False) -> str:
+    def to_markdown(self, title: str = "Rapport statistique de conversion 1979 -> AAC", include_power_analysis: bool = False) -> str:
         d = self.to_dict(include_power_analysis=include_power_analysis)
         ci = d["ci95_student"]
         boot = d["ci95_bootstrap"]
@@ -493,10 +493,10 @@ class DocumentStatisticalReport:
 
 
 def build_report(segments: list[tuple[str, str]], **kwargs) -> DocumentStatisticalReport:
-    """segments : liste de (label, texte_original_1979). La conversion ACC
-    est calculée ici pour garantir la cohérence avec acc_converter.to_acc."""
+    """segments : liste de (label, texte_original_1979). La conversion AAC
+    est calculée ici pour garantir la cohérence avec aac_converter.to_aac."""
     stats_segments = [
-        SegmentStat(label=label, original=text, converted=to_acc(text))
+        SegmentStat(label=label, original=text, converted=to_aac(text))
         for label, text in segments
         if text.strip()
     ]

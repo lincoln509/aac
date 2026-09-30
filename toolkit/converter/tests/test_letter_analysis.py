@@ -113,21 +113,21 @@ def test_o_breve_is_always_nucleus():
 def test_ng_positional_rule_is_now_correctly_enforced():
     """La règle positionnelle décrite dans le mémoire ("ng" -> "ŋ"
     seulement en fin de syllabe/mot) est maintenant réellement appliquée
-    par acc_converter.py (corrigé -- voir acc_converter.py, en-tête de
+    par aac_converter.py (corrigé -- voir aac_converter.py, en-tête de
     fichier, et l'historique git pour le commit correspondant).
 
     'grangou' (gran-gou) : le "g" commence la syllabe suivante -> "ng" ne
     fusionne PAS, contrairement à 'lang'/'long' (ng en fin de mot)."""
-    from acc_converter import to_acc
+    from aac_converter import to_aac
 
-    assert to_acc("grangou") == "grangŏ"
-    assert to_acc("lengis") == "lengis"
-    assert to_acc("lang") == "laŋ"
-    assert to_acc("long") == "loŋ"
-    assert to_acc("Bleng-bleng") == "Bleŋ-bleŋ"
-    assert to_acc("bling-bleng") == "bliŋ-bleŋ"
+    assert to_aac("grangou") == "grangŏ"
+    assert to_aac("lengis") == "lengis"
+    assert to_aac("lang") == "laŋ"
+    assert to_aac("long") == "loŋ"
+    assert to_aac("Bleng-bleng") == "Bleŋ-bleŋ"
+    assert to_aac("bling-bleng") == "bliŋ-bleŋ"
 
-    syllables = syllabify(to_acc("grangou"))
+    syllables = syllabify(to_aac("grangou"))
     assert not any(syl.startswith("ŋ") for syl in syllables), (
         "ŋ ne doit plus jamais apparaître en attaque de syllabe : la règle "
         "positionnelle garantit qu'il n'existe qu'en fin de syllabe (coda)."
@@ -166,7 +166,7 @@ def test_corpus_wide_sh_is_not_always_onset():
 
 def test_corpus_wide_ng_is_always_coda():
     """Conséquence directe de la règle positionnelle (maintenant appliquée
-    par acc_converter.py, voir test_ng_positional_rule_is_now_correctly_
+    par aac_converter.py, voir test_ng_positional_rule_is_now_correctly_
     enforced) : sur les 8 textes du corpus, ŋ n'apparaît plus jamais qu'en
     coda. S'il apparaissait en onset, ce serait la preuve d'une régression
     de la règle positionnelle."""

@@ -1,0 +1,25 @@
+name: Vérifie les synchronisations (convertisseur JS + corpus)
+
+# Complète sync-snapshots.yml. Ici on ne corrige PAS automatiquement : on
+# fait échouer le build si web-demo/*.html n'est plus synchronisé avec sa
+# source Python (aac_converter.js -> 3 pages, corpus.py -> index.html).
+# Correctif local : `python3 scripts/sync_converter.py` et
+# `python3 scripts/sync_corpus.py` (ou activer le hook .githooks/pre-commit,
+# qui les lance à chaque commit).
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: aac_converter.js -> web-demo/*.html
+        run: python3 scripts/sync_converter.py --check
+
+      - name: corpus.py -> web-demo/index.html
+        run: python3 scripts/sync_corpus.py --check

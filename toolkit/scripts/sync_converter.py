@@ -5,16 +5,16 @@ sync_converter.py
 
 CORRECTIF (revue de code, C3 — "quatre copies du convertisseur, déjà
 divergentes") : avant ce correctif, le code JavaScript du convertisseur
-(converter/acc_converter.js) était recopié À LA MAIN dans trois pages HTML
+(converter/aac_converter.js) était recopié À LA MAIN dans trois pages HTML
 (web-demo/index.html, web-demo/jwet.html, web-demo/documents.html), avec
 pour résultat des copies déjà différentes du fichier source (lexique
 périmé, comptage de "ng" incohérent...).
 
-Ce script élimine la copie manuelle : converter/acc_converter.js reste
+Ce script élimine la copie manuelle : converter/aac_converter.js reste
 l'UNIQUE source, et ce script l'injecte tel quel entre les marqueurs
 
-    // ACC-CONVERTER:BEGIN
-    // ACC-CONVERTER:END
+    // AAC-CONVERTER:BEGIN
+    // AAC-CONVERTER:END
 
 présents dans chacune des pages HTML ci-dessus. Le code reste inliné
 (plutôt que chargé via <script src="...">) pour continuer à fonctionner
@@ -35,7 +35,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-SOURCE = ROOT / "converter" / "acc_converter.js"
+SOURCE = ROOT / "converter" / "aac_converter.js"
 
 TARGETS = [
     ROOT / "web-demo" / "index.html",
@@ -43,8 +43,8 @@ TARGETS = [
     ROOT / "web-demo" / "documents.html",
 ]
 
-BEGIN = "// ACC-CONVERTER:BEGIN"
-END = "// ACC-CONVERTER:END"
+BEGIN = "// AAC-CONVERTER:BEGIN"
+END = "// AAC-CONVERTER:END"
 
 
 def build_block(source_code: str) -> str:
@@ -86,12 +86,12 @@ def main() -> int:
 
     if args.check:
         if drift:
-            print("Dérive détectée (converter/acc_converter.js non synchronisé) :")
+            print("Dérive détectée (converter/aac_converter.js non synchronisé) :")
             for t in drift:
                 print(f"  - {t.relative_to(ROOT)}")
             print("Lancez `python3 scripts/sync_converter.py` pour corriger.")
             return 1
-        print("OK : les 3 pages web-demo sont synchronisées avec acc_converter.js.")
+        print("OK : les 3 pages web-demo sont synchronisées avec aac_converter.js.")
         return 0
 
     if drift:

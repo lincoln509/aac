@@ -22,7 +22,7 @@ AUTOGRAF_LINCOLN = (
 def test_single_segment_matches_memoire_figures():
     """Le chiffre historique du mémoire (140 -> 127, -9,3 %) doit rester
     reproductible tel quel via le pipeline statistique, pas seulement via
-    acc_converter.convert()."""
+    aac_converter.convert()."""
     report = build_report([("lincoln", AUTOGRAF_LINCOLN)])
     assert report.chars_before_total == 140
     assert report.chars_after_total == 127
