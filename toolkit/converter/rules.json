@@ -1,0 +1,21 @@
+{
+  "_readme": "SOURCE UNIQUE des règles de conversion 1979 <-> AAC et des alphabets. Lu directement par aac_converter.py et aac_converter.js (Node) ; dans le navigateur, scripts/build.py en génère web-demo/generated/rules.js. Pour changer une règle : éditez ce fichier, puis lancez `python3 scripts/build.py`. Ne dupliquez ces valeurs nulle part ailleurs.",
+
+  "ng": {
+    "pattern": "(Ng|NG|ng|nG)(?![aeiouàèòAEIOUÀÈÒ])",
+    "to": { "Ng": "Ŋ", "NG": "Ŋ", "ng": "ŋ", "nG": "ŋ" }
+  },
+
+  "forward": [
+    { "name": "ou", "from": "ou", "to": "ŏ" },
+    { "name": "ch", "from": "ch", "to": "š" },
+    { "name": "ui", "from": "ui", "to": "wi" }
+  ],
+
+  "backward": { "š": "ch", "ŏ": "ou", "ŋ": "ng" },
+
+  "wi_from_ui": [],
+
+  "atomic_letters": ["š", "ŏ", "ŋ"],
+  "vowels": "aeiòèouŏà"
+}

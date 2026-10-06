@@ -35,8 +35,20 @@ Ce module est volontairement dépourvu de dépendances externes.
 """
 
 from __future__ import annotations
+import json
 import re
 from dataclasses import dataclass, field
+from pathlib import Path
+
+# ---------------------------------------------------------------------------
+# SOURCE UNIQUE : converter/rules.json (partagée avec aac_converter.js).
+# Ne recopiez aucune règle ici : modifiez rules.json puis `python3
+# scripts/build.py`.
+# ---------------------------------------------------------------------------
+RULES: dict = json.loads((Path(__file__).with_name("rules.json")).read_text(encoding="utf-8"))
+
+ATOMIC_LETTERS: tuple[str, ...] = tuple(RULES["atomic_letters"])
+VOWELS: frozenset[str] = frozenset(RULES["vowels"])
 
 # ---------------------------------------------------------------------------
 # Table des règles (1979 -> AAC), appliquées dans cet ordre précis.
@@ -51,8 +63,8 @@ from dataclasses import dataclass, field
 # "ng" -> "ŋ" seulement si NON suivi d'une voyelle (limite de syllabe).
 # Regex plutôt que .replace() simple : c'est la seule règle qui a besoin
 # de regarder le caractère suivant avant de décider.
-_NG_RULE = re.compile(r"(Ng|NG|ng|nG)(?![aeiouàèòAEIOUÀÈÒ])")
-_NG_REPLACEMENTS = {"Ng": "Ŋ", "NG": "Ŋ", "ng": "ŋ", "nG": "ŋ"}
+_NG_RULE = re.compile(RULES["ng"]["pattern"])
+_NG_REPLACEMENTS: dict[str, str] = RULES["ng"]["to"]
 
 # CORRECTIF (revue de code) — casse mixte non gérée ("OUI" -> "ŎI" -> "OuI").
 # Les règles ne couvraient que 3 casses figées (bas de casse, Titre, MAJ) par
@@ -75,12 +87,7 @@ def _make_case_preserving_sub(pattern: str, lower_repl: str):
 
     return rx, repl
 
-
-_FORWARD_RULES = [
-    _make_case_preserving_sub(r"ou", "ŏ"),
-    _make_case_preserving_sub(r"ch", "š"),
-    _make_case_preserving_sub(r"ui", "wi"),
-]
+_FORWARD_RULES = [_make_case_preserving_sub(r["from"], r["to"]) for r in RULES["forward"]]
 
 # CORRECTIF (revue de code, suite de M5) — casse en conversion inverse.
 #
@@ -100,8 +107,12 @@ _FORWARD_RULES = [
 #     (majuscule seulement si le caractère spécial est en tête de mot)
 #   - casse interne réellement imprévisible (rare)     -> repli sur l'ancien
 #     comportement caractère par caractère (documenté, non garanti correct)
-_BACKWARD_MAP_LOWER = {"š": "ch", "ŏ": "ou", "ŋ": "ng"}
-_WORD_RE = re.compile(r"[^\W\d_]+", re.UNICODE)
+_BACKWARD_MAP_LOWER: dict[str, str] = RULES["backward"]
+
+# Mot = suite de lettres (ponctuation et chiffres exclus). Définie ICI, une
+# seule fois : letter_analysis, alphabet_complet, analyse_complete et
+# corpus2_dudh la réutilisent au lieu de recopier la regex.
+WORD_RE = re.compile(r"[^\W\d_]+", re.UNICODE)
 
 
 def _word_case_mode(word: str) -> str:
@@ -138,7 +149,7 @@ def _decode_word(word: str) -> str:
 
 
 def _decode_backward_digraphs(text: str) -> str:
-    return _WORD_RE.sub(lambda m: _decode_word(m.group(0)), text)
+    return WORD_RE.sub(lambda m: _decode_word(m.group(0)), text)
 
 # ---------------------------------------------------------------------------
 # CORRECTIF (revue de code) — "wi" -> "ui" en conversion inverse.
@@ -166,17 +177,7 @@ def _decode_backward_digraphs(text: str) -> str:
 # Mots confirmés comme s'écrivant "ui" en orthographe 1979 (donc à reconvertir
 # depuis leur forme AAC "wi"). Vide par défaut : à compléter uniquement sur
 # preuve de corpus ou validation linguistique, jamais par supposition.
-WI_WORDS_FROM_UI: set[str] = set()
-
-# Conservé pour compatibilité ascendante avec l'ancien nom ; n'est plus
-# utilisé par to_1979 (qui fonctionne désormais par liste blanche).
-WI_WORDS_NEVER_FROM_UI: set[str] = {
-    "wi",         # oui
-    "kiwi",       # emprunt
-    "sandwich",   # déjà "sandwich" en 1979, jamais "sanduich"
-    "sandwitch",  # variante orthographique locale, même raison
-}
-
+WI_WORDS_FROM_UI: set[str] = set(RULES["wi_from_ui"])
 
 @dataclass
 class ConversionReport:
@@ -286,12 +287,10 @@ def diff_summary(text: str) -> dict[str, int]:
     les occurrences comme "grangou" (gran-gou), où "n" et "g" appartiennent
     à deux syllabes différentes, ne sont pas des séquences opaques et sont
     donc exclues de ce compte."""
-    return {
-        "ch": len(re.findall(r"[Cc][Hh]", text)),
-        "ou": len(re.findall(r"[Oo][Uu]", text)),
-        "ng": len(_NG_RULE.findall(text)),
-        "ui": len(re.findall(r"[Uu][Ii]", text)),
-    }
+    counts = {r["name"]: len(re.findall(re.escape(r["from"]), text, re.IGNORECASE)) for r in RULES["forward"]}
+    counts["ng"] = len(_NG_RULE.findall(text))
+    return counts
+
 
 
 if __name__ == "__main__":

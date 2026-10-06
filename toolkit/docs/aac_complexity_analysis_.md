@@ -1,0 +1,18 @@
+# Analyse formelle et application : Du tableau théorique à l'analyse des lettres atomiques
+
+
+## Partie 1 : Cadre théorique et formules générales
+
+Cette section reprend le tableau initial, qui définit les métriques générales.
+
+| Formule                                                                                                                                                                                                                       | Objet                                                                             | Description                                                         |
+|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|---------------------------------------------------------------------|
+| $$B = \frac{1}{N} \sum_{}{1}/\lvert\lvert{T(p_i)}\rvert\rvert$$- **N**: Nombre total d'éléments.<br/>- $\lvert\lvert{T(p_i)}\rvert\rvert$: Le cardinal (le nombre) des transformations ou des sens associés à l'élément $p_i$ | 	Bi-univocité                                                                     | Mesure l'unicité de la correspondance.                              |
+| $$\Omega=\sum_{}{f}(s){.}Op(s)$$- avec $Op(s)$ l'opacité d'une syllabe $s \in \{\sigma_1,..., \sigma_j\}$ par sa fréquence $f(s)$.<br/>- $\sigma_j$ les caractères de composition du syllabe.                                 | Opacité                                                                           | Quantifie l'irrégularité pondérée par la fréquence.                 |
+| $$\gamma=1-\frac{n_{aac}}{n_{1979}}$$                                                                                                                                                                                         | Gain scriptural                                                                   | Taux de réduction de la longueur du texte. Créole_1979 VS Créole_AAC |
+| $$\mathbb{E}[\gamma]=\sum{f_k}\Delta_k$$- avec $\Delta_k$ le gain partiel a chaque occurence du corpus choisit par sa frequence $f_k$                                                                                         | Décomposition du gain| Ventilation du gain par règle.                                     |
+| $$C_{mém} = \alpha\lvert\lvert{U}\rvert\rvert+\beta\lvert\lvert{R}\rvert\rvert$$                                                                                                                                              | 		Charge cognitive                                                                        | Coût mémoire (unités + règles).                             |
+| $$C_{moteur} = \sum{f(g)}{.}{m}(g)\tau$$- f(g): frequence des graphèmes g<br/>- m:temps pour ecrit g et $\tau \to $temps unitaire                                                                                             | 		Coût du tracé                                                                              | Coût moteur d'écriture.                              |
+| $$Fert=\#token/\#mots = T / W$$                                                                                                                                                                                               |Fertilité tokenistique|Efficacité de la tokenisation.|
+| $$D(g)=\log_2\frac{P(g \lvert\rvert créole)}{P(g \lvert\rvert fr)}$$                                                                                                                                                          |||
+

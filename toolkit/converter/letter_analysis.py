@@ -27,31 +27,26 @@ test_corpus_wide_ng_is_always_coda dans test_letter_analysis.py.
 
 from __future__ import annotations
 
-import re
+import math
 import statistics
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
-from aac_converter import to_aac
+# ATOMIC_LETTERS, VOWELS et WORD_RE ont UNE seule définition : aac_converter
+# (alimenté par converter/rules.json). Ils sont ré-exportés ici pour que
+# `from letter_analysis import ATOMIC_LETTERS` continue de fonctionner.
+from aac_converter import ATOMIC_LETTERS, VOWELS, WORD_RE, to_aac
 
 # ---------------------------------------------------------------------------
 # 1) Fréquence des lettres atomiques
 # ---------------------------------------------------------------------------
 
-ATOMIC_LETTERS = ("š", "ŏ", "ŋ")
-
-# Voyelles reconnues comme noyau syllabique dans le texte AAC (voir
-# syllabify() plus bas) : les voyelles orales du 1979 (a à e è i o ò u),
-# la voyelle atomique ŏ, et les nasales an/en/on qui restent des digrammes
-# à 2 lettres en AAC (non touchées par la réforme) -- leur second membre
-# (n) N'EST PAS une voyelle, donc seule la première lettre (a/e/o) compte
-# comme noyau ; "an" occupe alors noyau+coda sur un seul phonème nasal.
-# NOTE : doit rester synchronisé avec la classe de voyelles utilisée par
-# NG_RULE dans aac_converter.py/.js (aeiouàèò, + majuscules) -- "à" a été
-# ajouté ici pour lever une incohérence où syllabify() ne reconnaissait
-# pas "à" comme noyau et retombait sur une classification "onset" par
-# défaut pour tout le mot (y compris pour les lettres atomiques qu'il
-# contenait).
-VOWELS = set("aeiòèouŏà")
+# VOWELS (voyelles reconnues comme noyau syllabique, voir syllabify() plus
+# bas) : les voyelles orales du 1979 (a à e è i o ò u), la voyelle atomique ŏ,
+# et les nasales an/en/on qui restent des digrammes à 2 lettres en AAC (non
+# touchées par la réforme) -- leur second membre (n) N'EST PAS une voyelle,
+# donc seule la première lettre (a/e/o) compte comme noyau ; "an" occupe
+# alors noyau+coda sur un seul phonème nasal. Ces voyelles sont définies dans
+# converter/rules.json, partagées avec NG_RULE (aac_converter.py/.js).
 
 
 @dataclass
@@ -120,13 +115,10 @@ def atomic_letter_frequencies(text_1979: str) -> AtomicFrequencyReport:
 # 2) Analyse au niveau du mot
 # ---------------------------------------------------------------------------
 
-_WORD_RE = re.compile(r"[^\W\d_]+", re.UNICODE)
-
-
 def _tokenize_words(text_aac: str) -> list[str]:
     """Découpe un texte AAC en mots (lettres uniquement, ponctuation/chiffres
     exclus). Insensible à la casse pour le comptage des lettres atomiques."""
-    return _WORD_RE.findall(text_aac)
+    return WORD_RE.findall(text_aac)
 
 
 @dataclass
@@ -226,35 +218,47 @@ def word_level_analysis(text_1979: str) -> WordLevelReport:
 # convertisseur PLACE RÉELLEMENT chaque lettre atomique -- pas à trancher
 # un débat phonologique.
 
-CONSONANTS_PATTERN = re.compile(r"[^aeiòèouŏà]", re.IGNORECASE)
+def _split_syllables(word: str) -> list[tuple[int, int | None, int]]:
+    """Noyau UNIQUE du découpage syllabique (heuristique CV à attaque
+    maximale). Renvoie des tuples (début, index_du_noyau, fin_exclusive) ;
+    index_du_noyau vaut None pour un mot sans voyelle."""
+    vowels = [i for i, ch in enumerate(word.lower()) if ch in VOWELS]
+    if not vowels:
+        return [(0, None, len(word))] if word else []
+
+    out = []
+    start = 0
+    for idx, v in enumerate(vowels):
+        if idx == len(vowels) - 1:
+            end = len(word)  # dernière syllabe : va jusqu'à la fin du mot
+        else:
+            n_consonants = vowels[idx + 1] - v - 1
+            # 0 ou 1 consonne -> tout part en attaque de la suivante ;
+            # sinon, attaque max = 1 seule consonne devant la voyelle suivante
+            end = v + 1 if n_consonants <= 1 else v + 1 + (n_consonants - 1)
+        out.append((start, v, end))
+        start = end
+    return out
 
 
 def syllabify(word: str) -> list[str]:
     """Découpe un mot AAC en syllabes selon l'heuristique CV à attaque maximale."""
-    wl = word
-    vowel_positions = [i for i, ch in enumerate(wl.lower()) if ch in VOWELS]
-    if not vowel_positions:
-        return [wl] if wl else []
+    return [word[a:b] for a, _, b in _split_syllables(word) if b > a]
 
-    # bornes de chaque syllabe : (début, fin_exclusive)
-    bounds = []
-    start = 0
-    for idx, v in enumerate(vowel_positions):
-        if idx == len(vowel_positions) - 1:
-            end = len(wl)  # dernière syllabe : va jusqu'à la fin du mot
+
+def syllabify_parts(word: str) -> list[dict]:
+    """Même découpage que syllabify(), mais chaque syllabe est décrite par
+    ses lettres (en minuscules) : {"onset": [...], "nucleus": [...], "coda": [...]}.
+    Utilisé par les scripts d'analyse (alphabet_complet, analyse_complete,
+    corpus2_dudh) au lieu de leurs anciennes copies locales."""
+    w = [c.lower() for c in word]
+    out = []
+    for start, v, end in _split_syllables(word):
+        if v is None:
+            out.append({"onset": w, "nucleus": [], "coda": []})
         else:
-            next_v = vowel_positions[idx + 1]
-            n_consonants = next_v - v - 1
-            if n_consonants <= 1:
-                cut = v + 1  # 0 ou 1 consonne -> tout part en attaque de la suivante
-            else:
-                cut = v + 1 + (n_consonants - 1)  # attaque max = 1 seule consonne devant la voyelle suivante
-            end = cut
-        bounds.append((start, end))
-        start = end
-
-    return [wl[a:b] for a, b in bounds if b > a]
-
+            out.append({"onset": w[start:v], "nucleus": [w[v]], "coda": w[v + 1:end]})
+    return out
 
 def _classify_position(syllable: str, letter_index: int) -> str:
     """onset (avant le noyau), nucleus (le noyau lui-même), ou coda (après)."""
@@ -307,6 +311,35 @@ def syllable_functional_analysis(text_1979: str) -> SyllableFunctionalReport:
                     positions[ch][pos] += 1
 
     return SyllableFunctionalReport(positions=positions, n_words=len(words), n_syllables=n_syllables)
+
+
+# ---------------------------------------------------------------------------
+# Formules statistiques partagées par analyse_complete.py et corpus2_dudh.py
+# ---------------------------------------------------------------------------
+# scipy est importé à l'appel (et non en tête de module) : letter_analysis
+# reste utilisable sans scipy pour tout le reste.
+
+def clopper_pearson(k: int, n: int, alpha: float = 0.05) -> tuple[float, float]:
+    """IC exact de Clopper-Pearson pour une proportion k/n (bornes en proportion)."""
+    from scipy import stats
+
+    lo = stats.beta.ppf(alpha / 2, k, n - k + 1)
+    hi = stats.beta.ppf(1 - alpha / 2, k + 1, n - k)
+    return lo, hi
+
+
+def uniformity_chi2(counts: dict[str, int]) -> tuple[float, float]:
+    """chi² d'uniformité des effectifs (ddl = nombre de lettres - 1). Renvoie (chi2, p)."""
+    from scipy import stats
+
+    expected = sum(counts.values()) / len(counts)
+    chi2 = sum((n - expected) ** 2 / expected for n in counts.values())
+    return chi2, 1 - stats.chi2.cdf(chi2, df=len(counts) - 1)
+
+
+def atomic_entropy(shares: dict[str, float]) -> float:
+    """Entropie de Shannon des parts p_l, en base = nombre de lettres (max = 1)."""
+    return -sum(p * math.log(p, len(shares)) for p in shares.values())
 
 
 # ---------------------------------------------------------------------------

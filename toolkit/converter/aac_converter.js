@@ -3,18 +3,40 @@
  * Port JavaScript de aac_converter.py — mêmes règles, même comportement.
  * Aucune dépendance externe. Utilisable côté navigateur ou en Node.js.
  *
- * IMPORTANT : ce fichier est la SEULE copie exécutable du convertisseur JS
- * (CORRECTIF, revue de code, C3). Il ne doit plus être recopié à la main
- * dans web-demo/*.html : ces pages l'incluent via scripts/sync_converter.py,
- * qui injecte ce fichier tel quel entre des marqueurs AAC-CONVERTER:BEGIN /
- * AAC-CONVERTER:END. Toute divergence entre une page web et ce fichier est
- * un bug — ne jamais modifier le code entre ces marqueurs à la main.
+ * SOURCES UNIQUES (ne rien recopier ailleurs) :
+ *  - les règles et alphabets viennent de converter/rules.json (partagé avec
+ *  aac_converter.py) : Node le lit directement ; dans le navigateur,
+ *  web-demo/generated/rules.js (généré par scripts/build.py) définit
+ *  window.AAC_RULES et doit être chargé AVANT ce fichier ;
+ *  - ce fichier est chargé tel quel par les pages web-demo/*.html via
+ *  <script src="../converter/aac_converter.js"> : il n'est plus jamais
+ *  recopié dans le HTML.
+ *
+ * IMPORTANT : ce fichier est la SEULE copie exécutable du convertisseur JS.
+ * Il n'est recopié nulle part (ni dans web-demo/*.html, ni par un script) ;
+ * converter/tests/test_architecture.py vérifie sa parité avec le Python.
  */
+
+const RULES =
+    typeof module !== "undefined" && module.exports
+        ? require("./rules.json")
+        : typeof window !== "undefined"
+            ? window.AAC_RULES
+            : undefined;
+if (!RULES) {
+  throw new Error(
+      "AAC_RULES introuvable : chargez web-demo/generated/rules.js avant aac_converter.js " +
+      "(généré par `python3 scripts/build.py`)."
+  );
+}
+
+const ATOMIC_LETTERS = RULES.atomic_letters;
+const VOWELS = new Set([...RULES.vowels]);
 
 // "ng" -> "ŋ" seulement si NON suivi d'une voyelle (limite de syllabe) :
 // évalué AVANT les règles de FORWARD_RULES (voir aac_converter.py).
-const NG_RULE = /(Ng|NG|ng|nG)(?![aeiouàèòAEIOUÀÈÒ])/g;
-const NG_REPLACEMENTS = { "Ng": "Ŋ", "NG": "Ŋ", "ng": "ŋ", "nG": "ŋ" };
+const NG_RULE = new RegExp(RULES.ng.pattern, "g"); // /(Ng|NG|ng|nG)(?![aeiouàèòAEIOUÀÈÒ])/g;
+const NG_REPLACEMENTS = RULES.ng.to; // { "Ng": "Ŋ", "NG": "Ŋ", "ng": "ŋ", "nG": "ŋ" };
 
 // CORRECTIF (revue de code, M5) : règles insensibles à la casse et
 // préservant la casse trouvée (MAJUSCULES -> MAJUSCULES, Titre -> Titre,
@@ -31,11 +53,10 @@ function caseAwareRepl(lowerRepl) {
   };
 }
 
-const FORWARD_RULES = [
-  [/ou/gi, caseAwareRepl("ŏ")],
-  [/ch/gi, caseAwareRepl("š")],
-  [/ui/gi, caseAwareRepl("wi")],
-];
+const FORWARD_RULES = RULES.forward.map((r) => [new RegExp(r.from, "gi"), caseAwareRepl(r.to)]);
+// const FORWARD_RULES = [
+//   [/ou/gi, caseAwareRepl("ŏ")], [/ch/gi, caseAwareRepl("š")], [/ui/gi, caseAwareRepl("wi")],
+// ];
 
 function toAac(text) {
   let result = text.replace(NG_RULE, (m) => NG_REPLACEMENTS[m]);
@@ -51,9 +72,7 @@ function toAac(text) {
 // aucune preuve de corpus ne le justifie et cela corrompait des mots
 // courants de 1979 (swiv, lwil, kwit, nwit, pwi, fwi...).
 // ---------------------------------------------------------------------
-const WI_WORDS_FROM_UI = new Set([]); // liste blanche, vide tant que non confirmée
-// Conservé pour compatibilité ascendante uniquement (plus utilisé ci-dessous).
-const WI_WORDS_NEVER_FROM_UI = new Set(["wi", "kiwi", "sandwich", "sandwitch"]);
+const WI_WORDS_FROM_UI = new Set(RULES.wi_from_ui); // liste blanche, vide tant que non confirmée // const WI_WORDS_NEVER_FROM_UI = new Set(["wi", "kiwi", "sandwich", "sandwitch"]);
 
 // CORRECTIF (revue de code, suite de M5) — décision de casse au niveau du
 // mot entier plutôt que du caractère isolé (miroir de `_decode_word` /
@@ -61,7 +80,7 @@ const WI_WORDS_NEVER_FROM_UI = new Set(["wi", "kiwi", "sandwich", "sandwitch"]);
 // (Š/Ŏ/Ŋ) est toujours "majuscule" au sens de la casse Unicode : on ne
 // peut pas savoir, à partir de lui seul, s'il vient d'un digramme "Ch"
 // (Titre) ou "CH" (MAJUSCULES) sans regarder le reste du mot.
-const BACKWARD_MAP_LOWER = { "š": "ch", "ŏ": "ou", "ŋ": "ng" };
+const BACKWARD_MAP_LOWER = RULES.backward; //{ "š": "ch", "ŏ": "ou", "ŋ": "ng" };
 
 function isAlpha(ch) {
   return /\p{L}/u.test(ch);
@@ -130,13 +149,10 @@ function to1979(text, convertWi = "none") {
 }
 
 function diffSummary(text) {
-  const count = (re) => (text.match(re) || []).length;
-  return {
-    ch: count(/[Cc][Hh]/g),
-    ou: count(/[Oo][Uu]/g),
-    ng: (text.match(NG_RULE) || []).length,
-    ui: count(/[Uu][Ii]/g),
-  };
+  const out = {};
+  for (const r of RULES.forward) out[r.name] = (text.match(new RegExp(r.from, "gi")) || []).length;
+  out.ng = (text.match(NG_RULE) || []).length;
+  return out;
 }
 
 function convertWithReport(text) {
@@ -159,10 +175,10 @@ function convertWithReport(text) {
 }
 
 // Export pour Node.js / bundlers, tout en restant utilisable directement
-// via <script> dans le navigateur (attache à window si présent).
+// via <script> dans le navigateur (attache à window si présent --> fonctions globales + window.AACConverter).
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { toAac, to1979, diffSummary, convertWithReport, WI_WORDS_FROM_UI, WI_WORDS_NEVER_FROM_UI };
+  module.exports = { toAac, to1979, diffSummary, convertWithReport, WI_WORDS_FROM_UI,  RULES, ATOMIC_LETTERS, VOWELS };
 }
 if (typeof window !== "undefined") {
-  window.AACConverter = { toAac, to1979, diffSummary, convertWithReport };
+  window.AACConverter = { toAac, to1979, diffSummary, convertWithReport, RULES, ATOMIC_LETTERS, VOWELS};
 }

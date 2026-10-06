@@ -4,42 +4,22 @@ analyse_complete.py
 ===================
 Développe toutes les formules statistiques sur les 8 textes de corpus.py.
 """
-import re
 import math
 import unicodedata
 from collections import defaultdict, Counter
 from scipy import stats
 from corpus import CORPUS
-from aac_converter import to_aac
+from aac_converter import to_aac, ATOMIC_LETTERS, WORD_RE
+from document_stats import leave_one_out_paired_t
+from letter_analysis import (
+    atomic_entropy, clopper_pearson, syllabify_parts, uniformity_chi2,
+)
 
-ATOMIC = {"š", "ŏ", "ŋ"}
-VOWELS = set("aeèàiouòŏ")
+ATOMIC = set(ATOMIC_LETTERS)  # source unique : converter/rules.json
 
 # ---------- utilitaires ----------
 def norm(c):
     return unicodedata.normalize("NFC", c).lower()
-
-def strip_accents(s):
-    return "".join(c for c in unicodedata.normalize("NFD", s)
-                   if unicodedata.category(c) != "Mn")
-
-def syllabify(word):
-    w = [norm(c) for c in word]
-    voy = [i for i, c in enumerate(w) if c in VOWELS]
-    if not voy:
-        return [{"onset": w, "nucleus": [], "coda": []}]
-    sylls = [{"onset": w[:voy[0]], "nucleus": [w[voy[0]]], "coda": []}]
-    for k in range(1, len(voy)):
-        between = w[voy[k-1]+1:voy[k]]
-        if len(between) <= 1:
-            onset = between
-        elif len(between) == 2:
-            sylls[-1]["coda"].append(between[0]); onset = [between[1]]
-        else:
-            sylls[-1]["coda"].extend(between[:-1]); onset = [between[-1]]
-        sylls.append({"onset": onset, "nucleus": [w[voy[k]]], "coda": []})
-    sylls[-1]["coda"].extend(w[voy[-1]+1:])
-    return sylls
 
 # ---------- 1. statistiques de base ----------
 print("=" * 78)
@@ -107,18 +87,15 @@ D = total_atom / N
 print(f"N = {N}, total atomiques = {total_atom}, densité D = {D*100:.3f} %")
 print(f"{'lettre':<8s} {'n':>5s} {'f (%)':>8s} {'p (%)':>8s} {'IC95 % Clopper-Pearson':>28s}")
 for l in ATOMIC:
-    lo = stats.beta.ppf(0.025, n_l[l], N - n_l[l] + 1)
-    hi = stats.beta.ppf(0.975, n_l[l] + 1, N - n_l[l])
+    lo, hi = clopper_pearson(n_l[l], N)
     print(f"{l:<8s} {n_l[l]:>5d} {f_l[l]*100:>8.3f} {p_l[l]*100:>8.2f}   [{lo*100:.3f} % ; {hi*100:.3f} %]")
 
 # chi² uniformité
-bar_n = total_atom / 3
-chi2 = sum((n_l[l] - bar_n)**2 / bar_n for l in ATOMIC)
-p_chi2 = 1 - stats.chi2.cdf(chi2, df=2)
+chi2, p_chi2 = uniformity_chi2(n_l)
 print(f"\nchi² uniformité = {chi2:.3f}, ddl = 2, p = {p_chi2:.2e}")
 
 # entropie
-H = -sum(p_l[l] * math.log(p_l[l], 3) for l in ATOMIC)
+H = atomic_entropy(p_l)
 print(f"entropie H(A) = {H:.4f} (max = 1)")
 
 # ---------- 3. analyse au niveau du mot ----------
@@ -127,7 +104,7 @@ print("3. ANALYSE AU NIVEAU DU MOT")
 print("=" * 78)
 all_words = []
 for e in CORPUS.values():
-    all_words.extend(re.findall(r"[^\W\d_]+", to_aac(e["texte"]), flags=re.UNICODE))
+    all_words.extend(WORD_RE.findall(to_aac(e["texte"])))
 M = len(all_words)
 a_w = [sum(1 for c in w if norm(c) in ATOMIC) for w in all_words]
 W_plus = [w for w, a in zip(all_words, a_w) if a >= 1]
@@ -153,7 +130,7 @@ print("4. POSITIONS SYLLABIQUES (onset / nucleus / coda)")
 print("=" * 78)
 occ = defaultdict(Counter)
 for w in all_words:
-    for syll in syllabify(w):
+    for syll in syllabify_parts(w):
         for pos in ("onset", "nucleus", "coda"):
             for c in syll[pos]:
                 if c in ATOMIC:
@@ -224,15 +201,13 @@ print("\n" + "=" * 78)
 print("7. LEAVE-ONE-OUT (ROBUSTESSE DU TEST T APPARIÉ)")
 print("=" * 78)
 names_loo = [r[0] for r in rows]
-before_loo = np.array([r[1] for r in rows])
-after_loo = np.array([r[2] for r in rows])
+before_loo = [r[1] for r in rows]
+after_loo = [r[2] for r in rows]
 
 t, p = stats.ttest_rel(before_loo, after_loo)
 print(f"{'—':<26s} t={t:6.3f}  p={p:.4f}  [{'sig' if p < 0.05 else 'NON SIG'}]")
 
 print("\nLeave-one-out :")
-for i, name in enumerate(names_loo):
-    m = np.arange(len(names_loo)) != i
-    t, p = stats.ttest_rel(before_loo[m], after_loo[m])
+for i, t, p in leave_one_out_paired_t(before_loo, after_loo):
     status = "sig" if p < 0.05 else "NON SIG"
-    print(f"sans {name:<22s} t={t:6.3f}  p={p:.4f}  [{status}]")
+    print(f"sans {names_loo[i]:<22s} t={t:6.3f}  p={p:.4f}  [{status}]")

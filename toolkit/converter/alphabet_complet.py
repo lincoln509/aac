@@ -15,18 +15,20 @@ CORRECTIONS INTÉGRÉES :
 - BUG 5 : Syntaxe set + set (TypeError) → set.union()
 """
 
-import re
 import math
 import unicodedata
 from collections import Counter, defaultdict
-from aac_converter import to_aac
+from aac_converter import ATOMIC_LETTERS, WORD_RE, to_aac
 from corpus import CORPUS
+from letter_analysis import syllabify_parts
 
 
 # ------------------------------------------------------------------
 # 0. Configuration — 24 lettres AAC / 32 unités 1979
 # ------------------------------------------------------------------
-AAC_ALPHABET = sorted(set("abdefgijklmnoprstvwyz").union("šŏŋ"))
+# 21 lettres simples communes au 1979 et à l'AAC (définies une seule fois ici).
+PLAIN_LETTERS = "abdefgijklmnoprstvwyz"
+AAC_ALPHABET = sorted(set(PLAIN_LETTERS).union(ATOMIC_LETTERS))
 assert len(AAC_ALPHABET) == 24, f"AAC doit avoir 24 lettres, pas {len(AAC_ALPHABET)}"
 assert "u" not in AAC_ALPHABET, "BUG : 'u' ne doit pas être dans l'alphabet AAC"
 
@@ -34,19 +36,16 @@ assert "u" not in AAC_ALPHABET, "BUG : 'u' ne doit pas être dans l'alphabet AAC
 UNITS_1979_3 = ["oun"]                                       # 1 unité
 UNITS_1979_2 = ["ch", "ng", "ou", "an", "en", "on", "ui"]    # 7 unités
 UNITS_1979_1_AAC = ["à", "è", "ò"]                           # 3 unités
-UNITS_1979_1_PLAIN = list("abdefgijklmnoprstvwyz")           # 21 unités
+UNITS_1979_1_PLAIN = list(PLAIN_LETTERS)                      # 21 unités
 # Total = 1 + 7 + 3 + 21 = 32 ✓
 
 ALPHABET_1979 = UNITS_1979_1_PLAIN + UNITS_1979_1_AAC + UNITS_1979_2 + UNITS_1979_3
 assert len(ALPHABET_1979) == 32, f"1979 doit avoir 32 unités, pas {len(ALPHABET_1979)}"
 assert len(set(ALPHABET_1979)) == 32, "BUG : doublon détecté dans ALPHABET_1979"
 
-# CORRECTIF (revue de code) : 'à' manquait, faisant retomber tout mot dont
-# la seule voyelle est 'à' (ex. "là") sur une syllabe dégénérée sans
-# nucleus (tout classé "onset") dans syllabify() plus bas -- même bug que
-# celui déjà documenté et corrigé dans letter_analysis.py (VOWELS), dont
-# l'ensemble ci-dessous est maintenant aligné. 'i' dupliqué retiré au passage.
-VOWELS_AAC = set("aeiòèoŏà")
+# NB : le syllabeur (syllabify_parts) et l'ensemble des voyelles (dont 'à',
+# qui manquait dans une ancienne copie locale) viennent de letter_analysis /
+# converter/rules.json -- plus aucune copie locale ici.
 
 
 # ------------------------------------------------------------------
@@ -197,28 +196,10 @@ print(f"G(AAC)  = {gini(n_AAC):.4f}")
 # ------------------------------------------------------------------
 # 7. Positions syllabiques (24 lettres AAC)
 # ------------------------------------------------------------------
-def syllabify(word):
-    w = [c.lower() for c in word]
-    voy = [i for i, c in enumerate(w) if c in VOWELS_AAC]
-    if not voy:
-        return [{"onset": w, "nucleus": [], "coda": []}]
-    sylls = [{"onset": w[:voy[0]], "nucleus": [w[voy[0]]], "coda": []}]
-    for k in range(1, len(voy)):
-        between = w[voy[k-1]+1:voy[k]]
-        if len(between) <= 1:
-            onset = between
-        elif len(between) == 2:
-            sylls[-1]["coda"].append(between[0]); onset = [between[1]]
-        else:
-            sylls[-1]["coda"].extend(between[:-1]); onset = [between[-1]]
-        sylls.append({"onset": onset, "nucleus": [w[voy[k]]], "coda": []})
-    sylls[-1]["coda"].extend(w[voy[-1]+1:])
-    return sylls
-
-mots_AAC = re.findall(r"[^\W\d_]+", texte_AAC, flags=re.UNICODE)
+mots_AAC = WORD_RE.findall(texte_AAC)
 occ = defaultdict(Counter)
 for w in mots_AAC:
-    for syll in syllabify(w):
+    for syll in syllabify_parts(w):
         for pos in ("onset", "nucleus", "coda"):
             for c in syll[pos]:
                 if c in AAC_ALPHABET:
