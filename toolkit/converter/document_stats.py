@@ -61,6 +61,18 @@ def _json_safe(obj):
     return obj
 
 
+def leave_one_out_paired_t(before, after):
+    """Robustesse du test t apparié : le recalcule en retirant tour à tour
+    UNE observation. Génère (indice_retiré, t, p). Partagé par
+    analyse_complete.py et corpus2_dudh.py (qui ne diffèrent que par le
+    libellé affiché)."""
+    before, after = np.asarray(before), np.asarray(after)
+    for i in range(len(before)):
+        keep = np.arange(len(before)) != i
+        t, p = sp_stats.ttest_rel(before[keep], after[keep])
+        yield i, t, p
+
+
 @dataclass
 class SegmentStat:
     """Une observation = un paragraphe (ou une page, en repli)."""

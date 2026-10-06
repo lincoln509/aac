@@ -77,15 +77,14 @@ exclus), et $W = (w_1, \dots, w_M)$ la suite des mots obtenus, $M = |W|$.
 $$a(w) = \sum_{j=1}^{k} \mathbb{1}[c_j \in \mathcal{A}]$$
 (nombre de lettres atomiques dans $w$, avec multiplicité).
 
-Soit $W^+ = \{w \in W : a(w) \geq 1\}$ le sous-ensemble des mots touchés
-par la réforme.
+Soit $W^+ = \{w \in W : a(w) \geq 1\}$ le sous-ensemble des mots touchés par la réforme.
 
-| Grandeur | Définition | Lecture |
-|---|---|---|
-| Couverture globale | $C = \dfrac{\lvert W^+ \rvert}{M}$ | proportion des mots touchés par la réforme |
-| Couverture par lettre | $C_l = \dfrac{\lvert \{w \in W : l \in w\} \rvert}{M}$ | proportion des mots contenant spécifiquement $l$ |
-| Moyenne globale | $\mu_{\text{all}} = \dfrac{1}{M} \displaystyle\sum_{w \in W} a(w)$ | densité atomique moyenne par mot, mots non concernés inclus |
-| Moyenne conditionnelle | $\mu_{\text{pos}} = \dfrac{1}{\lvert W^+ \rvert} \displaystyle\sum_{w \in W^+} a(w)$ | intensité de la réforme, une fois qu'un mot est touché |
+| Grandeur               | Définition                                                                           | Lecture                                                     |
+|------------------------|--------------------------------------------------------------------------------------|-------------------------------------------------------------|
+| Couverture globale     | $C = \dfrac{\lvert W^+ \rvert}{M}$                                                   | proportion des mots touchés par la réforme                  |
+| Couverture par lettre  | $C_l = \dfrac{\lvert \{w \in W : l \in w\} \rvert}{M}$                               | proportion des mots contenant spécifiquement $l$            |
+| Moyenne globale        | $\mu_{\text{all}} = \dfrac{1}{M} \displaystyle\sum_{w \in W} a(w)$                   | densité atomique moyenne par mot, mots non concernés inclus |
+| Moyenne conditionnelle | $\mu_{\text{pos}} = \dfrac{1}{\lvert W^+ \rvert} \displaystyle\sum_{w \in W^+} a(w)$ | intensité de la réforme, une fois qu'un mot est touché      |
 
 **Identité de cohérence.** Puisque les mots hors $W^+$ contribuent 0 à la
 somme, $\sum_{w \in W} a(w) = \sum_{w \in W^+} a(w)$, d'où :
@@ -111,8 +110,8 @@ Vérification de l'identité : $C \cdot \mu_{\text{pos}} = 0{,}220 \times 1{,}12
 
 ### Le syllabeur
 
-$\text{syllabify} : W \to \mathcal{S}^*$ est un **découpeur heuristique
-graphémique**, pas une analyse phonologique validée : il associe à chaque
+$\text{syllabify} : W \to \mathcal{S}^*$ est un **découpeur heuristique graphémique**,
+pas une analyse phonologique validée : il associe à chaque
 mot $w$ une suite ordonnée de syllabes $(s_1, \dots, s_m)$, $s_j \in \mathcal{S}$.
 
 Principe : chaque syllabe $s \in \mathcal{S}$ contient exactement une
@@ -125,7 +124,7 @@ standard pour les langues à forte préférence CV comme le créole) :
 - 3 consonnes ou plus → toutes sauf la dernière en coda, la dernière en attaque (cas rare).
 
 Exemples vérifiés par les tests (`test_letter_analysis.py`) :
-`šante` → `šan-te`, `ekran` → `ek-ran`, `laŋ` → `laŋ` (1 syllabe).
+`šante` → `šan-te`, `ekran` → `e-kran`, `laŋ` → `laŋ` (1 syllabe).
 
 **Limite assumée** : cet outil sert à mesurer *où le convertisseur place
 réellement chaque lettre*, pas à trancher un débat de phonologie créole.
@@ -134,9 +133,8 @@ réellement chaque lettre*, pas à trancher un débat de phonologie créole.
 
 Soit $s = (\sigma_1, \dots, \sigma_k)$ une syllabe, c'est-à-dire la suite
 ordonnée de ses $k$ caractères — pour `šan`, $s = (\sigma_1, \sigma_2, \sigma_3)
-= (\text{š}, a, n)$. Soit $j^* \in \{1, \dots, k\}$ l'indice (unique, par
-construction du syllabeur) du noyau vocalique de $s$ — ici $j^* = 2$, car
-$\sigma_2 = a$ est la voyelle.
+= (\text{š}, a, n)$.
+Soit $j^* \in \{1, \dots, k\}$ l'indice (unique, par construction du syllabeur) du noyau vocalique de $s$ — ici $j^* = 2$, car $\sigma_2 = a$ est la voyelle.
 
 Pour chaque indice $j$ tel que $\sigma_j \in \mathcal{A}$ (c'est-à-dire pour
 chaque occurrence d'une lettre atomique dans $s$), on définit la fonction
@@ -225,7 +223,7 @@ en fin de composant d'un mot composé, ou devant une consonne) :
 
 ```text
 grangou  -> grangŏ   (gran-gou : "g" commence la syllabe suivante, ng ne fusionne pas)
-lengis   -> lengis   (lin-gis : idem, inchangé)
+lengis   -> lengis   (len-gis : idem, inchangé)
 lang     -> laŋ      (ng en fin de mot : fusionne)
 long     -> loŋ
 Bleng-bleng -> Bleŋ-bleŋ

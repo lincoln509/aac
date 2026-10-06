@@ -38,7 +38,8 @@ aac-toolkit/
 │       ├── test_document_converter.py  # fidélité de mise en forme docx
 │       ├── test_document_stats.py      # validité du traitement statistique
 │       ├── test_corpus_diversity.py    # écart de gain mesuré sur les 8 textes du corpus
-│       └── test_letter_analysis.py     # fréquence et analyse fonctionnelle des lettres atomiques
+│       ├── test_letter_analysis.py     # fréquence et analyse fonctionnelle des lettres atomiques
+│       └── test_architecture.py        # source unique : fichiers générés à jour, parité Python/JS, pas de copies
 ├── web-demo/
 │   ├── index.html             # démo interactive, un seul fichier
 │   ├── documents.html         # conversion de documents entiers (docx/pdf) + rapport statistique
@@ -54,12 +55,13 @@ aac-toolkit/
 │   ├── aac-logo-square.png    # favicon
 │   └── aac-og.jpg             # image de partage réseaux sociaux
 ├── scripts/
-│   └── sync_snapshots.py      # resynchronise l'instantané hors-ligne du site
+│   └── build.py               # génère web-demo/generated/ (règles, corpus, instantanés)
 ├── .githooks/
-│   ├── pre-commit              # relance sync_snapshots.py à chaque commit
+│   ├── pre-commit              # relance build.py à chaque commit
 │   └── README.md               # comment l'activer
 ├── .github/workflows/
-│   └── sync-snapshots.yml      # même vérification, filet de sécurité côté GitHub
+│   ├── check-sync.yml          # échoue si web-demo/generated/ est périmé ou si un test échoue
+│   └── sync-snapshots.yml      # régénère web-demo/generated/, filet de sécurité côté GitHub
 ├── LICENSE
 └── README.md
 ```
@@ -75,9 +77,12 @@ prochain rechargement de page, sans rien d'autre à faire.
 Quand le site est ouvert directement depuis le disque (double-clic,
 `file://`), les navigateurs interdisent `fetch()` vers d'autres fichiers
 locaux : la visionneuse retombe alors sur un **instantané intégré**
-directement dans `index.html` (encodé en base64), pour que la démo reste
-utilisable hors-ligne. Cet instantané ne se met pas à jour tout seul —
-c'est le rôle de [`scripts/sync_snapshots.py`](scripts/sync_snapshots.py).
+dans `web-demo/generated/snapshots.js` (fichiers encodés en base64, chargé
+par une balise `<script>`, qui fonctionne en `file://`), pour que la démo
+reste utilisable hors-ligne. Les règles de conversion (`rules.js`) et le
+corpus (`corpus.js`) sont générés de la même façon : une seule source
+chacun, jamais recopiés dans les pages. Rien de tout cela ne se met à jour
+tout seul — c'est le rôle de [`scripts/build.py`](scripts/build.py).
 
 **Automatique** : activez le hook une seule fois par clone —
 
@@ -85,17 +90,18 @@ c'est le rôle de [`scripts/sync_snapshots.py`](scripts/sync_snapshots.py).
 git config core.hooksPath .githooks
 ```
 
-— et chaque `git commit` resynchronise l'instantané si besoin, sans y
+— et chaque `git commit` régénère `web-demo/generated/` si besoin, sans y
 penser. Un filet de sécurité équivalent tourne aussi côté GitHub Actions
-([`.github/workflows/sync-snapshots.yml`](.github/workflows/sync-snapshots.yml))
+([`.github/workflows/sync-snapshots.yml`](.github/workflows/sync-snapshots.yml),
+contrôlé par `check-sync.yml`)
 pour les modifications faites sans le hook local (éditeur web GitHub, par
 exemple).
 
 **Manuel**, si besoin :
 
 ```bash
-python3 scripts/sync_snapshots.py          # met à jour
-python3 scripts/sync_snapshots.py --check  # vérifie seulement (utile en CI)
+python3 scripts/build.py          # met à jour
+python3 scripts/build.py --check  # vérifie seulement (utile en CI)
 ```
 
 ## Essayer localement
@@ -215,7 +221,7 @@ Détail complet et justification linguistique : [`docs/grapheme-table.md`](docs/
 
 ## Limite connue et documentée
 
-La conversion AAC → 1979 n'est **pas parfaitement réversible** pour la séquence `wi` : ce groupe existait déjà dans l'orthographe de 1979 pour des mots qui n'ont jamais été écrits `ui` (l'exemple le plus fréquent est `wi`, « oui »). Le convertisseur inclut une petite liste d'exceptions lexicales (`WI_WORDS_NEVER_FROM_UI`) pour gérer les cas les plus courants, mais une fidélité totale demanderait un lexique complet — c'est justement l'un des livrables prévus en phase 2 de la feuille de route du mémoire (constitution d'un corpus de référence bilingue). Ce n'est pas caché : c'est testé explicitement dans `test_converter.py`.
+La conversion AAC → 1979 n'est **pas parfaitement réversible** pour la séquence `wi` : ce groupe existait déjà dans l'orthographe de 1979 pour des mots qui n'ont jamais été écrits `ui` (l'exemple le plus fréquent est `wi`, « oui »). Le convertisseur inclut une petite liste blanche de mots (`wi_from_ui` dans `converter/rules.json`) pour gérer les cas les plus courants, mais une fidélité totale demanderait un lexique complet — c'est justement l'un des livrables prévus en phase 2 de la feuille de route du mémoire (constitution d'un corpus de référence bilingue). Ce n'est pas caché : c'est testé explicitement dans `test_converter.py`.
 
 ## Conversion de documents (Word / PDF) et traitement statistique
 
@@ -314,7 +320,7 @@ Le premier reproduit exactement la table de la section 4.1.2 du mémoire ; le se
 - **Memwa** — 12 cartes / 6 paires : chaque paire marie l'orthographe 1979 et AAC du même mot, pratique directe de la conversion.
 - **Gramè/Òtograf** — 12 questions mêlant orthographe (« comment s'écrit X en AAC ? ») et grammaire (marqueurs de temps te/ap/pral/fèk/ta, marqueur pluriel yo).
 
-Tout le contenu créole est généré à l'exécution par la même fonction `toAac()` que `converter/aac_converter.js` (embarquée dans la page) à partir de mots en orthographe 1979 — aucune orthographe AAC n'est tapée à la main, pour éviter les erreurs de transcription. `python3 -m http.server` (ou `scripts/serve.py`) depuis `web-demo/`, puis ouvrir `jwet.html`, suffit pour y jouer en local.
+Tout le contenu créole est généré à l'exécution par la même fonction `toAac()` que `converter/aac_converter.js` (chargée par la page) à partir de mots en orthographe 1979 — aucune orthographe AAC n'est tapée à la main, pour éviter les erreurs de transcription. `python3 -m http.server` (ou `scripts/serve.py`) depuis `web-demo/`, puis ouvrir `jwet.html`, suffit pour y jouer en local.
 
 ## Par rapport aux travaux existants
 

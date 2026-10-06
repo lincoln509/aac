@@ -1,9 +1,7 @@
 # CORRECTIF (revue de code, M9) : sans ce fichier, les fins de ligne
 # dépendent de la configuration git locale de chaque contributeur, ce qui
-# fait échouer `scripts/sync_snapshots.py --check` en permanence dès que
-# le dépôt est cloné avec autocrlf=true (CRLF) alors que les instantanés
-# base64 encodés dans web-demo/index.html sont générés en LF (voir la
-# comparaison utilisée par sync_snapshots.py).
+# ferait échouer `scripts/build.py --check` en permanence dès que le dépôt
+# est cloné avec autocrlf=true (CRLF) : web-demo/generated/ est généré en LF.
 * text=auto eol=lf
 *.png binary
 *.jpg binary

@@ -1,11 +1,11 @@
 #!/bin/sh
 # .githooks/pre-commit
 #
-# Relance automatiquement scripts/sync_converter.py, sync_corpus.py et
-# sync_snapshots.py avant chaque commit.
-# Si des fichiers surveillés (README.md, LICENSE, converter/*, keyboard/*)
-# ont changé, cet instantané intégré dans web-demo/index.html est remis à
-# jour et ajouté au commit en cours — vous n'avez plus jamais à y penser.
+# Relance scripts/build.py avant chaque commit : il régénère
+# web-demo/generated/ (règles, corpus, instantanés hors-ligne) à partir de
+# leurs sources uniques. Si un fichier généré change, il est ajouté au commit
+# en cours -- vous n'avez plus jamais à y penser. Les pages web-demo/*.html
+# ne sont jamais modifiées par ce hook.
 #
 # Installation (une seule fois par clone) :
 #   git config core.hooksPath .githooks
@@ -19,20 +19,15 @@ ROOT_DIR="$(git rev-parse --show-toplevel)"
 cd "$ROOT_DIR"
 
 if ! command -v python3 >/dev/null 2>&1; then
-    echo "pre-commit: python3 introuvable, synchronisation des instantanés ignorée." >&2
+    echo "pre-commit: python3 introuvable, génération de web-demo/generated/ ignorée." >&2
     exit 0
 fi
 
-# Ordre : d'abord les générateurs de code (JS converti + corpus), puis
-# l'instantané hors-ligne qui embarque l'état final des fichiers surveillés.
-python3 scripts/sync_converter.py
-python3 scripts/sync_corpus.py
-python3 scripts/sync_snapshots.py
+python3 scripts/build.py
 
-# Si un script a modifié une page web-demo, on l'ajoute au commit en cours
-if ! git diff --quiet -- web-demo; then
-    git add web-demo
-    echo "pre-commit: web-demo/ mis à jour et ajouté au commit."
+if ! git diff --quiet -- web-demo/generated || [ -n "$(git ls-files --others --exclude-standard -- web-demo/generated)" ]; then
+    git add web-demo/generated
+    echo "pre-commit: web-demo/generated/ mis à jour et ajouté au commit."
 fi
 
 exit 0

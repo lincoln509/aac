@@ -80,8 +80,6 @@ class ConversionResult:
 # DOCX
 # ---------------------------------------------------------------------------
 
-_OPAQUE_SEQUENCES = ("ch", "Ch", "CH", "cH","ou", "Ou", "OU", "oU", "ng", "Ng", "NG","nG", "ui", "Ui", "UI", "uI")
-
 
 def _convert_paragraph_runs(paragraph, warnings: list[str], location: str) -> str:
     """Convertit chaque run en place (préserve la mise en forme du run).

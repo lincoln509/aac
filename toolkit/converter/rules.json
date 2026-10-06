@@ -14,7 +14,7 @@
 
   "backward": { "š": "ch", "ŏ": "ou", "ŋ": "ng" },
 
-  "wi_from_ui": [],
+  "wi_from_ui": ["uit", "uitèn", "dizuit", "vennsuit","tousuit", "zuit"],
 
   "atomic_letters": ["š", "ŏ", "ŋ"],
   "vowels": "aeiòèouŏà"
