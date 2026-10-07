@@ -1,0 +1,68 @@
+{
+  "_readme": "Décomptes de jetons par texte du corpus, produits par converter/fertilite_tokenizers.py --corpus --export. Lus par scripts/build.py -> web-demo/generated/fertilite_precomputed.js pour les tokeniseurs que la page ne peut pas exécuter (NLLB-200). Ne pas éditer à la main : relancer le script. provisional=true : valeurs non produites par --export.",
+  "tokenizers": {
+    "nllb-200": {
+      "model": "facebook/nllb-200-distilled-600M",
+      "provisional": true,
+      "note": "Déduit du tableau imprimé par `fertilite_tokenizers.py --corpus` (jetons = Fert × mots ; les Fert, Δ, moyenne et écart-type imprimés sont retrouvés à l'identique), obtenu avant que le script ne compte les <unk>. Pour confirmer : python3 converter/fertilite_tokenizers.py --corpus --tokenizers nllb-200 --export converter/fertilite_precomputed.json (un avertissement « <unk> » signalerait un écart).",
+      "texts": {
+        "lincoln_chant": {
+          "words": 27,
+          "tokens_1979": 37,
+          "tokens_aac": 46,
+          "sha1_1979": "eac79ae94b0fe9f1c0ab22f1b1027d8037e6a0e6",
+          "sha1_aac": "5a03b92ca4d908a4314011fa9c687c35c9aed59b"
+        },
+        "lincoln_dwa_travay": {
+          "words": 13,
+          "tokens_1979": 14,
+          "tokens_aac": 20,
+          "sha1_1979": "562b1e71360817af850eee9cc45602283710bea0",
+          "sha1_aac": "0f3ad5d658e7827bc65d9b188b7ee12035e5f14b"
+        },
+        "konstitisyon_1987": {
+          "words": 31,
+          "tokens_1979": 62,
+          "tokens_aac": 65,
+          "sha1_1979": "bc4766b870e3685470a5db3c2dfea73eb5c88a40",
+          "sha1_aac": "ceb5302f85631ec65bbf4929e6575b27a8caf5f0"
+        },
+        "dudh_atik1": {
+          "words": 31,
+          "tokens_1979": 40,
+          "tokens_aac": 52,
+          "sha1_1979": "d728fe5d04aede06762fa75c4b851b85c5e472b2",
+          "sha1_aac": "a035a36e1e6b827454cef9a8065a6127dc20910f"
+        },
+        "pwoveb_lavi": {
+          "words": 24,
+          "tokens_1979": 37,
+          "tokens_aac": 40,
+          "sha1_1979": "1c559ce763e3f9be9d7f8fea5c10fbf970e6610c",
+          "sha1_aac": "82667c7caf3b5d700349b9708c4a20325a5554d9"
+        },
+        "pwoveb_travay": {
+          "words": 22,
+          "tokens_1979": 35,
+          "tokens_aac": 42,
+          "sha1_1979": "f8c0cfe45625147fd2af0686ba2009c4571aa598",
+          "sha1_aac": "45ace9e330eea581cebbfd7c60f452fe86e197ff"
+        },
+        "durand_choukoun": {
+          "words": 151,
+          "tokens_1979": 216,
+          "tokens_aac": 252,
+          "sha1_1979": "330c0452dbfac5bb254277d676eefad8168f4775",
+          "sha1_aac": "8b053f0b863fc5260e1346a5fa5670f28bb417a6"
+        },
+        "sylvain_cigal_founmi": {
+          "words": 146,
+          "tokens_1979": 232,
+          "tokens_aac": 255,
+          "sha1_1979": "e0eb8af26924c47c5b1e868cfc197a088d9a8c3b",
+          "sha1_aac": "d221440d14084428e8658b92fe16c030101320f1"
+        }
+      }
+    }
+  }
+}

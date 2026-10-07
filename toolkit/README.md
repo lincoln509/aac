@@ -32,6 +32,8 @@ aac-toolkit/
 │   ├── document_stats.py      # traitement statistique (écart-type, IC, test t, bootstrap)
 │   ├── letter_analysis.py     # fréquence et fonction syllabique (onset/nucleus/coda) des lettres atomiques
 │   ├── corpus.py               # corpus de validation à 8 textes indépendants
+│   ├── fertilite_tokenizers.py # fertilité tokenistique 1979 vs AAC (cl100k_base, o200k_base, NLLB-200)
+│   ├── fertilite_precomputed.json # décomptes de jetons NLLB-200 (--export), affichés par la page web
 │   ├── requirements-documents.txt
 │   └── tests/
 │       ├── test_converter.py           # tests de non-régression liés au mémoire
@@ -39,11 +41,14 @@ aac-toolkit/
 │       ├── test_document_stats.py      # validité du traitement statistique
 │       ├── test_corpus_diversity.py    # écart de gain mesuré sur les 8 textes du corpus
 │       ├── test_letter_analysis.py     # fréquence et analyse fonctionnelle des lettres atomiques
+│       ├── test_fertilite_tokenizers.py # export JSON et comptage des <unk> de NLLB (sans télécharger de modèle)
 │       └── test_architecture.py        # source unique : fichiers générés à jour, parité Python/JS, pas de copies
 ├── web-demo/
 │   ├── index.html             # démo interactive, un seul fichier
 │   ├── documents.html         # conversion de documents entiers (docx/pdf) + rapport statistique
-│   └── jwet.html               # 4 jeux de pratique de l'orthographe AAC
+│   ├── jwet.html               # 4 jeux de pratique de l'orthographe AAC
+│   ├── token.html         # nombre de tokens (cl100k_base) 1979 vs AAC, hors-ligne
+│   └── vendor/                # tokeniseur js-tiktoken embarqué (voir vendor/README.md)
 ├── keyboard/
 │   ├── ht-t-k0-aac.xml        # disposition clavier CLDR Keyboard 3.0
 │   └── README.md              # guide d'installation par plateforme
@@ -221,7 +226,7 @@ Détail complet et justification linguistique : [`docs/grapheme-table.md`](docs/
 
 ## Limite connue et documentée
 
-La conversion AAC → 1979 n'est **pas parfaitement réversible** pour la séquence `wi` : ce groupe existait déjà dans l'orthographe de 1979 pour des mots qui n'ont jamais été écrits `ui` (l'exemple le plus fréquent est `wi`, « oui »). Le convertisseur inclut une petite liste blanche de mots (`wi_from_ui` dans `converter/rules.json`) pour gérer les cas les plus courants, mais une fidélité totale demanderait un lexique complet — c'est justement l'un des livrables prévus en phase 2 de la feuille de route du mémoire (constitution d'un corpus de référence bilingue). Ce n'est pas caché : c'est testé explicitement dans `test_converter.py`.
+La conversion AAC → 1979 n'est **pas parfaitement réversible** pour la séquence `wi` : ce groupe existait déjà dans l'orthographe de 1979 pour des mots qui n'ont jamais été écrits `ui` (l'exemple le plus fréquent est `wi`, « oui »). Le convertisseur ne devine donc pas : seuls les mots d'une **liste blanche** de mots confirmés en `ui` (`wi_from_ui` dans `converter/rules.json`, en orthographe 1979 : `uit`, `uitèn`, `dizuit`, `vennsuit` à ce jour) sont reconvertis de `wi` en `ui` ; tout autre `wi` (`wi`, `swiv`, `lwil`, `kwit`, `nwit`…) reste intact. C'est le comportement par défaut (`convert_wi="lexicon"`) ; `convert_wi="none"` désactive toute reconversion. Un mot en `ui` absent de la liste (par exemple `toutsuit`) n'est donc pas reconverti : la liste ne s'allonge que sur preuve de corpus ou validation linguistique. Dans la page du convertisseur, les mots en `ui` que vous écrivez vous-même dans le panneau 1979 sont en plus retenus **pour la session** (`uiWords()` en JS, `ui_words()` / `extra_ui_words` en Python) : ils reviennent avec leur `ui` si vous modifiez le côté AAC ou inversez les panneaux, sans entrer dans la liste officielle ; cette mémoire n'est pas sauvegardée et disparaît quand on recharge la page. Une fidélité totale demanderait un lexique complet — c'est justement l'un des livrables prévus en phase 2 de la feuille de route du mémoire (constitution d'un corpus de référence bilingue). Ce n'est pas caché : c'est testé explicitement dans `test_converter.py`.
 
 ## Conversion de documents (Word / PDF) et traitement statistique
 
@@ -282,9 +287,28 @@ Résultat sur les 8 textes de `corpus.py` (627 syllabes, 445 mots) : `ŏ` est, p
 
 Tests : `converter/tests/test_letter_analysis.py` (17 tests). Pour un rapport lisible plutôt qu'un simple pass/fail, `python3 letter_analysis.py --corpus` (depuis `converter/`) affiche la densité atomique et la fonction syllabique agrégées sur les 8 textes, texte par texte.
 
+## Fertilité tokenistique (nombre de tokens d'un modèle de langage)
+
+Les modèles de langage ne lisent pas des lettres mais des *tokens*. La **fertilité** d'un tokeniseur sur un texte est `nombre de tokens ÷ nombre de mots` : à nombre de mots égal, plus elle est basse, moins le texte coûte (temps, argent, fenêtre de contexte). `converter/fertilite_tokenizers.py` la mesure en 1979 et en AAC avec trois tokeniseurs de familles différentes : `cl100k_base` (GPT-3.5 / GPT-4) et `o200k_base` (GPT-4o), deux BPE *byte-level* (`tiktoken`), et NLLB-200 (SentencePiece, entraîné sur 200 langues dont le créole haïtien).
+
+```bash
+pip install tiktoken                       # cl100k_base et o200k_base (non requis par le reste du dépôt)
+pip install transformers sentencepiece     # NLLB-200 seulement : très lourd (~2 Go avec ses dépendances)
+
+python3 converter/fertilite_tokenizers.py                      # texte d'exemple, les 3 tokeniseurs
+python3 converter/fertilite_tokenizers.py "Chante pou chase lapli nan kò mwen."
+python3 converter/fertilite_tokenizers.py --corpus             # les 8 textes de corpus.py + moyenne
+python3 converter/fertilite_tokenizers.py --corpus --tokenizers cl100k_base o200k_base   # sans NLLB
+python3 converter/fertilite_tokenizers.py --corpus --tokenizers nllb-200 --export converter/fertilite_precomputed.json
+```
+
+Un tokeniseur indisponible est signalé sans empêcher les autres de tourner. Attention à l'ordre des arguments : le texte doit venir **avant** `--tokenizers`, sinon `argparse` le prend pour un nom de tokeniseur.
+
+La même mesure est disponible **sans rien installer** dans [`web-demo/token.html`](web-demo/token.html) (lien « Tokèn » du site), pour `cl100k_base` et `o200k_base` : on coche un ou plusieurs tokeniseurs (chacun n'est chargé qu'au moment où on le coche) et la page les compare côte à côte, sur un texte libre ou sur les 8 textes du corpus (moyenne et écart-type des textes, comme `--corpus`, et total Σ jetons ÷ Σ mots), avec les tokens affichés un par un. NLLB-200 ne peut pas tourner dans le navigateur (ses fichiers de tokeniseur ne sont pas dans le dépôt) : son bloc de colonnes, marqué d'un astérisque, vient des décomptes pré-calculés par `--export` dans `converter/fertilite_precomputed.json`, pour les 8 textes du corpus seulement. Ce fichier est lié au corpus et aux règles de conversion par des empreintes SHA-1 : un test échoue s'ils changent, et il faut relancer la commande ci-dessus. Tant que `provisional` vaut `true` dans le fichier, la page indique que les valeurs ne sont pas encore confirmées par `--export`. Le script compte aussi les `<unk>` de NLLB (caractères inconnus de son vocabulaire) et les signale sur `stderr`. La page utilise `converter/aac_converter.js` pour la conversion et des tokeniseurs embarqués dans [`web-demo/vendor/`](web-demo/vendor/README.md), donc elle fonctionne aussi hors-ligne. Chaque tokeniseur donne ses propres chiffres : ne généralisez pas le résultat de l'un à un autre.
+
 ## Tests
 
-Le dépôt compte 51 tests répartis sur 5 fichiers, tous dans `converter/tests/`. Depuis `toolkit/converter/` :
+Le dépôt compte 86 tests répartis sur 7 fichiers, tous dans `converter/tests/`. Depuis `toolkit/converter/` :
 
 ```bash
 pip install pytest scipy numpy python-docx reportlab pdfplumber --break-system-packages   # dépendances
@@ -292,15 +316,17 @@ python3 -m pytest tests/ -v                # tout le monde, un test par ligne
 python3 -m pytest tests/test_letter_analysis.py -v   # un seul fichier
 ```
 
-`reportlab` et `pdfplumber` ne servent qu'à `test_document_converter.py` (conversion PDF↔docx) : sans eux, ce fichier échoue à l'import — lancer `python3 -m pytest tests/ --ignore=tests/test_document_converter.py` pour tester le reste (49 tests) sans les installer.
+`reportlab` et `pdfplumber` ne servent qu'à `test_document_converter.py` (conversion PDF↔docx) : sans eux, ce fichier échoue à l'import — lancer `python3 -m pytest tests/ --ignore=tests/test_document_converter.py` pour tester le reste (84 tests) sans les installer.
 
 | Fichier | Tests | Couvre |
 |---|---:|---|
-| `test_converter.py` | 14 | règles de conversion 1979 ↔ AAC, non-régression du chiffre du mémoire |
+| `test_converter.py` | 27 | règles de conversion 1979 ↔ AAC, non-régression du chiffre du mémoire |
 | `test_document_stats.py` | 13 | moyenne, écart-type, IC95 %, test t, bootstrap |
 | `test_corpus_diversity.py` | 5 | écart de gain mesuré sur les 8 textes (2,5 %–9,3 %) |
 | `test_letter_analysis.py` | 17 | fréquence, couverture lexicale, fonction syllabique onset/nucleus/coda |
 | `test_document_converter.py` | 2 | fidélité de mise en forme docx/pdf (nécessite reportlab/pdfplumber) |
+| `test_architecture.py` | 17 | source unique : fichiers générés à jour, pages sans copie du convertisseur, JS des pages qui compile, parité Python/Node, tokeniseur embarqué (nécessite `node` pour une partie) |
+| `test_fertilite_tokenizers.py` | 5 | export JSON de `fertilite_tokenizers.py` ; comptage des `<unk>` de NLLB avec un mini-tokeniseur local (2 tests exigent `transformers`, sinon ignorés) |
 
 **Voir le résultat pour chaque texte du corpus individuellement** (pas seulement pass/fail) : `pytest` ne montre que la réussite d'une assertion, pas les valeurs mesurées. Pour ça, deux scripts s'exécutent directement et impriment un tableau détaillé :
 

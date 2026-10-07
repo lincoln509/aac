@@ -1,0 +1,697 @@
+<!doctype html>
+<html lang="fr" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <title>Fètilite tokenizasyon — AAC</title>
+    <meta content="Konpare konbyen tokèn yon tèks kreyòl koute an òtograf 1979 ak an AAC, ak tokenizè cl100k_base (GPT-4) ak o200k_base (GPT-4o), dirèkteman nan navigatè a."
+          name="description">
+
+    <link href="../assets/aac-logo-square.png" rel="icon" type="image/png">
+    <link href="../assets/aac-logo-square.png" rel="apple-touch-icon">
+
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap"
+          rel="stylesheet">
+
+    <!--
+      Paj sa a pa gen okenn depandans eksteren : tokenizè a (vendor/js-tiktoken-cl100k.min.js,
+      ≈1 Mo) ak konvètisè a chaje nan depo a, kidonk li mache tou lè w louvri l dirèkteman
+      (file://), san entènèt. Sèl polis Google Fonts ki sou entènèt — san yo, paj la
+      itilize polis sistèm nan.
+    -->
+
+    <link href="styles.css" rel="stylesheet"/>
+</head>
+<body>
+
+<div class="wrap">
+    <div class="topbar">
+        <a class="brand" href="index.html" style="border-style:double; border-radius: 10px;">
+            <img alt="Logo AAC" src="../assets/aac_symbole.png">
+            <span class="brand-word" style="margin-left: -20px;  padding-right: 15px">AAC</span>
+        </a>
+        <nav class="toplinks">
+            <a href="index.html">Konvètisè</a>
+            <a href="documents.html">Dokiman</a>
+            <a href="jwet.html">Jwèt</a>
+            <a class="active" href="token.html">Tokèn</a>
+        </nav>
+    </div>
+
+    <header class="hero">
+        <p class="eyebrow">Tokenizasyon · cl100k_base (GPT-4) ak o200k_base (GPT-4o)</p>
+        <h1>Konbyen tokèn yon tèks kreyòl koute? <br><em>1979 VS AAC</em></h1>
+        <p class="lede">Modèl lang tankou GPT-4 pa li lèt youn pa youn : yo koupe tèks la an <em>tokèn</em>. Pi plis
+            tokèn pou menm tèks la, pi plis resous (tan, lajan, kontèks) li mande. Kole yon tèks an kreyòl 1979 : paj la
+            konvèti l an AAC epi konpare nonb tokèn yo, tout bagay nan navigatè a.</p>
+    </header>
+
+    <section id="tekst">
+        <h2>1. Chwazi oswa kole yon tèks</h2>
+        <p class="section-note">Tèks la dwe an òtograf 1979. Konvèsyon an fèt ak menm konvètisè
+            (<code>aac_converter.js</code>) ak rès sit la.</p>
+
+        <label class="lbl" for="src">Sous tèks la</label>
+        <select id="src"></select>
+
+        <label class="lbl" for="input">Tèks an 1979</label>
+        <textarea id="input" spellcheck="false"></textarea>
+
+        <fieldset class="tk-box" style="margin-top:18px;">
+            <legend class="lbl" id="legList">Tokenizè yo (chwazi youn oswa plizyè pou konpare yo)</legend>
+            <div id="tkList"></div>
+        </fieldset>
+        <p class="note-small" style="margin:6px 0 0;">Yon tokenizè chaje sèlman lè w make l (<code>cl100k_base</code> ≈
+            1 Mo, <code>o200k_base</code> ≈ 2,3 Mo). NLLB-200 pa ka kouri nan navigatè a : valè li yo pre-kalkile pa
+            <code>converter/fertilite_tokenizers.py</code> epi parèt sèlman nan tablo kòpis la (seksyon 3).</p>
+
+        <div class="status-line"><span class="spinner on" id="spinner"></span><span
+                id="status">Ap chaje tokenizè yo…</span></div>
+    </section>
+
+    <section id="rezilta">
+        <h2>2. Rezilta</h2>
+        <p class="section-note">Fètilite = nonb tokèn ÷ nonb mo. Pi piti pi bon : mwens tokèn pou menm kantite mo.</p>
+
+        <div class="results" id="results">
+            <p class="facts" id="facts"></p>
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                    <tr>
+                        <th class="title-num">Tokenizè</th>
+                        <th class="num">Tokèn 1979</th>
+                        <th class="num">Tokèn AAC</th>
+                        <th class="num">Fert 1979</th>
+                        <th class="num">Fert AAC</th>
+                        <th class="num">Chanjman tokèn</th>
+                    </tr>
+                    </thead>
+                    <tbody id="cmpBody"></tbody>
+                </table>
+            </div>
+
+            <p class="note-small" id="preNote"></p>
+
+            <div class="detail-pick" id="detailPick">
+                <label class="lbl" for="detailTok">Detay pou</label>
+                <select id="detailTok"></select>
+            </div>
+            <div class="stat-grid" id="statGrid"></div>
+
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th class="num">Mo</th>
+                        <th class="num">Tokèn</th>
+                        <th class="num">Fert = tokèn/mo</th>
+                        <th class="num">Okte UTF-8</th>
+                    </tr>
+                    </thead>
+                    <tbody id="detailBody"></tbody>
+                </table>
+            </div>
+
+            <div class="preview-grid">
+                <div class="preview-block">
+                    <div class="k">Tokèn — 1979</div>
+                    <div class="tokens" id="tok1979"></div>
+                </div>
+                <div class="preview-block">
+                    <div class="k">Tokèn — AAC</div>
+                    <div class="tokens" id="tokAac"></div>
+                </div>
+            </div>
+            <p class="note-small" id="tokNote"></p>
+        </div>
+
+        <details class="info-box">
+            <summary>Kijan pou li rezilta yo</summary>
+            <p><b>Fert</b> (fètilite) = tokèn ÷ mo. Se menm fòmil ak <code>converter/fertilite_tokenizers.py</code> :
+                pou menm tèks la ak menm tokenizè a, script la ak paj la dwe bay menm chif yo. Paj la kalkile <code>cl100k_base</code>
+                (GPT-3.5 / GPT-4) ak <code>o200k_base</code> (GPT-4o) dirèkteman ; NLLB-200 parèt sèlman nan tablo kòpis
+                la, ak valè pre-kalkile pa script la.</p>
+            <p><b>Poukisa chif la ka monte menm si tèks la vin pi kout ?</b> Lèt atomik yo (<code>š</code>,
+                <code>ŏ</code>, <code>ŋ</code>) pran 2 okte an UTF-8 e vokabilè tokenizè yo pa fèt espesyalman pou
+                kreyòl : yo ka koupe yo an plizyè mòso. Egzanp : « pou » = 2 tokèn, men « pŏ » = 3 tokèn ak tou de
+                tokenizè yo (ŏ koupe an 2 okte izole, ki parèt kòm <code>�</code> anba a). Chak tokenizè gen pwòp
+                vokabilè li : konpare yo, epi pa jeneralize rezilta youn bay lòt. Pa gen okenn rezilta ki pwomèt davans.
+            </p>
+            <p><b>Limit.</b> Yon mo = yon moso separe pa espas. Tèks tankou <code>&lt;|endoftext|&gt;</code> konte kòm
+                tèks òdinè. Yon tokèn ki gen sèlman yon pati nan yon karaktè UTF-8 parèt ak yon kontou pwentiye.</p>
+        </details>
+    </section>
+
+    <section id="kolekte">
+        <h2>3. Tout kòpis la</h2>
+        <p class="section-note">Menm kalkil la sou chak tèks kòpis la (sous : <code>converter/corpus.py</code>), yon
+            blòk kolòn pou chak tokenizè ki make. <b>Mwayèn</b> = mwayèn fètilite chak tèks, ak ekart-tip (menm chif ak
+            <code>--corpus</code> nan script la). <b>Σ</b> = tout tèks yo ansanm (Σ tokèn ÷ Σ mo).</p>
+        <div class="table-scroll">
+            <table>
+                <thead id="corpusHead"></thead>
+                <tbody id="corpusBody">
+                <tr>
+                    <td>Ap tann tokenizè yo…</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="note-small" id="corpusNote" style="margin-top:12px;"></p>
+    </section>
+
+    <footer>
+        <p><a href="index.html">← Retounen nan konvètisè senp la</a></p>
+        <p>
+            Menm kalkil la nan teminal : <code>python3 converter/fertilite_tokenizers.py "tèks ou" --tokenizers
+            cl100k_base</code> (bezwen <code>pip install tiktoken</code> ; mete tèks la <em>anvan</em> <code>--tokenizers</code>).
+            Ajoute <code>--corpus</code> pou tout kòpis la.
+            Tokenizè paj la se <a href="https://github.com/dqbd/tiktoken">js-tiktoken</a> (MIT), yon pò JavaScript de
+            <code>tiktoken</code> ; kopi li nan <code>web-demo/vendor/</code>.
+        </p>
+    </footer>
+</div>
+
+<!-- Données et convertisseur partagés : UNE seule source chacun (voir
+     scripts/build.py). Balises <script src> : elles fonctionnent aussi à
+     l'ouverture directe du fichier (file://), contrairement à fetch(). -->
+<script src="generated/rules.js"></script>
+<script src="../converter/aac_converter.js"></script>
+<script src="generated/corpus.js"></script>
+<script src="generated/fertilite_precomputed.js"></script>
+
+<script>
+    (function () {
+        "use strict";
+
+        // Texte d'exemple identique à celui de converter/fertilite_tokenizers.py, pour que la page
+        // et le script donnent les mêmes chiffres sur le même texte.
+        var DEFAULT_TEXT =
+            "Chante pou chase lapli nan kò mwen. Grangou ap fè nou mache lwen, " +
+            "men lengis la rete la. Bekàn Jàn pwofàn, dodàn kay la, ak yon " +
+            "sandwich pou granmoun ki vle wè bouch li louvri.";
+        var MAX_CHIPS = 1500;          // limite d'éléments DOM affichés par colonne
+        // Tokeniseurs disponibles dans la page (UNE liste) ; chaque bundle de vendor/ s'enregistre
+        // dans window.AACTiktoken (voir vendor/README.md). Chargés seulement quand on les coche.
+        var TOKENIZERS = [
+            {id: "cl100k_base", sub: "GPT-3.5 / GPT-4", file: "vendor/js-tiktoken-cl100k.min.js", on: true},
+            {id: "o200k_base", sub: "GPT-4o", file: "vendor/js-tiktoken-o200k.min.js", on: true}
+        ];
+
+        // Tokeniseurs que la page ne peut pas exécuter (ex. NLLB-200) : décomptes pré-calculés par
+        // converter/fertilite_tokenizers.py --export (generated/fertilite_precomputed.js), corpus seulement.
+        var PRE = (window.AAC_PRECOMPUTED && window.AAC_PRECOMPUTED.tokenizers) || {};
+        var PRE_IDS = Object.keys(PRE).filter(function (id) {
+            return !TOKENIZERS.some(function (t) {
+                return t.id === id;
+            });
+        });
+
+        var $ = function (id) {
+            return document.getElementById(id);
+        };
+        var encoders = {};   // id -> objet Tiktoken (une fois chargé)
+        var pending = {};    // id -> Promise de chargement
+
+        // ---- chargement à la demande (balise <script> dynamique : fonctionne aussi en file://) ----
+        function loadTokenizer(t) {
+            if (encoders[t.id]) return Promise.resolve();
+            if (pending[t.id]) return pending[t.id];
+            var p = new Promise(function (resolve, reject) {
+                var s = document.createElement("script");
+                s.src = t.file;
+                s.onload = function () {
+                    // laisse le navigateur afficher « chargement » avant l'analyse du vocabulaire (~0,3 à 1 s)
+                    setTimeout(function () {
+                        try {
+                            encoders[t.id] = window.AACTiktoken.get(t.id);
+                            resolve();
+                        } catch (e) {
+                            reject(e);
+                        }
+                    }, 30);
+                };
+                s.onerror = function () {
+                    reject(new Error("pa ka chaje " + t.file));
+                };
+                document.head.appendChild(s);
+            });
+            pending[t.id] = p;
+            p.catch(function () {
+                delete pending[t.id];
+            });   // permet de réessayer
+            return p;
+        }
+
+        // tokeniseurs pré-calculés cochés
+        function activePre() {
+            return PRE_IDS.filter(function (id) {
+                return $("tkp-" + id).checked;
+            });
+        }
+
+        // tokeniseurs cochés ET chargés
+        function active() {
+            return TOKENIZERS.filter(function (t) {
+                return $("tk-" + t.id).checked && encoders[t.id];
+            });
+        }
+
+        // ---- mesure (miroir de measure() dans fertilite_tokenizers.py) ----
+        function countWords(t) {
+            var s = t.trim();
+            return s ? s.split(/\s+/).length : 0;
+        }
+
+        function utf8Bytes(t) {
+            return new TextEncoder().encode(t).length;
+        }
+
+        function measure(text1979, t) {
+            var enc = encoders[t.id];
+            var aac = toAac(text1979);
+            // disallowedSpecial = [] : « <|endoftext|> » est traité comme du texte ordinaire.
+            var t79 = enc.encode(text1979, [], []), tAac = enc.encode(aac, [], []);
+            var w79 = countWords(text1979), wAac = countWords(aac);
+            return {
+                aac: aac, tok1979: t79, tokAac: tAac, w1979: w79, wAac: wAac,
+                fert1979: w79 ? t79.length / w79 : NaN,
+                fertAac: wAac ? tAac.length / wAac : NaN,
+                b1979: utf8Bytes(text1979), bAac: utf8Bytes(aac)
+            };
+        }
+
+        // ---- affichage ----
+        function fmt(x, d) {
+            return isFinite(x) ? x.toFixed(d) : "—";
+        }
+
+        function pct(a, b) {
+            return b ? ((a - b) / b * 100) : NaN;
+        }   // variation de a par rapport à b
+        function signed(x) {
+            return isFinite(x) ? (x > 0 ? "+" : "") + x.toFixed(1) + " %" : "—";
+        }
+
+        function cls(x) {
+            return !isFinite(x) || x === 0 ? "" : (x < 0 ? "good" : "bad");
+        }  // moins de tokens = mieux
+
+        function el(tag, className, text) {
+            var e = document.createElement(tag);
+            if (className) e.className = className;
+            if (text !== undefined) e.textContent = text;
+            return e;
+        }
+
+        function card(k, val, sub, c) {
+            var d = el("div", "stat-card");
+            d.appendChild(el("div", "k", k));
+            d.appendChild(el("div", "val" + (c ? " " + c : ""), val));
+            d.appendChild(el("div", "sub", sub));
+            return d;
+        }
+
+        function row(cells) {
+            var tr = document.createElement("tr");
+            cells.forEach(function (c) {
+                var td = el("td", (c.num ? "num " : "") + (c.sep ? "sepl " : "") + (c.cls || ""), c.v);
+                if (c.title) td.title = c.title;
+                tr.appendChild(td);
+            });
+            return tr;
+        }
+
+        function th(text, className, colspan) {
+            var h = el("th", className || "", text);
+            if (colspan) h.colSpan = colspan;
+            return h;
+        }
+
+        function renderChips(container, ids, enc) {
+            container.textContent = "";
+            ids.slice(0, MAX_CHIPS).forEach(function (id, i) {
+                var s = enc.decode([id]);
+                // U+FFFD : le jeton ne contient qu'une partie d'un caractère UTF-8 (octets isolés).
+                var partial = s.indexOf("\uFFFD") !== -1;
+                var chip = el("span", "tok " + (i % 2 ? "b" : "a") + (partial ? " partial" : ""), s.replace(/\n/g, "↵"));
+                chip.title = "id " + id + (partial ? " (moso karaktè UTF-8)" : "");
+                container.appendChild(chip);
+            });
+        }
+
+        function render() {
+            var results = $("results");
+            var act = active();
+            var text = $("input").value;
+            if (!act.length || !text.trim()) {
+                results.classList.remove("on");
+                return;
+            }
+            var ms = act.map(function (t) {
+                return {t: t, m: measure(text, t)};
+            });
+            var m0 = ms[0].m;   // mots et octets ne dépendent pas du tokeniseur
+
+            var pre = activePre();
+            $("preNote").textContent = pre.length
+                ? pre.join(", ") + " pa konte nan tablo sa a : yo pa kalkile nan navigatè a (gade tablo kòpis la, seksyon 3)."
+                : "";
+            $("facts").textContent = m0.w1979 + " mo · " + m0.b1979 + " okte UTF-8 an 1979 → " + m0.bAac + " an AAC (" + signed(pct(m0.bAac, m0.b1979)) + ")";
+
+            // tableau comparatif
+            var cmp = $("cmpBody");
+            cmp.textContent = "";
+            ms.forEach(function (x) {
+                var d = pct(x.m.tokAac.length, x.m.tok1979.length);
+                cmp.appendChild(row([{v: x.t.id + " (" + x.t.sub + ")"}, {
+                    v: x.m.tok1979.length,
+                    num: 1
+                }, {v: x.m.tokAac.length, num: 1},
+                    {v: fmt(x.m.fert1979, 3), num: 1}, {v: fmt(x.m.fertAac, 3), num: 1}, {
+                        v: signed(d),
+                        num: 1,
+                        cls: cls(d)
+                    }]));
+            });
+
+            // détail pour un tokeniseur (menu : seulement ceux qui sont actifs, sélection conservée)
+            var pick = $("detailTok"), keep = pick.value;
+            pick.textContent = "";
+            ms.forEach(function (x) {
+                var o = el("option", "", x.t.id);
+                o.value = x.t.id;
+                pick.appendChild(o);
+            });
+            pick.value = ms.some(function (x) {
+                return x.t.id === keep;
+            }) ? keep : ms[0].t.id;
+            $("detailPick").style.display = ms.length > 1 ? "flex" : "none";
+            var cur = ms.filter(function (x) {
+                return x.t.id === pick.value;
+            })[0], m = cur.m, enc = encoders[cur.t.id];
+
+            var dTok = pct(m.tokAac.length, m.tok1979.length);
+            var dBytes = pct(m.bAac, m.b1979);
+            var grid = $("statGrid");
+            grid.textContent = "";
+            grid.appendChild(card("Fert 1979", fmt(m.fert1979, 3), m.tok1979.length + " tokèn / " + m.w1979 + " mo"));
+            grid.appendChild(card("Fert AAC", fmt(m.fertAac, 3), m.tokAac.length + " tokèn / " + m.wAac + " mo"));
+            grid.appendChild(card("Chanjman tokèn", signed(dTok), "AAC konpare ak 1979 · " + cur.t.id, cls(dTok)));
+            grid.appendChild(card("Chanjman okte UTF-8", signed(dBytes), m.bAac + " kont " + m.b1979 + " okte", cls(dBytes)));
+
+            var body = $("detailBody");
+            body.textContent = "";
+            body.appendChild(row([{v: "1979"}, {v: m.w1979, num: 1}, {
+                v: m.tok1979.length,
+                num: 1
+            }, {v: fmt(m.fert1979, 3), num: 1}, {v: m.b1979, num: 1}]));
+            body.appendChild(row([{v: "AAC"}, {v: m.wAac, num: 1}, {v: m.tokAac.length, num: 1}, {
+                v: fmt(m.fertAac, 3),
+                num: 1
+            }, {v: m.bAac, num: 1}]));
+            body.appendChild(row([{v: "Chanjman"}, {v: "", num: 1},
+                {v: signed(dTok), num: 1, cls: cls(dTok)}, {
+                    v: signed(pct(m.fertAac, m.fert1979)),
+                    num: 1,
+                    cls: cls(pct(m.fertAac, m.fert1979))
+                },
+                {v: signed(dBytes), num: 1, cls: cls(dBytes)}]));
+
+            renderChips($("tok1979"), m.tok1979, enc);
+            renderChips($("tokAac"), m.tokAac, enc);
+            var over = Math.max(m.tok1979.length, m.tokAac.length) - MAX_CHIPS;
+            $("tokNote").textContent = over > 0 ? "Sèlman " + MAX_CHIPS + " premye tokèn yo parèt (chif yo konte tout tèks la)." : "";
+            results.classList.add("on");
+        }
+
+        // ---- tableau du corpus : un bloc de colonnes par tokeniseur ----
+        var mean = function (a) {
+            return a.reduce(function (x, y) {
+                return x + y;
+            }, 0) / a.length;
+        };
+        var sd = function (a) {   // écart-type d'échantillon (n-1), comme statistics.stdev
+            if (a.length < 2) return 0;
+            var mu = mean(a);
+            return Math.sqrt(a.reduce(function (x, y) {
+                return x + (y - mu) * (y - mu);
+            }, 0) / (a.length - 1));
+        };
+
+        function renderCorpus() {
+            var act = active(), pre = activePre(), head = $("corpusHead"), body = $("corpusBody");
+            head.textContent = "";
+            body.textContent = "";
+            $("corpusNote").textContent = "";
+            if (!act.length) {
+                body.appendChild(row([{v: "Make omwen yon tokenizè."}]));
+                return;
+            }
+            var corpus = window.AAC_CORPUS || [];
+
+            // colonnes : d'abord les tokeniseurs calculés ici, puis ceux pré-calculés
+            var cols = act.map(function (t) {
+                return {id: t.id, live: t};
+            })
+                .concat(pre.map(function (id) {
+                    return {id: id, data: PRE[id]};
+                }));
+            var provisional = pre.filter(function (id) {
+                return PRE[id].provisional;
+            });
+
+            var h1 = document.createElement("tr"), h2 = document.createElement("tr");
+            h1.appendChild(th("Tèks"));
+            h1.appendChild(th("Mo", "num"));
+            h2.appendChild(th(""));
+            h2.appendChild(th("", "num"));
+            cols.forEach(function (c) {
+                var g = th(c.id + (c.data ? " *" : ""), "group", 3);
+                if (c.data) g.title = "Valè pre-kalkile pa converter/fertilite_tokenizers.py (" + c.data.model + ")" + (c.data.provisional ? " — poko konfime" : "");
+                h1.appendChild(g);
+                h2.appendChild(th("Fert 1979", "num sepl"));
+                h2.appendChild(th("Fert AAC", "num"));
+                h2.appendChild(th("Chanjman tokèn", "num"));
+            });
+            head.appendChild(h1);
+            head.appendChild(h2);
+
+            var acc = cols.map(function () {
+                return {f79: [], fAac: [], t79: 0, tAac: 0, n: 0};
+            });
+            var words = 0;
+            corpus.forEach(function (e) {
+                var w = countWords(e.texte), cells = [{v: e.titre}, {v: w, num: 1}];
+                words += w;
+                cols.forEach(function (c, i) {
+                    var t79, tAac;
+                    if (c.live) {
+                        var m = measure(e.texte, c.live);
+                        t79 = m.tok1979.length;
+                        tAac = m.tokAac.length;
+                    } else {
+                        var d = c.data.texts && c.data.texts[e.key];
+                        if (d && d.words === w) {
+                            t79 = d.tokens_1979;
+                            tAac = d.tokens_aac;
+                        }   // données périmées : ignorées
+                    }
+                    if (t79 === undefined) {
+                        cells.push({v: "—", num: 1, sep: 1}, {v: "—", num: 1}, {v: "—", num: 1});
+                        return;
+                    }
+                    var dl = pct(tAac, t79);
+                    acc[i].f79.push(t79 / w);
+                    acc[i].fAac.push(tAac / w);
+                    acc[i].t79 += t79;
+                    acc[i].tAac += tAac;
+                    acc[i].n += w;
+                    cells.push({v: fmt(t79 / w, 3), num: 1, sep: 1}, {v: fmt(tAac / w, 3), num: 1}, {
+                        v: signed(dl),
+                        num: 1,
+                        cls: cls(dl)
+                    });
+                });
+                body.appendChild(row(cells));
+            });
+
+            var n = corpus.length;
+            if (n) {
+                var rMean = [{v: "Mwayèn (n=" + n + ")"}, {v: ""}], rSd = [{v: "Ekart-tip"}, {v: ""}],
+                    rSum = [{v: "Σ tout kòpis la"}, {v: words, num: 1}];
+                acc.forEach(function (a) {
+                    if (!a.f79.length) {
+                        rMean.push({v: "—", num: 1, sep: 1}, {v: "—", num: 1}, {v: ""});
+                        rSd.push({v: "", sep: 1}, {v: ""}, {v: ""});
+                        rSum.push({v: "—", num: 1, sep: 1}, {v: "—", num: 1}, {v: ""});
+                        return;
+                    }
+                    var dm = pct(mean(a.fAac), mean(a.f79)), dt = pct(a.tAac, a.t79);
+                    rMean.push({v: fmt(mean(a.f79), 3), num: 1, sep: 1}, {
+                        v: fmt(mean(a.fAac), 3),
+                        num: 1
+                    }, {v: signed(dm), num: 1, cls: cls(dm)});
+                    rSd.push({v: fmt(sd(a.f79), 3), num: 1, sep: 1}, {v: fmt(sd(a.fAac), 3), num: 1}, {v: ""});
+                    var tip = a.t79 + " → " + a.tAac + " tokèn / " + a.n + " mo";
+                    rSum.push({v: fmt(a.t79 / a.n, 3), num: 1, sep: 1, title: tip}, {
+                        v: fmt(a.tAac / a.n, 3),
+                        num: 1,
+                        title: tip
+                    }, {v: signed(dt), num: 1, cls: cls(dt), title: tip});
+                });
+                body.appendChild(row(rMean));
+                body.appendChild(row(rSd));
+                var tr = row(rSum);
+                tr.className = "total";
+                body.appendChild(tr);
+            }
+
+            if (pre.length) {
+                $("corpusNote").textContent = "* " + pre.join(", ") + " : valè pre-kalkile pa converter/fertilite_tokenizers.py (yo pa kalkile nan navigatè a)."
+                    + (provisional.length ? " Yo poko konfime ak vèsyon script la ki konte <unk> yo : relanse " + "script la ak --export (gade README)." : "");
+            }
+        }
+
+        // ---- sélecteur de source ----
+        function setupSource() {
+            var sel = $("src");
+            var o = el("option", "", "— Tèks pa m (ekri oswa kole l anba a) —");
+            o.value = "custom";
+            sel.appendChild(o);
+            o = el("option", "", "Tèks egzanp (menm ak script Python la)");
+            o.value = "sample";
+            sel.appendChild(o);
+            (window.AAC_CORPUS || []).forEach(function (e) {
+                var opt = el("option", "", e.titre + " — " + e.sous);
+                opt.value = "c:" + e.key;
+                sel.appendChild(opt);
+            });
+            sel.value = "sample";
+            sel.addEventListener("change", function () {
+                var v = sel.value, t = "";
+                if (v === "sample") t = DEFAULT_TEXT;
+                else if (v.indexOf("c:") === 0) {
+                    var hit = (window.AAC_CORPUS || []).filter(function (e) {
+                        return "c:" + e.key === v;
+                    })[0];
+                    t = hit ? hit.texte : "";
+                } else {
+                    $("input").focus();
+                    return;
+                }
+                $("input").value = t;
+                render();
+            });
+        }
+
+        // ---- choix des tokeniseurs + statut ----
+        var loadingNow = 0, lastError = "";
+
+        function refreshStatus() {
+            var st = $("status"), spin = $("spinner");
+            spin.classList.toggle("on", loadingNow > 0);
+            if (lastError) {
+                st.className = "err";
+                st.textContent = "Erè : " + lastError;
+                return;
+            }
+            st.className = "";
+            var ready = active().map(function (t) {
+                return t.id;
+            });
+            st.textContent = loadingNow > 0
+                ? "Ap chaje tokenizè yo…"
+                : (ready.length ? "Tokenizè pare : " + ready.join(", ") + " — tout kalkil yo fèt nan navigatè a." : "");
+        }
+
+        function refreshAll() {
+            render();
+            renderCorpus();
+            refreshStatus();
+        }
+
+        function ensureLoaded(t) {
+            if (encoders[t.id]) {
+                refreshAll();
+                return;
+            }
+            loadingNow++;
+            lastError = "";
+            refreshStatus();
+            loadTokenizer(t).then(function () {
+                loadingNow--;
+                refreshAll();
+            })
+                .catch(function (e) {
+                    loadingNow--;
+                    lastError = e.message;
+                    $("tk-" + t.id).checked = false;
+                    refreshAll();
+                });
+        }
+
+        function setupTokenizers() {
+            var box = $("tkList");
+            TOKENIZERS.forEach(function (t) {
+                var lab = el("label", "tk"), cb = document.createElement("input");
+                cb.type = "checkbox";
+                cb.id = "tk-" + t.id;
+                cb.checked = t.on;
+                lab.appendChild(cb);
+                lab.appendChild(el("code", "", t.id));
+                lab.appendChild(el("span", "", t.sub));
+                box.appendChild(lab);
+                cb.addEventListener("change", function () {
+                    var any = TOKENIZERS.some(function (u) {
+                        return $("tk-" + u.id).checked;
+                    });
+                    if (!any) {
+                        cb.checked = true;
+                        return;
+                    }   // au moins un tokeniseur reste coché
+                    if (cb.checked) ensureLoaded(t); else refreshAll();
+                });
+            });
+            PRE_IDS.forEach(function (id) {
+                var lab = el("label", "tk"), cb = document.createElement("input");
+                cb.type = "checkbox";
+                cb.id = "tkp-" + id;
+                cb.checked = true;
+                lab.appendChild(cb);
+                lab.appendChild(el("code", "", id));
+                lab.appendChild(el("span", "", "valè pre-kalkile, kòpis la sèlman" + (PRE[id].provisional ? " (poko konfime)" : "")));
+                box.appendChild(lab);
+                cb.addEventListener("change", refreshAll);
+            });
+            if (!PRE_IDS.length) {   // pas de données pré-calculées : on l'explique au lieu de cacher NLLB
+                var off = el("label", "tk off"), ob = document.createElement("input");
+                ob.type = "checkbox";
+                ob.disabled = true;
+                off.appendChild(ob);
+                off.appendChild(el("code", "", "NLLB-200"));
+                off.appendChild(el("span", "", "sèlman nan script Python la"));
+                box.appendChild(off);
+            }
+        }
+
+        setupTokenizers();
+        setupSource();
+        $("input").value = DEFAULT_TEXT;
+        $("input").addEventListener("input", function () {
+            $("src").value = "custom";
+            clearTimeout(render.timer);
+            render.timer = setTimeout(render, 150);
+        });
+        $("detailTok").addEventListener("change", render);
+        TOKENIZERS.filter(function (t) {
+            return t.on;
+        }).forEach(ensureLoaded);
+    })();
+</script>
+</body>
+</html>

@@ -24,145 +24,21 @@
 -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-
-<style>
-  :root{
-    --bg: #F6F3EC;
-    --paper: #FCFAF5;
-    --ink: #1C1A17;
-    --ink-soft: #565049;
-    --primary: #1F3864;
-    --primary-soft: #2c4c85;
-    --accent: #8A6D3B;
-    --old: #A5342C;
-    --old-bg: #F6DAD6;
-    --new: #2F6F62;
-    --new-bg: #DCEBE6;
-    --warn: #8A6D3B;
-    --warn-bg: #F1E6D2;
-    --rule: #DED6C4;
-    --display: 'Fraunces', serif;
-    --body: 'Source Serif 4', serif;
-    --mono: 'IBM Plex Mono', monospace;
-  }
-  *{box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
-  body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--body); font-size:17px; line-height:1.6;}
-  .wrap{max-width:960px; margin:0 auto; padding:0 28px;}
-  .topbar{display:flex; align-items:center; justify-content:space-between; padding:22px 0; border-bottom:1px solid var(--rule);}
-  .brand{display:flex; align-items:center; gap:12px; text-decoration:none; color:var(--primary);}
-  .brand img{height:38px; width:auto; display:block;}
-  .brand-word{font-family:var(--mono); font-size:13px; letter-spacing:.1em; color:var(--ink-soft);}
-  .toplinks{display:flex; gap:20px; font-family:var(--mono); font-size:12.5px;}
-  .toplinks a{color:var(--ink-soft); text-decoration:none;}
-  .toplinks a:hover, .toplinks a.active{color:var(--primary);}
-
-  header.hero{padding:56px 0 44px; border-bottom:1px solid var(--rule);}
-  .eyebrow{
-    font-family:var(--mono); font-size:12.5px; letter-spacing:.14em; text-transform:uppercase;
-    color:var(--accent); margin:0 0 22px; display:flex; align-items:center; gap:10px;
-  }
-  .eyebrow::before{content:""; width:22px; height:1px; background:var(--accent); display:inline-block;}
-  h1{
-    font-family:var(--display); font-optical-sizing:auto; font-weight:600;
-    font-size:clamp(2rem, 4.4vw, 3rem); line-height:1.1; margin:0 0 18px; color:var(--primary); letter-spacing:-.01em;
-  }
-  .lede{font-size:1.1rem; color:var(--ink-soft); max-width:62ch; margin:0;}
-  .lede a{color:var(--primary);}
-
-  section{padding:48px 0; border-bottom:1px solid var(--rule);}
-  h2{font-family:var(--display); font-weight:600; font-size:1.5rem; color:var(--primary); margin:0 0 8px;}
-  .section-note{color:var(--ink-soft); font-size:.98rem; margin:0 0 28px; max-width:62ch;}
-
-  .dropzone{
-    background:var(--paper); border:2px dashed var(--rule); border-radius:6px; padding:44px 24px;
-    text-align:center; cursor:pointer; transition:border-color .2s ease, background .2s ease;
-  }
-  .dropzone.drag{border-color:var(--primary); background:var(--new-bg);}
-  .dropzone .dz-title{font-family:var(--display); font-size:1.2rem; color:var(--primary); margin:0 0 6px;}
-  .dropzone .dz-sub{color:var(--ink-soft); font-size:.92rem; margin:0;}
-  .dropzone input{display:none;}
-  .dz-btn{
-    display:inline-block; margin-top:16px; font-family:var(--mono); font-size:12.5px; letter-spacing:.04em;
-    background:var(--primary); color:var(--paper); border:none; border-radius:20px; padding:10px 20px; cursor:pointer;
-  }
-  .dz-btn:hover{background:var(--primary-soft);}
-
-  .status-line{
-    display:flex; align-items:center; gap:10px; margin-top:18px; font-family:var(--mono); font-size:12.5px;
-    color:var(--ink-soft);
-  }
-  .spinner{
-    width:14px; height:14px; border-radius:50%; border:2px solid var(--rule); border-top-color:var(--primary);
-    animation:spin .8s linear infinite; display:none;
-  }
-  .spinner.on{display:inline-block;}
-  @keyframes spin{to{transform:rotate(360deg);}}
-
-  .warn-box{
-    background:var(--warn-bg); border:1px solid #E4D3AE; border-radius:4px; padding:14px 18px;
-    font-size:.92rem; color:#5b4a26; margin-top:16px; display:none;
-  }
-  .warn-box.on{display:block;}
-  .warn-box ul{margin:6px 0 0; padding-left:1.2em;}
-
-  .results{display:none; margin-top:36px;}
-  .results.on{display:block;}
-
-  .stat-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(160px,1fr)); gap:1px; background:var(--rule); border:1px solid var(--rule); border-radius:4px; overflow:hidden; margin-bottom:24px;}
-  .stat-card{background:var(--paper); padding:16px 18px;}
-  .stat-card .lbl{font-family:var(--mono); font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:6px;}
-  .stat-card .val{font-family:var(--display); font-size:1.5rem; color:var(--primary); font-weight:600;}
-  .stat-card .val.new{color:var(--new);}
-  .stat-card .sub{font-family:var(--mono); font-size:11px; color:var(--ink-soft); margin-top:4px;}
-
-  .info-box{
-    background:var(--paper); border:1px solid var(--rule); border-radius:4px; padding:18px 22px;
-    font-size:.95rem; margin-bottom:24px;
-  }
-  .info-box summary{cursor:pointer; font-family:var(--mono); font-size:12px; letter-spacing:.04em; color:var(--primary); text-transform:uppercase;}
-  .info-box .term{margin-top:14px;}
-  .info-box .term b{color:var(--primary);}
-
-  table{width:100%; border-collapse:collapse; font-size:.92rem; margin-bottom:24px;}
-  th, td{text-align:left; padding:9px 12px; border-bottom:1px solid var(--rule);}
-  th{font-family:var(--mono); font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft); font-weight:500;}
-  td.mono{font-family:var(--mono); font-size:.88rem;}
-  tr:last-child td{border-bottom:none;}
-  .verdict{font-weight:600;}
-  .verdict.sig{color:var(--new);}
-  .verdict.nonsig{color:var(--old);}
-
-  .downloads{display:flex; gap:12px; flex-wrap:wrap; margin-top:8px;}
-  .dl-btn{
-    font-family:var(--mono); font-size:12.5px; letter-spacing:.03em; color:var(--paper); background:var(--new);
-    border:none; border-radius:20px; padding:10px 18px; cursor:pointer; text-decoration:none; display:inline-block;
-  }
-  .dl-btn:hover{background:#255950;}
-  .dl-btn.secondary{background:var(--primary);}
-  .dl-btn.secondary:hover{background:var(--primary-soft);}
-
-  .preview-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:24px;}
-  .preview-block{background:var(--paper); border:1px solid var(--rule); border-radius:4px; padding:14px 16px; font-family:var(--mono); font-size:13px; line-height:1.6; max-height:220px; overflow:auto;}
-  .preview-block .lbl{font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-soft); margin-bottom:8px;}
-  @media (max-width:640px){.preview-grid{grid-template-columns:1fr;}}
-
-  footer{padding:40px 0 72px; color:var(--ink-soft); font-size:.9rem;}
-  footer a{color:var(--primary);}
-</style>
+  <link href="styles.css" rel="stylesheet"/>
 </head>
 <body>
 
 <div class="wrap">
   <div class="topbar">
-    <a class="brand" href="index.html">
-      <img src="../assets/aac-logo.png" alt="Logo AAC">
-      <span class="brand-word">aac.ht</span>
+    <a class="brand" href="index.html" style="border-style:double; border-radius: 10px;">
+      <img alt="Logo AAC" src="../assets/aac_symbole.png">
+      <span class="brand-word" style="margin-left: -20px;  padding-right: 15px">AAC</span>
     </a>
     <nav class="toplinks">
       <a href="index.html">Konvètisè</a>
       <a href="documents.html" class="active">Dokiman</a>
       <a href="jwet.html">Jwèt</a>
+      <a href="token.html">Tokèn</a>
     </nav>
   </div>
 
@@ -210,7 +86,7 @@
 
       <div class="stat-grid" id="statGrid"></div>
 
-      <details class="info-box" open>
+      <details class="info-box">
         <summary>Kisa "lwa Student" ak "bootstrap" vle di?</summary>
         <div class="term">
           <b>Lwa Student (entèval konfyans "Student")</b> — Lè'w kalkile yon mwayèn sou yon ti kantite echantiyon (isit: yon ti kantite paragraf), mwayèn sa a p ap janm egzakteman koresponn ak "vrè" mwayèn nan si'w te gen dokiman an antye pou'w analize. Lwa Student bay yon fouchèt otou mwayèn nan ("entèval konfyans 95 %") kote vrè valè a gen 95 chans sou 100 pou l ye, si w ta refè menm mezi a plizyè fwa. Se yon zouti estatistik ki fèt espesyalman pou ti echantiyon (kontrèman ak lwa nòmal la, ki mande plis obsèvasyon pou l fyab).
@@ -779,6 +655,7 @@ function renderReport(report, downloads, power) {
     <div class="stat-card"><div class="lbl">Tès t apareye</div><div class="val">t(${report.df}) = ${fmt(report.tStat, 2)}</div><div class="sub">p = ${Number.isFinite(report.pValue) ? report.pValue.toExponential(2) : "—"}</div></div>
     <div class="stat-card"><div class="lbl">Tès pèmitasyon</div><div class="val">p = ${Number.isFinite(report.permutation.pValue) ? report.permutation.pValue.toFixed(4) : "—"}</div><div class="sub">${report.permutation.nPermutations || 0} tiraj</div></div>
     <div class="stat-card"><div class="lbl">d de Cohen</div><div class="val">${fmt(report.cohensD, 2)}</div><div class="sub">IC95 [${fmt(report.bootCID[0],2)} ; ${fmt(report.bootCID[1],2)}]</div></div>
+    <div class="stat-card"><div class="lbl"></div><div class="val"></div><div class="sub"></div></div>
   `;
 
   const tbody = document.getElementById("segmentTableBody");
