@@ -217,9 +217,9 @@ exposer, ajoutez-les à `BLOCKED_PREFIXES` en haut de
 | /ʃ/       | ch      | š   | U+0161    | Remplacé      |
 | /u/, /ũ/  | ou, oun | ŏ   | U+014F    | Remplacé      |
 | /ɲ/       | ng      | ŋ   | U+014B    | Remplacé      |
-| /ã/       | an      | an  | —         | **Inchangé**  |
-| /ɛ̃/       | en      | en  | —         | **Inchangé**  |
-| /õ/       | on      | on  | —         | **Inchangé**  |
+| /ã/       | an      | an  | —         | **Séquence déjà existante**  |
+| /ɛ̃/       | en      | en  | —         | **Séquence déjà existante**  |
+| /õ/       | on      | on  | —         | **Séquence déjà existante**  |
 | /ɥi/      | ui      | wi  | —         | Séquence déjà existante |
 
 Détail complet et justification linguistique : [`docs/grapheme-table.md`](docs/grapheme-table.md) et chapitre III du mémoire.

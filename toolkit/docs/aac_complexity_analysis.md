@@ -6,23 +6,47 @@ correspondance phonème/graphème, le coût de la réforme pour l'usager
 humain, sa distinctivité linguistique, son impact matériel, et la validité
 statistique des mesures.
 
-Contrairement à `letter-frequency-analysis.md`, la plupart de ces
-grandeurs ne sont **pas encore implémentées** dans `converter/` : aucun
-fichier de code ne calcule $B$, $\Omega$, $C_{\text{mém}}$, $C_{\text{moteur}}$,
-$\text{Fert}$, $D(g)$, $J(g)$, $E_{\text{papier}}$ ou $t$ dans l'état actuel
-du projet (seul $\gamma$, le gain scriptural, existe déjà dans
-`acc_converter.py`/`.js` et `document_stats.py`). Ce document a donc un
-double objectif : (1) fixer une définition formelle non ambiguë de chaque
-grandeur, suffisamment précise pour être codée sans interprétation
-différente d'un développeur à l'autre, et (2) signaler, comme pour `ng`
-dans le document précédent, les points où la formule telle que donnée est
-**sous-déterminée** et où un choix d'implémentation devra être fait et
-documenté avant tout calcul sur corpus.
+**Révision.** Cette version s'appuie directement sur le texte du mémoire
+(*Mémoire — Alphabet Atomique Créole (AAC), v1.3.1*) et sur le toolkit
+publié (`lincoln509.github.io/aac`), plutôt que sur des hypothèses
+génériques. Deux conséquences : (1) plusieurs grandeurs, jusque-là
+seulement formalisées, peuvent désormais être chiffrées avec les données
+réelles du mémoire (corpus de 8 textes, chapitre IV ; chapitre V sur la
+tokenisation) ; (2) chaque formule est désormais aussi évaluée pour un
+**second système concurrent déjà discuté par le mémoire lui-même** : la
+proposition linéariste de Frantz Gourdet (2022), que le mémoire cite à
+plusieurs reprises (§3.1.5, §3.5, §5.4) mais ne compare pas encore
+chiffre à chiffre sur les axes de ce document.
 
-Trois résultats peuvent en revanche déjà être vérifiés sans nouveau code,
-soit par dérivation directe de `acc_converter.py`, soit par un test
-ponctuel : ils sont présentés avec leurs chiffres, le reste reste à l'état
-de spécification.
+**Un point de méthode conditionne toute la suite**, signalé explicitement
+par l'utilisateur et confirmé par le texte du mémoire (§3.1.5, §3.1.6) :
+AAC et Gourdet traitent différemment les sept séquences déjà
+« transparentes » de l'orthographe de 1979 (an, en, on, oun, à, è, ò) et
+la séquence ui.
+
+- **AAC** ne leur attribue **aucun nouveau graphème** : an/en/on/oun
+  restent des **combinaisons** voyelle + n engendrées par une règle de
+  composition (la même qui existait déjà en 1979), et ui devient wi, une
+  combinaison de deux lettres déjà existantes (w + i). Ni l'une ni
+  l'autre ne comptent parmi les 24 lettres atomiques de l'AAC.
+- **Gourdet** leur attribue au contraire des **monogrammes dédiés**,
+  comptés comme des lettres à part entière au même titre que les
+  consonnes et voyelles de base : ä, ë, ö, ü pour an/en/on/oun, et
+  (sur un point précisé par F. Gourdet lui-même) g̈ pour ng. Seule
+  exception chez Gourdet : /ɥi/ (ui) n'y reçoit pas non plus de
+  monogramme dédié, mais la notation Yw, et /u/ oral n'y crée aucun
+  symbole nouveau non plus puisque Gourdet **redéfinit** la lettre u déjà
+  existante pour noter directement ce son — un choix de parcimonie que
+  l'AAC lui-même ne fait pas (l'AAC introduit ŏ plutôt que de redéfinir
+  u). Il en résulte que l'inventaire nominal de Gourdet n'est, par
+  construction, **pas réduit** par rapport aux 32 lettres de 1979 (le
+  mémoire le dit explicitement : « substitution symbole pour symbole »),
+  alors que l'AAC le ramène à 24.
+
+Cette différence de philosophie traverse presque toutes les grandeurs
+ci-dessous ($B$, $C_{\text{mém}}$, $C_{\text{moteur}}$, $\gamma$, $D(g)$) :
+elle n'avantage pas systématiquement un système sur l'autre, comme le
+détail section par section le montre.
 
 ---
 
@@ -82,13 +106,39 @@ question pertinente pour un *scripteur*. La question symétrique
 pertinente pour un *lecteur*) donnerait une formule différente,
 $B' = \frac{1}{\lVert\Sigma\rVert}\sum_g \frac{1}{\lVert \mathcal{G}^{-1}(g)\rVert}$,
 avec potentiellement une valeur différente. Les deux sont utiles mais ne
-sont pas interchangeables ; le mémoire doit préciser laquelle est visée
-avant implémentation. Avec les graphies 1979 (`ch`, `ou`, `ng`, `ui`) et
-leur unique lecture phonémique assumée par le mémoire, l'AAC ne change
-*a priori* pas $B$ côté phonème → graphie (un phonème gardait déjà une
-seule graphie en 1979, l'AAC ne fait qu'en raccourcir l'écriture) — sauf
-si l'inventaire $P$ inclut des cas de variation dialectale ou
-d'homographie non couverts ici.
+sont pas interchangeables.
+
+**Ce que dit le mémoire lui-même — et pourquoi $B$ doit être lue à deux
+niveaux.** Le mémoire définit la bi-univocité comme « à chaque phonème du
+créole haïtien correspond un graphème unique et non ambigu », en
+précisant explicitement que les nasales an/en/on « satisfont pleinement à
+ce principe sans qu'aucune modification graphique ne soit nécessaire »
+(§3.1). Autrement dit, le mémoire adopte une version de $B$ **tolérante
+à la composition** : une séquence compte comme « un graphème unique et
+non ambigu » dès lors qu'elle résulte d'une règle régulière et sans
+exception, même si elle occupe plusieurs points de code. Sous cette
+lecture (notons-la $B_{\text{règle}}$), an/en/on satisfont déjà $B=1$ en
+1979 comme en AAC, et $B_{\text{règle}}$ ne distingue donc **pas** 1979,
+AAC et Gourdet sur ce point — seules les quatre séquences réellement
+opaques (ch, ou, oun, ng) font encore défaut en 1979 et sont corrigées
+par les deux réformes.
+
+Une seconde lecture, plus stricte (notons-la $B_{\text{atome}}$, celle
+qui compte $\lVert\mathcal{G}(p_i)\rVert$ en points de code et non en
+« règles »), **distingue en revanche nettement** AAC et Gourdet sur les
+nasales : pour /ã/, /ɛ̃/, /õ/ et /ũ/, Gourdet fait passer la graphie de 2
+points de code (an, en, on, oun) à 1 (ä, ë, ö, ü) — un vrai gain de
+$B_{\text{atome}}$ — tandis que l'AAC, par choix délibéré de parcimonie
+(§3.1.6 du mémoire), laisse ces quatre graphies inchangées à 2 points de
+code. Sur ce sous-ensemble précis de phonèmes, **Gourdet obtient donc un
+$B_{\text{atome}}$ strictement supérieur à celui de l'AAC** — un résultat
+que le principe de parcimonie de l'AAC assume et justifie (§3.1.6 : « un
+système ne doit être corrigé que là où il est réellement défaillant »),
+mais qui doit être présenté comme un choix, pas comme une supériorité
+automatique de l'AAC sur toute la ligne. Sur ch, ou (oral) et ng, en
+revanche, les deux systèmes convergent : chacun fait passer la graphie de
+2 points de code à 1 ($B_{\text{atome}}=1$ pour les deux), avec la
+réserve technique de §2.2 ci-dessous pour `ng` chez Gourdet.
 
 ### 1.2 Opacité — $\Omega = \displaystyle\sum_{s} f(s)\,\text{Op}(s)$
 
@@ -104,9 +154,41 @@ d'opacité du texte, pondérée par la fréquence d'usage.
 $s \in \{\text{ch, ou, ng, ui}\}$ et $0$ sinon, $\Omega$ compté en
 occurrences brutes (sans normaliser par la longueur du texte) coïncide
 avec la somme des quatre compteurs déjà renvoyés par `diff_summary()` /
-`diffSummary()` dans `acc_converter.py`/`.js` — aucune nouvelle mesure
+`diffSummary()` dans `aac_converter.py`/`.js` — aucune nouvelle mesure
 n'est nécessaire pour cette version simple, seulement une somme
 pondérée des champs `ch`, `ou`, `ng`, `ui` du dictionnaire déjà renvoyé.
+
+**Chiffres réels, désormais disponibles (§4.1.2 du mémoire, corpus des 8
+textes, 2190 caractères).** Le mémoire donne le détail exact des
+occurrences *réellement opaques* : `ch` apparaît 30 fois (30 caractères
+économisés), `ou` 75 fois (75 caractères économisés), et `ng` apparaît 8
+fois au total mais seulement **4 occurrences sont en position réellement
+opaque** (fin de syllabe/mot, convertibles en ŋ) — les 4 autres, comme
+dans *grangou*, ont le n et le g dans deux syllabes distinctes et ne sont
+donc *pas* opaques au sens phonologique retenu ici, même si la séquence
+textuelle « ng » y apparaît. C'est une confirmation directe, sur un
+corpus réel, de la nécessité déjà signalée dans `letter-frequency-analysis.md`
+de distinguer les occurrences brutes de `ng` (8) des occurrences
+opaques (4) — $\text{Op}(\text{ng})$ ne doit **pas** être appliqué à
+toute occurrence textuelle de la sous-chaîne « ng », uniquement à celles
+où `_NG_RULE` de `aac_converter.py` déclenche effectivement la
+substitution.
+
+**Et chez Gourdet ?** Puisque Gourdet attribue un monogramme dédié à
+chacune des quatre nasales (an, en, on, oun), sa propre version de
+$\Omega$ compterait, en plus de ch/ou/ng, les occurrences de ces quatre
+séquences comme opaques également (elles ne le sont pas phonologiquement
+— le mémoire le dit lui-même, §3.1.6 — mais elles le deviennent
+*graphématiquement* dès lors qu'un système choisit de leur dédier un
+monogramme). $\Omega_{\text{Gourdet}} \geq \Omega_{\text{AAC}}$ par
+construction si l'on garde la même définition d'« opaque » que le
+mémoire (séquences non déductibles lettre à lettre) ; si l'on redéfinit
+plutôt $\text{Op}(s)$ comme « séquence que *ce système* a choisi de
+corriger », alors $\Omega_{\text{Gourdet}} > \Omega_{\text{AAC}}$
+presque mécaniquement, Gourdet corrigeant sept séquences (ch, ou, oun,
+ng, an, en, on) contre quatre pour l'AAC — un résultat qui dépend
+entièrement de la définition retenue pour $\text{Op}$, raison de plus
+pour la documenter avant tout calcul comparatif.
 
 **Point à ne pas confondre avec $\gamma$.** `ui` compte comme opaque
 ($\text{Op}(\text{ui})=1$, digramme non lu lettre à lettre) mais ne
@@ -120,13 +202,82 @@ le gain *d'écriture*, et elles divergent précisément sur `ui`.
 ### 1.3 Gain scriptural — $\gamma = 1 - \dfrac{n_{\text{AAC}}}{n_{1979}}$
 
 **Déjà implémenté.** Cette formule est exactement
-`gainPercentTotal / 100` dans `acc_converter.py`/`.js`
+`gainPercentTotal / 100` dans `aac_converter.py`/`.js`
 (`(before - after) / before`, avec `before = n_1979`, `after = n_AAC`) —
-aucun nouveau code n'est nécessaire, seul le nom diffère. C'est la
-grandeur déjà mesurée dans `letter-frequency-analysis.md` et
-`document_stats.py` : moyenne 5,7 %, IC95 % [3,8 % ; 7,5 %] sur le corpus
-de 8 textes (voir §4.2 pour une vérification de cohérence de cet
-intervalle avec la formule $t$ de validation statistique).
+aucun nouveau code n'est nécessaire, seul le nom diffère.
+
+**Chiffres exacts du mémoire (§4.1.2, corpus de 8 textes, 2190 caractères
+originaux au total) :** gain moyen **5,66 %** par texte (IC95 % :
+[3,79 % ; 7,52 %], loi de Student à 7 degrés de liberté, $n=8$) et gain
+pondéré **5,11 %** sur l'ensemble du corpus (112 caractères économisés
+sur 2190). Une seconde moyenne, calculée sur les six textes externes
+seulement (en excluant les deux textes de rédaction personnelle, qui
+présentent les gains les plus élevés), s'établit à **4,65 %**
+(IC95 % : [3,18 % ; 6,13 %], $n=6$, 5 degrés de liberté) — l'intervalle
+reste strictement positif, ce qui montre que le gain n'est pas un
+artefact des textes de l'auteur. §4.2 recalcule $t$ pour ces deux
+intervalles et confirme leur signification statistique.
+
+**Et chez Gourdet ?** C'est ici que la différence de philosophie décrite
+en introduction devient quantifiable, et le résultat est contre-intuitif.
+En points de code, Gourdet réduit `ch`→`c` (2→1) et `ng`→`g̈` *en
+apparence* (2→1 caractère visuel), exactement comme l'AAC pour `ch`→`š`
+et `ng`→`ŋ` ; surtout, Gourdet réduit **aussi** les quatre nasales
+(`an`→`ä`, `en`→`ë`, `on`→`ö`, `oun`→`ü`, chacune 2→1), que l'AAC laisse
+volontairement inchangées. Sur ce seul critère des points de code, le
+périmètre de réduction de Gourdet est donc **plus large** que celui de
+l'AAC (7 séquences réduites contre 4), ce qui suggérerait un $\gamma$
+plus élevé pour Gourdet — mais deux réserves empêchent de conclure sans
+données supplémentaires :
+
+1. **La fréquence des nasales an/en/on/oun n'est pas mesurée dans ce
+   mémoire** (le corpus de `letter-frequency-analysis.md` ne compte que
+   š/ŏ/ŋ, pas les occurrences brutes d'an/en/on en 1979, puisque l'AAC ne
+   les touche pas). Sans ce chiffre, $\gamma_{\text{Gourdet}}$ ne peut
+   pas être calculé, seulement borné inférieurement par
+   $\gamma_{\text{AAC}}$ (Gourdet réduit tout ce que l'AAC réduit, plus
+   les nasales).
+2. **`ng`→`g̈` ne réduit en réalité rien du tout en points de code**, pour
+   une raison purement technique vérifiée ci-dessous (§1.4bis) : Unicode
+   ne propose aucune forme précomposée pour « g tréma », qui doit donc
+   s'écrire comme deux points de code (g + diacritique combinant), soit
+   *autant* que « ng » en 1979 — contrairement à ce que sa seule
+   apparence visuelle suggère.
+
+**Vérification Unicode (nouvelle, non présente dans le mémoire) :**
+
+| Graphie | Points de code | Octets UTF-8 |
+|---|---:|---:|
+| `ch` (1979) → `š` (AAC) | 2 → **1** | 2 → 2 |
+| `ch` (1979) → `c` (Gourdet) | 2 → **1** | 2 → **1** |
+| `ou` (1979) → `ŏ` (AAC) | 2 → **1** | 2 → 2 |
+| `ou` (1979) → `u` (Gourdet, cas oral) | 2 → **1** | 2 → **1** |
+| `ng` (1979) → `ŋ` (AAC) | 2 → **1** | 2 → 2 |
+| `ng` (1979) → `g̈` (Gourdet) | 2 → **2 (inchangé)** | 2 → **3 (pire)** |
+| `an` (1979) → inchangé (AAC) | 2 → 2 | 2 → 2 |
+| `an` (1979) → `ä` (Gourdet) | 2 → **1** | 2 → 2 |
+
+(Vérifié directement avec `unicodedata` : š, ŏ, ŋ, ä, ë, ö, ü, c sont
+chacun un point de code précomposé unique ; « g̈ » n'existe pas en forme
+précomposée et s'encode obligatoirement en LATIN SMALL LETTER G +
+COMBINING DIAERESIS, soit 2 points de code et 3 octets UTF-8 — **plus
+lourd que `ng` lui-même**.)
+
+Deux enseignements structurants pour la suite du document :
+- **Sur `ch` et `ou`, Gourdet gagne à la fois en caractères *et* en
+  octets** (en réutilisant des lettres ASCII déjà existantes, `c` et
+  `u`), là où l'AAC ne gagne qu'en caractères (š/ŏ restent des points de
+  code Latin Extended-A à 2 octets). C'est un avantage réel de Gourdet
+  sur cette portion précise du système, qui n'a aucun équivalent côté
+  AAC — et qui aura des conséquences directes en §2.3 (Fert).
+- **Sur `ng`, le choix de Gourdet (g̈) n'apporte aucun bénéfice
+  informatique réel** : ni gain de caractères, ni gain d'octets — à
+  l'inverse, une perte de 1 octet. C'est une confirmation concrète, par
+  un cas limite, du principe de « faisabilité technique immédiate »
+  que le mémoire revendique pour l'AAC (§3.1.6) : le choix de ŋ
+  (caractère précomposé Unicode depuis l'origine du standard) plutôt
+  qu'un symbole composé à base de tréma n'est pas qu'une préférence
+  esthétique, c'est un avantage technique vérifiable.
 
 ### 1.4 Décomposition du gain — $\mathbb{E}[\gamma] = \displaystyle\sum_k f_k\,\Delta_k$
 
@@ -134,6 +285,20 @@ intervalle avec la formule $t$ de validation statistique).
 `ng→ŋ`, `ui→wi`), $\Delta_k$ le nombre de caractères économisés par
 application de la règle $k$ ($\Delta_{\text{ch}}=\Delta_{\text{ou}}=\Delta_{\text{ng}}=1$,
 $\Delta_{\text{ui}}=0$), et $f_k$ la fréquence de la règle $k$.
+
+**Chiffres réels pour instancier l'identité (§4.1.2 du mémoire, $n_{1979}=2190$) :**
+$n_{\text{ch}}=30$, $n_{\text{ou}}=75$, $n_{\text{ng,opaque}}=4$ (voir §1.2
+ci-dessus pour la distinction occurrences brutes/opaques de `ng`),
+$n_{\text{ui}}=0$ (aucune occurrence de `ui` relevée sur ce corpus
+particulier). Soit $f_{\text{ch}} = 30/2190$, $f_{\text{ou}} = 75/2190$,
+$f_{\text{ng}} = 4/2190$, $f_{\text{ui}} = 0$, d'où
+$\sum_k f_k\Delta_k = (30+75+4\times1+0)/2190 = 109/2190 \approx 4{,}98\,\%$
+— proche mais pas rigoureusement identique au 5,11 % pondéré rapporté
+(l'écart vient d'une occurrence de `ch`, `ou` ou `ng` additionnelle
+quelque part dans le corpus non détaillée explicitement dans le texte du
+mémoire, 112 caractères économisés au total contre 109 recomptés ici :
+à vérifier directement sur `corpus.py` plutôt que sur le texte narratif
+du mémoire avant publication d'un chiffre définitif).
 
 **Ce n'est pas une approximation : c'est une identité exacte, à condition
 de bien normaliser $f_k$.** Si l'on pose $f_k = n_k / n_{1979}$ (le
