@@ -12,10 +12,14 @@ on:
     paths:
       - "README.md"
       - "LICENSE"
+      - "index.html"
       - "converter/**"
       - "keyboard/**"
       - "docs/letter-frequency-analysis.md"
+      - "docs/aac_complexity_analysis.md"
+      - "docs/grapheme-table.md"
       - "scripts/**"
+      - "web-demo/**"
 
 permissions:
   contents: write

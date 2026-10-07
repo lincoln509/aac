@@ -139,6 +139,22 @@
 <script src="generated/rules.js"></script>
 <script src="../converter/aac_converter.js"></script>
 <script>
+/* Garde-fou : si generated/rules.js ou aac_converter.js n'a pas pu se charger (404, cache
+   périmé...), aac_converter.js s'arrête avant d'initialiser NG_RULE et la page affiche sinon
+   l'erreur trompeuse « Cannot access 'NG_RULE' before initialization ». On affiche la vraie cause. */
+(function () {
+  if (window.AAC_RULES && window.AACConverter) return;
+  var b = document.createElement("div");
+  b.setAttribute("role", "alert");
+  b.style.cssText = "margin:12px;padding:12px 16px;border:1px solid #b00020;border-radius:8px;" +
+    "background:#fdecea;color:#b00020;font:14px/1.4 system-ui,sans-serif";
+  b.textContent = "Erè : pa ka chaje konvètisè a (" +
+    (!window.AAC_RULES ? "generated/rules.js manke" : "converter/aac_converter.js pa chaje") +
+    "). Rafrechi paj la (Ctrl+F5) epi verifye fichye sa yo sou sèvè a.";
+  document.body.insertBefore(b, document.body.firstChild);
+})();
+</script>
+<script>
 /* =====================================================================
    1) document_stats — mwayèn, ekar-tip, IC Student, bootstrap, tès t,
       d Cohen. Menm fòmil yo egzakteman ak converter/document_stats.py,

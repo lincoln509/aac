@@ -188,6 +188,19 @@
     (function () {
         "use strict";
 
+        // Garde-fou : si generated/rules.js ou converter/aac_converter.js n'a pas pu se charger
+        // (404, cache périmé...), aac_converter.js s'arrête en cours de route et laisse NG_RULE
+        // non initialisé -> sinon l'utilisateur voit l'erreur trompeuse « Cannot access 'NG_RULE'
+        // before initialization » au lieu de la vraie cause.
+        if (!window.AAC_RULES || !window.AACConverter) {
+            var stEl = document.getElementById("status");
+            stEl.className = "err";
+            stEl.textContent = "Erè : pa ka chaje konvètisè a (" +
+                (!window.AAC_RULES ? "generated/rules.js manke" : "converter/aac_converter.js pa chaje") +
+                "). Rafrechi paj la (Ctrl+F5) epi verifye fichye sa yo sou sèvè a.";
+            return;
+        }
+
         // Texte d'exemple identique à celui de converter/fertilite_tokenizers.py, pour que la page
         // et le script donnent les mêmes chiffres sur le même texte.
         var DEFAULT_TEXT =
