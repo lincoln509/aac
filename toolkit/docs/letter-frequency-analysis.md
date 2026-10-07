@@ -126,8 +126,7 @@ standard pour les langues à forte préférence CV comme le créole) :
 Exemples vérifiés par les tests (`test_letter_analysis.py`) :
 `šante` → `šan-te`, `ekran` → `e-kran`, `laŋ` → `laŋ` (1 syllabe).
 
-**Limite assumée** : cet outil sert à mesurer *où le convertisseur place
-réellement chaque lettre*, pas à trancher un débat de phonologie créole.
+**Limite assumée** : cet outil sert à mesurer **où le convertisseur place réellement chaque lettre**, pas à trancher un débat de phonologie créole.
 
 ### Classification onset / nucleus / coda
 
@@ -156,7 +155,7 @@ avant → attaque, au noyau → noyau, après → coda.
 Dans l'exemple `šan` : $\text{pos}(\sigma_1, s) = \text{pos}(\text{š}, s) = \text{onset}$
 (car $1 < 2$), et si la syllabe contenait un `ŋ` en position 3, on aurait
 $\text{pos}(\sigma_3, s) = \text{coda}$ (car $3 > 2$). C'est une fonction
-définie *par occurrence*, pas par lettre : il faut l'agréger sur tout le
+définie **par occurrence**, pas par lettre : il faut l'agréger sur tout le
 corpus pour obtenir un résultat par lettre atomique.
 
 **Distribution conditionnelle empirique.** En notant $\text{Occ}(l)$
@@ -218,7 +217,7 @@ syllabe `ŋŏ` — pas en fin de syllabe. Sur le corpus, cela produisait 38 %
 d'occurrences de `ŋ` en onset plutôt qu'en coda.
 
 **Ceci est maintenant corrigé.** `aac_converter.py` n'applique `ng → ŋ` que
-lorsque `ng` n'est *pas* suivi d'une voyelle (donc uniquement en fin de mot,
+lorsque `ng` n'est **pas** suivi d'une voyelle (donc uniquement en fin de mot,
 en fin de composant d'un mot composé, ou devant une consonne) :
 
 ```text

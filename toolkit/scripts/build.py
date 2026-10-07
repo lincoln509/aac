@@ -58,6 +58,7 @@ VIEWER_FILES = [
     ("kbguide", "keyboard/README.md", "keyboard/README.md", "markdown"),
     ("kbxml", "ht-t-k0-aac.xml", "keyboard/ht-t-k0-aac.xml", "xml"),
     ("freq", "letter-frequency-analysis.md", "docs/letter-frequency-analysis.md", "markdown"),
+    ("analysis", "complexity_analysis.md", "docs/aac_complexity_analysis.md", "markdown"),
     ("rules", "rules.json", "converter/rules.json", "json"),
     ("py", "aac_converter.py", "converter/aac_converter.py", "python"),
     ("js", "aac_converter.js", "converter/aac_converter.js", "javascript"),

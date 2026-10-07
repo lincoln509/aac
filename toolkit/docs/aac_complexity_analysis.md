@@ -7,7 +7,7 @@ humain, sa distinctivité linguistique, son impact matériel, et la validité
 statistique des mesures.
 
 **Révision.** Cette version s'appuie directement sur le texte du mémoire
-(*Mémoire — Alphabet Atomique Créole (AAC), v1.3.1*) et sur le toolkit
+(**Mémoire — Alphabet Atomique Créole (AAC), v1.3.1**) et sur le toolkit
 publié (`lincoln509.github.io/aac`), plutôt que sur des hypothèses
 génériques. Deux conséquences : (1) plusieurs grandeurs, jusque-là
 seulement formalisées, peuvent désormais être chiffrées avec les données
@@ -101,20 +101,20 @@ correspondance est parfaitement biunivoque phonème → graphie.
 **Point sous-déterminé.** La formule ne précise pas le sens de la
 correspondance. $B$ telle qu'écrite mesure l'univocité **phonème → graphies**
 (« le phonème /ʃ/ a-t-il toujours la même écriture ? »), ce qui est la
-question pertinente pour un *scripteur*. La question symétrique
+question pertinente pour un **scripteur**. La question symétrique
 **graphie → phonèmes** (« la lettre `g` se lit-elle toujours pareil ? »,
-pertinente pour un *lecteur*) donnerait une formule différente,
+pertinente pour un **lecteur**) donnerait une formule différente,
 $B' = \frac{1}{\lVert\Sigma\rVert}\sum_g \frac{1}{\lVert \mathcal{G}^{-1}(g)\rVert}$,
 avec potentiellement une valeur différente. Les deux sont utiles mais ne
 sont pas interchangeables.
 
-**Ce que dit le mémoire lui-même — et pourquoi $B$ doit être lue à deux
-niveaux.** Le mémoire définit la bi-univocité comme « à chaque phonème du
+**Ce que dit le mémoire lui-même — et pourquoi $B$ doit être lue à deux niveaux.**
+Le mémoire définit la bi-univocité comme « à chaque phonème du
 créole haïtien correspond un graphème unique et non ambigu », en
 précisant explicitement que les nasales an/en/on « satisfont pleinement à
 ce principe sans qu'aucune modification graphique ne soit nécessaire »
-(§3.1). Autrement dit, le mémoire adopte une version de $B$ **tolérante
-à la composition** : une séquence compte comme « un graphème unique et
+(§3.1). Autrement dit, le mémoire adopte une version de $B$ **tolérante à la composition** 
+: une séquence compte comme « un graphème unique et
 non ambigu » dès lors qu'elle résulte d'une règle régulière et sans
 exception, même si elle occupe plusieurs points de code. Sous cette
 lecture (notons-la $B_{\text{règle}}$), an/en/on satisfont déjà $B=1$ en
@@ -162,10 +162,9 @@ pondérée des champs `ch`, `ou`, `ng`, `ui` du dictionnaire déjà renvoyé.
 textes, 2190 caractères).** Le mémoire donne le détail exact des
 occurrences *réellement opaques* : `ch` apparaît 30 fois (30 caractères
 économisés), `ou` 75 fois (75 caractères économisés), et `ng` apparaît 8
-fois au total mais seulement **4 occurrences sont en position réellement
-opaque** (fin de syllabe/mot, convertibles en ŋ) — les 4 autres, comme
-dans *grangou*, ont le n et le g dans deux syllabes distinctes et ne sont
-donc *pas* opaques au sens phonologique retenu ici, même si la séquence
+fois au total mais seulement **4 occurrences sont en position réellement opaque** (fin de syllabe/mot, convertibles en ŋ) — les 4 autres, comme
+dans **grangou**, ont le n et le g dans deux syllabes distinctes et ne sont
+donc **pas** opaques au sens phonologique retenu ici, même si la séquence
 textuelle « ng » y apparaît. C'est une confirmation directe, sur un
 corpus réel, de la nécessité déjà signalée dans `letter-frequency-analysis.md`
 de distinguer les occurrences brutes de `ng` (8) des occurrences
@@ -183,7 +182,7 @@ séquences comme opaques également (elles ne le sont pas phonologiquement
 monogramme). $\Omega_{\text{Gourdet}} \geq \Omega_{\text{AAC}}$ par
 construction si l'on garde la même définition d'« opaque » que le
 mémoire (séquences non déductibles lettre à lettre) ; si l'on redéfinit
-plutôt $\text{Op}(s)$ comme « séquence que *ce système* a choisi de
+plutôt $\text{Op}(s)$ comme « séquence que **ce système** a choisi de
 corriger », alors $\Omega_{\text{Gourdet}} > \Omega_{\text{AAC}}$
 presque mécaniquement, Gourdet corrigeant sept séquences (ch, ou, oun,
 ng, an, en, on) contre quatre pour l'AAC — un résultat qui dépend
@@ -196,8 +195,8 @@ contribue **pas** au gain scriptural $\gamma$ : `ui → wi` ne fusionne pas
 deux caractères en un seul atome, donc $\Delta_{\text{ui}} = 0$ dans la
 formule 1.4 ci-dessous alors que $\text{Op}(\text{ui})=1$ ici. $\Omega$ et
 $\gamma$ ne doivent donc pas être présentés comme deux mesures d'une même
-chose à un facteur près : $\Omega$ mesure l'opacité *de lecture*, $\gamma$
-le gain *d'écriture*, et elles divergent précisément sur `ui`.
+chose à un facteur près : $\Omega$ mesure l'opacité **de lecture**, $\gamma$
+le gain **d'écriture**, et elles divergent précisément sur `ui`.
 
 ### 1.3 Gain scriptural — $\gamma = 1 - \dfrac{n_{\text{AAC}}}{n_{1979}}$
 
@@ -206,9 +205,8 @@ le gain *d'écriture*, et elles divergent précisément sur `ui`.
 (`(before - after) / before`, avec `before = n_1979`, `after = n_AAC`) —
 aucun nouveau code n'est nécessaire, seul le nom diffère.
 
-**Chiffres exacts du mémoire (§4.1.2, corpus de 8 textes, 2190 caractères
-originaux au total) :** gain moyen **5,66 %** par texte (IC95 % :
-[3,79 % ; 7,52 %], loi de Student à 7 degrés de liberté, $n=8$) et gain
+**Chiffres exacts du mémoire (§4.1.2, corpus de 8 textes, 2190 caractères originaux au total) :**
+gain moyen **5,66 %** par texte (IC95 % : [3,79 % ; 7,52 %], loi de Student à 7 degrés de liberté, $n=8$) et gain
 pondéré **5,11 %** sur l'ensemble du corpus (112 caractères économisés
 sur 2190). Une seconde moyenne, calculée sur les six textes externes
 seulement (en excluant les deux textes de rédaction personnelle, qui
@@ -230,8 +228,8 @@ l'AAC (7 séquences réduites contre 4), ce qui suggérerait un $\gamma$
 plus élevé pour Gourdet — mais deux réserves empêchent de conclure sans
 données supplémentaires :
 
-1. **La fréquence des nasales an/en/on/oun n'est pas mesurée dans ce
-   mémoire** (le corpus de `letter-frequency-analysis.md` ne compte que
+1. **La fréquence des nasales an/en/on/oun n'est pas mesurée dans ce mémoire** 
+(le corpus de `letter-frequency-analysis.md` ne compte que
    š/ŏ/ŋ, pas les occurrences brutes d'an/en/on en 1979, puisque l'AAC ne
    les touche pas). Sans ce chiffre, $\gamma_{\text{Gourdet}}$ ne peut
    pas être calculé, seulement borné inférieurement par
@@ -241,7 +239,7 @@ données supplémentaires :
    une raison purement technique vérifiée ci-dessous (§1.4bis) : Unicode
    ne propose aucune forme précomposée pour « g tréma », qui doit donc
    s'écrire comme deux points de code (g + diacritique combinant), soit
-   *autant* que « ng » en 1979 — contrairement à ce que sa seule
+   **autant** que « ng » en 1979 — contrairement à ce que sa seule
    apparence visuelle suggère.
 
 **Vérification Unicode (nouvelle, non présente dans le mémoire) :**
@@ -260,18 +258,17 @@ données supplémentaires :
 (Vérifié directement avec `unicodedata` : š, ŏ, ŋ, ä, ë, ö, ü, c sont
 chacun un point de code précomposé unique ; « g̈ » n'existe pas en forme
 précomposée et s'encode obligatoirement en LATIN SMALL LETTER G +
-COMBINING DIAERESIS, soit 2 points de code et 3 octets UTF-8 — **plus
-lourd que `ng` lui-même**.)
+COMBINING DIAERESIS, soit 2 points de code et 3 octets UTF-8 — **plus lourd que `ng` lui-même**.)
 
 Deux enseignements structurants pour la suite du document :
-- **Sur `ch` et `ou`, Gourdet gagne à la fois en caractères *et* en
-  octets** (en réutilisant des lettres ASCII déjà existantes, `c` et
+- **Sur `ch` et `ou`, Gourdet gagne à la fois en caractères *et* en octets** 
+  (en réutilisant des lettres ASCII déjà existantes, `c` et
   `u`), là où l'AAC ne gagne qu'en caractères (š/ŏ restent des points de
   code Latin Extended-A à 2 octets). C'est un avantage réel de Gourdet
   sur cette portion précise du système, qui n'a aucun équivalent côté
   AAC — et qui aura des conséquences directes en §2.3 (Fert).
-- **Sur `ng`, le choix de Gourdet (g̈) n'apporte aucun bénéfice
-  informatique réel** : ni gain de caractères, ni gain d'octets — à
+- **Sur `ng`, le choix de Gourdet (g̈) n'apporte aucun bénéfice informatique réel** :
+  ni gain de caractères, ni gain d'octets — à
   l'inverse, une perte de 1 octet. C'est une confirmation concrète, par
   un cas limite, du principe de « faisabilité technique immédiate »
   que le mémoire revendique pour l'AAC (§3.1.6) : le choix de ŋ
@@ -395,17 +392,15 @@ Dans tous les cas, **le nombre d'octets UTF-8 reste identique**, alors
 que le nombre de caractères diminue : š, ŏ et ŋ sont des caractères
 « Latin étendu-A » codés sur 2 octets en UTF-8, exactement comme les deux
 lettres ASCII (`ch`, `ou`, `ng`) qu'ils remplacent. Le gain scriptural
-$\gamma$ (mesuré en caractères) **ne se traduit donc par aucun gain en
-octets**.
+$\gamma$ (mesuré en caractères) **ne se traduit donc par aucun gain en octets**.
 
-**Confirmation avec trois tokeniseurs réels, sur les 8 textes complets du
-corpus de validation** (`fertilite_tokenizers.py`, fourni avec ce
-document). Trois familles délibérément différentes, pas trois variantes
-d'une même bibliothèque : `cl100k_base` et `o200k_base` sont deux BPE
+**Confirmation avec trois tokeniseurs réels, sur les 8 textes complets du corpus de validation**
+(`fertilite_tokenizers.py`, fourni avec ce document). Trois familles délibérément différentes,
+pas trois variantes d'une même bibliothèque : `cl100k_base` et `o200k_base` sont deux BPE
 byte-level d'OpenAI (GPT-3.5/4 et GPT-4o/GPT-5 respectivement), tandis
 que NLLB-200 (`facebook/nllb-200-distilled-600M`, Meta) est un tokeniseur
-SentencePiece/unigramme entraîné sur 200 langues **dont le créole
-haïtien** (`hat_Latn`) — le seul des trois dont le vocabulaire a pu voir
+SentencePiece/unigramme entraîné sur 200 langues **dont le créole haïtien**
+(`hat_Latn`) — le seul des trois dont le vocabulaire a pu voir
 du vrai texte créole 1979 pendant son entraînement.
 
 | Tokeniseur | $\overline{\text{Fert}}_{1979}$ (n=8) | $\overline{\text{Fert}}_{\text{AAC}}$ (n=8) | $\Delta$ moyen | $\Delta$ min–max sur les 8 textes |
@@ -414,8 +409,7 @@ du vrai texte créole 1979 pendant son entraînement.
 | `o200k_base` | 1,667 (σ=0,267) | 2,072 (σ=0,160) | **+24,3 %** | +6,8 % à +51,2 % |
 | NLLB-200 | 1,486 (σ=0,270) | 1,751 (σ=0,174) | **+17,8 %** | +4,8 % à +42,9 % |
 
-**Résultat net : $\text{Fert}_{\text{AAC}} > \text{Fert}_{1979}$ sur les
-24 observations (8 textes × 3 tokeniseurs), sans une seule exception.**
+**Résultat net : $\text{Fert}_{\text{AAC}} > \text{Fert}_{1979}$ sur les 24 observations (8 textes × 3 tokeniseurs), sans une seule exception.**
 Sous l'hypothèse nulle « pas d'effet systématique » (chaque observation
 aurait 50 % de chances d'aller dans un sens ou l'autre), la probabilité
 d'obtenir 24 résultats positifs sur 24 par hasard est $0{,}5^{24} \approx 6\times10^{-8}$,
@@ -424,7 +418,7 @@ d'un tokeniseur particulier ni d'un texte particulier. Fait notable :
 même **NLLB-200**, le tokeniseur le plus susceptible d'avoir "vu" du
 créole authentique à l'entraînement, montre le même effet (+17,8 %) que
 les deux tokeniseurs anglo-centrés — ce qui pointe vers une cause
-structurelle (š/ŏ/ŋ sont des points de code rares dans *tous* les corpus
+structurelle (š/ŏ/ŋ sont des points de code rares dans **tous** les corpus
 d'entraînement, créole inclus, faute de textes déjà écrits en AAC) plutôt
 que vers un simple biais anglo-centré corrigible en changeant de
 tokeniseur.
@@ -436,8 +430,8 @@ fait que `ŏ` porte, à lui seul, environ 62 % des occurrences de lettres
 atomiques du corpus (`letter-frequency-analysis.md` §1), donc l'essentiel
 de la perte de fertilité mesurée ici.
 
-**Ce résultat remplace désormais l'estimation par octets comme preuve
-principale** : $\text{Fert}$ est mesuré, pas hypothétique, sur le corpus
+**Ce résultat remplace désormais l'estimation par octets comme preuve principale** : 
+$\text{Fert}$ est mesuré, pas hypothétique, sur le corpus
 de validation complet, avec trois tokeniseurs indépendants, un effet
 parfaitement consistant en signe, et une ampleur (+18 % à +24 % de
 tokens en moyenne) à mettre en regard du gain scriptural $\gamma$
@@ -477,8 +471,8 @@ distinctivité réduit le score global, qu'on cherche vraisemblablement à
 minimiser pour choisir entre plusieurs réformes graphiques candidates).
 
 **C'est la formule la moins spécifiée du lot, par nature.** Contrairement
-aux dix autres, $J(g)$ n'est pas une mesure empirique mais un **choix
-normatif** : rien dans les données ne dicte quels $C_i$ entrer dans la
+aux dix autres, $J(g)$ n'est pas une mesure empirique mais un **choix normatif** :
+rien dans les données ne dicte quels $C_i$ entrer dans la
 somme, ni la valeur des poids $w_i$. Avant tout calcul, le mémoire doit
 fixer explicitement (a) la liste des $C_i$ retenus parmi les grandeurs
 ci-dessus, (b) leurs poids, et (c) une justification de ces poids
@@ -522,13 +516,13 @@ l'impact que le mémoire veut communiquer, $\rho_c$ prend l'une des
 valeurs sourcées suivantes (toutes ramenées ici au gramme de papier pour
 rester comparables, mais voir les limites plus bas) :
 
-| Sortie visée | Source | Valeur rapportée | Ramenée au gramme de papier |
-|---|---|---|---:|
-| CO₂e (méthode directe, par feuille) | Dias & Arroja (2012), ISO 14040/14044, berceau-client | 4,64 g CO₂e / feuille A4 | $4{,}64 / 4{,}99 \approx 0{,}930\ \text{g CO}_2\text{e/g}$ |
-| CO₂e (méthode par tonne) | Sun, Wang, Shi & Klemeš (2018), *Renewable and Sustainable Energy Reviews* 92, 828-833, berceau-usine — chiffre rapporté par Furszyfer Del Rio *et al.* (2022), *Renewable and Sustainable Energy Reviews* 167, 112706, qui le cite sans en être la source primaire | ≈ 951 kg CO₂e / tonne de papier | $951\,000 / 1\,000\,000 \approx 0{,}951\ \text{g CO}_2\text{e/g}$ |
-| Masse de bois (principal) | IEA (2007), *Tracking industrial Energy Efficiency and CO2 Emissions* — cité dans Furszyfer Del Rio *et al.* (2022) | 2,2 t bois / t papier kraft blanchi | $2{,}2 \times 10^{-6}\ \text{t bois/g}$ |
-| Volume de bois (recoupement) | FAO, ≈ 4,25 m³ bois rond / tonne de pâte chimique | — | $4{,}25 \times 10^{-6}\ \text{m}^3\text{/g}$ *(de pâte, pas de papier fini — voir limite ci-dessous)* |
-| Nombre d'arbres | Conservatree (calcul des années 1970) | 24 arbres / tonne (papier impression/écriture, procédé kraft) | $2{,}4 \times 10^{-5}\ \text{arbre/g}$ |
+| Sortie visée | Source                                                                                                                                                                                                                                                                | Valeur rapportée | Ramenée au gramme de papier |
+|---|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---|---:|
+| CO₂e (méthode directe, par feuille) | Dias & Arroja (2012), ISO 14040/14044, berceau-client                                                                                                                                                                                                                 | 4,64 g CO₂e / feuille A4 | $4{,}64 / 4{,}99 \approx 0{,}930\ \text{g CO}_2\text{e/g}$ |
+| CO₂e (méthode par tonne) | Sun, Wang, Shi & Klemeš (2018), **Renewable and Sustainable Energy Reviews** 92, 828-833, berceau-usine — chiffre rapporté par Furszyfer Del Rio *et al.* (2022), *Renewable and Sustainable Energy Reviews* 167, 112706, qui le cite sans en être la source primaire | ≈ 951 kg CO₂e / tonne de papier | $951\,000 / 1\,000\,000 \approx 0{,}951\ \text{g CO}_2\text{e/g}$ |
+| Masse de bois (principal) | IEA (2007), **Tracking industrial Energy Efficiency and CO2 Emissions** — cité dans Furszyfer Del Rio **et al.** (2022)                                                                                                                                               | 2,2 t bois / t papier kraft blanchi | $2{,}2 \times 10^{-6}\ \text{t bois/g}$ |
+| Volume de bois (recoupement) | FAO, ≈ 4,25 m³ bois rond / tonne de pâte chimique                                                                                                                                                                                                                     | — | $4{,}25 \times 10^{-6}\ \text{m}^3\text{/g}$ *(de pâte, pas de papier fini — voir limite ci-dessous)* |
+| Nombre d'arbres | Conservatree (calcul des années 1970)                                                                                                                                                                                                                                 | 24 arbres / tonne (papier impression/écriture, procédé kraft) | $2{,}4 \times 10^{-5}\ \text{arbre/g}$ |
 
 **La masse de bois a désormais deux sources indépendantes qui se recoupent.**
 Contrairement au facteur FAO (pâte, pas papier fini — voir limite ci-dessous),
@@ -537,7 +531,7 @@ kraft, sans étape intermédiaire ni hypothèse sur le taux de charges
 minérales : c'est donc la valeur principale à retenir pour la masse de
 bois, d'autant qu'elle porte sur le même procédé (kraft) que la ligne
 « arbres » de Conservatree juste en dessous — cohérence interne entre les
-deux lignes. Le facteur FAO reste utile comme recoupement en *volume*
+deux lignes. Le facteur FAO reste utile comme recoupement en **volume**
 (m³), mais nécessite une densité du bois pour être comparé à la valeur
 IEA (en masse) :
 
@@ -553,8 +547,8 @@ corroboration raisonnable, mais qui repose sur une densité choisie par
 nous plutôt que sourcée, donc à présenter comme un recoupement
 illustratif et non comme une preuve.
 
-**Deux sources indépendantes de CO₂e se recoupent, c'est une bonne
-nouvelle pour la robustesse de $\rho_c$** : $0{,}930$ et $0{,}951\ \text{g CO}_2\text{e/g}$
+**Deux sources indépendantes de CO₂e se recoupent, c'est une bonne nouvelle pour la robustesse de $\rho_c$** :
+$0{,}930$ et $0{,}951\ \text{g CO}_2\text{e/g}$
 ne s'écartent que d'environ 2 %, malgré des méthodologies et des
 périmètres différents (une LCA précise du papier de bureau portugais vs.
 une moyenne mondiale « tous types de papier confondus », rapportée par
